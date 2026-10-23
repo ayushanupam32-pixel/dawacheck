@@ -43,13 +43,20 @@ jobs:
       - name: Parse brand dataset
         if: ${{ inputs.with_brands }}
         run: uv run python -m dawacheck_pipeline.parse_brands
+      - name: Fetch Jan Aushadhi Kendra list
+        run: uv run python -m dawacheck_pipeline.fetch_kendras
+      - name: Parse Kendras (geocodes only new or misplaced addresses, with a cache)
+        run: uv run python -m dawacheck_pipeline.parse_kendras
       - name: Load into Supabase (validates first; fails without changing live data)
         run: uv run python -m dawacheck_pipeline.load_supabase ${{ inputs.with_brands && '--with-brands' || '' }}
+      - name: Build static Kendra files for the website
+        run: uv run python -m dawacheck_pipeline.build_static
 
-      - name: Commit raw download
+      # Committing web/public/data triggers a Vercel redeploy with the new Kendra files.
+      - name: Commit raw downloads, geocode cache and website data
         run: |
           git config user.name "dawacheck-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add raw/
-          git diff --cached --quiet || git commit -m "Data refresh: raw downloads $(date -u +%F)"
+          git add raw/ cache/ ../web/public/data/
+          git diff --cached --quiet || git commit -m "Data refresh $(date -u +%F)"
           git push

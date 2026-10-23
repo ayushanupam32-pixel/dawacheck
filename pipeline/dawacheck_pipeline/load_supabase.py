@@ -22,6 +22,7 @@ import pandas as pd
 import requests
 
 from dawacheck_pipeline.fetch_jan_aushadhi import SOURCE_PAGE as JA_SOURCE_PAGE
+from dawacheck_pipeline.fetch_kendras import SOURCE_PAGE as KENDRAS_SOURCE_PAGE
 from dawacheck_pipeline.parse_brands import SOURCE_NAME as BRANDS_SOURCE
 from dawacheck_pipeline.paths import CLEAN_DIR
 
@@ -184,6 +185,29 @@ def load_brands(db: Supabase, salt_ids: dict[str, int], brands: pd.DataFrame) ->
     return len(rows)
 
 
+def load_kendras(db: Supabase, kendras: pd.DataFrame) -> int:
+    today = date.today().isoformat()
+    rows = [
+        {
+            "kendra_code": r.kendra_code,
+            "address": clean(r.address),
+            "district": clean(r.district),
+            "state": clean(r.state),
+            "pincode": clean(r.pincode),
+            "phone": clean(r.phone),
+            "lat": clean(r.lat),
+            "lng": clean(r.lng),
+            "geo_precision": clean(r.geo_precision),
+            "last_seen": today,
+        }
+        for r in kendras.itertuples(index=False)
+    ]
+    db.upsert("kendras", rows, on_conflict="kendra_code")
+    # Kendras missing from today's official list have closed or been de-listed.
+    db.delete_where("kendras", "last_seen", f"lt.{today}")
+    return len(rows)
+
+
 def record_run(db: Supabase, source: str, rows_loaded: int, url: str) -> None:
     db.upsert(
         "data_sources",
@@ -235,12 +259,29 @@ def main() -> None:
     if (ja.mrp <= 0).any():
         raise SystemExit("Refusing to load: a Jan Aushadhi price is not positive")
 
+    kendras = pd.read_csv(
+        CLEAN_DIR / "kendras.csv", dtype={"pincode": str, "phone": str, "district": str}
+    )
+    live_kendras = db.count("kendras")
+    if live_kendras and not 0.8 * live_kendras <= len(kendras) <= 1.2 * live_kendras:
+        raise SystemExit(f"Refusing to load: {len(kendras)} Kendras vs {live_kendras} live (±20%)")
+    placed = kendras.lat.notna()
+    if (
+        not kendras[placed].lat.between(6, 37.5).all()
+        or not kendras[placed].lng.between(68, 97.5).all()
+    ):
+        raise SystemExit("Refusing to load: a Kendra is outside India's bounding box")
+
     salt_ids = load_salts(db, *frames)
     print(f"salts: {len(salt_ids)}")
 
     n = load_ja_products(db, salt_ids, ja)
     record_run(db, "ja_products", n, JA_SOURCE_PAGE)
     print(f"ja_products: {n}")
+
+    n = load_kendras(db, kendras)
+    record_run(db, "kendras", n, KENDRAS_SOURCE_PAGE)
+    print(f"kendras: {n}")
 
     if brands is not None:
         n = load_brands(db, salt_ids, brands)

@@ -21,7 +21,9 @@
       "duplicates": "Same ingredient in two family medicines",
       "kendra": "Nearest Jan Aushadhi Kendra"
     },
-    "privacy": "Your photos and location stay on your phone."
+    "privacy": "Your photos and location stay on your phone.",
+    "kendraTitle": "Find a Jan Aushadhi Kendra",
+    "kendraBody": "See the 3 nearest Kendras, with directions"
   },
   "common": {
     "language": "Language",
@@ -63,5 +65,35 @@
     "searchAgain": "Search again",
     "error": "Something went wrong. Please try again.",
     "brandCredit": "Brand names and ingredients: A-Z Medicine Dataset of India (Kaggle, CC BY-SA 4.0), November 2022."
+  },
+  "kendras": {
+    "title": "Nearest Jan Aushadhi Kendra",
+    "intro": "Find the 3 Jan Aushadhi Kendras closest to you.",
+    "useLocation": "Use my location",
+    "or": "or",
+    "pinLabel": "Enter your PIN code",
+    "pinSubmit": "Find",
+    "pinInvalid": "Please enter a 6-digit PIN code.",
+    "pinUnknown": "We don't know this PIN code yet. Try a nearby PIN code, or use your location.",
+    "pinApprox": "Using the approximate centre of your PIN code area.",
+    "locating": "Finding your location…",
+    "loading": "Finding nearby Kendras…",
+    "locationDenied": "Location was not shared. You can type your PIN code instead.",
+    "privacy": "Your location stays on your phone. Distances are worked out on your phone, not on our server.",
+    "km": "{km} km away",
+    "noneNearby": "No Jan Aushadhi Kendra within 10 km. These are the closest:",
+    "noneAtAll": "We couldn't find any Kendra near this place.",
+    "call": "Call to check stock",
+    "directions": "Directions",
+    "stockNote": "Stock is not published, so please call before you go.",
+    "showMap": "Show on map",
+    "mapNote": "The map comes from OpenStreetMap, which will see the map area (not your exact location).",
+    "you": "You are here",
+    "straightLine": "Distances are in a straight line; the road may be longer.",
+    "approxLocation": "Location is approximate (from PIN code)",
+    "source": "Source",
+    "updated": "Last updated",
+    "error": "Something went wrong. Please try again.",
+    "kendraName": "Jan Aushadhi Kendra"
   }
 }

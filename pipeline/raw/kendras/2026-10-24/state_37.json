@@ -1,0 +1,68 @@
+{
+ "responseBody": {
+  "pageIndex": null,
+  "pageSize": null,
+  "totalElement": null,
+  "totalPages": null,
+  "isLastPage": null,
+  "isFirstPage": null,
+  "addKendraResponseList": [
+   {
+    "id": 409,
+    "contactNumber": "8492933898",
+    "storeCode": "PMBJK00825",
+    "pinCode": 194101,
+    "stateId": 37,
+    "districtId": 9,
+    "stateName": "Ladakh",
+    "districtName": "Leh Ladakh",
+    "kendraAddress": "Jan Aushadhi Store Snm Hospital",
+    "createdDate": "null",
+    "updatedDate": "null",
+    "status": 1,
+    "latitude": "34.15348256",
+    "longitude": "77.58062184",
+    "serialNo": null,
+    "applicationId": null
+   },
+   {
+    "id": 3580,
+    "contactNumber": "7889445510",
+    "storeCode": "PMBJK06044",
+    "pinCode": 194103,
+    "stateId": 37,
+    "districtId": 6,
+    "stateName": "Ladakh",
+    "districtName": "Kargil",
+    "kendraAddress": "District Hospital",
+    "createdDate": "null",
+    "updatedDate": "null",
+    "status": 1,
+    "latitude": "34.55926455",
+    "longitude": "76.12487916",
+    "serialNo": null,
+    "applicationId": null
+   },
+   {
+    "id": 17775,
+    "contactNumber": "9419217473",
+    "storeCode": "PMBJK20767",
+    "pinCode": 194101,
+    "stateId": 37,
+    "districtId": 9,
+    "stateName": "Ladakh",
+    "districtName": "Leh Ladakh",
+    "kendraAddress": "S.N.M Hospital Leh",
+    "createdDate": "null",
+    "updatedDate": "null",
+    "status": 1,
+    "latitude": "34.14473",
+    "longitude": "77.55612",
+    "serialNo": null,
+    "applicationId": null
+   }
+  ]
+ },
+ "message": "record found successfully",
+ "responseCode": 200
+}

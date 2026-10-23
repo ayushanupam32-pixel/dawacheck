@@ -1,0 +1,50 @@
+{
+ "responseBody": {
+  "pageIndex": null,
+  "pageSize": null,
+  "totalElement": null,
+  "totalPages": null,
+  "isLastPage": null,
+  "isFirstPage": null,
+  "addKendraResponseList": [
+   {
+    "id": 10112,
+    "contactNumber": "8281964363",
+    "storeCode": "PMBJK13058",
+    "pinCode": 682555,
+    "stateId": 31,
+    "districtId": 553,
+    "stateName": "Lakshadweep",
+    "districtName": "Lakshadweep District",
+    "kendraAddress": "Administrative Office Building, Thanal Charitable Organization",
+    "createdDate": "null",
+    "updatedDate": "2025-11-21",
+    "status": 1,
+    "latitude": "10.561148658737482",
+    "longitude": "72.6462780018524",
+    "serialNo": null,
+    "applicationId": null
+   },
+   {
+    "id": 21123,
+    "contactNumber": "8281964363",
+    "storeCode": "PMBJK24106",
+    "pinCode": 682555,
+    "stateId": 31,
+    "districtId": 553,
+    "stateName": "Lakshadweep",
+    "districtName": "Lakshadweep District",
+    "kendraAddress": "Near Arafa Bazar, Amini Island, U.T. of  Lakshadweep",
+    "createdDate": "null",
+    "updatedDate": "null",
+    "status": 1,
+    "latitude": "11.12342",
+    "longitude": "72.71682",
+    "serialNo": null,
+    "applicationId": null
+   }
+  ]
+ },
+ "message": "record found successfully",
+ "responseCode": 200
+}

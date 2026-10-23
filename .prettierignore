@@ -9,3 +9,4 @@ pipeline/raw
 pipeline/.venv
 pipeline/raw
 pipeline/clean
+web/public/data

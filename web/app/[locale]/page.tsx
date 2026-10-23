@@ -37,10 +37,11 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const dict = await getDictionary(locale);
   const t = dict.home;
 
-  // The three ways to start a check. Each gets an href when its milestone lands:
-  // typing a name in M1 (done), scanning and uploading in M3.
+  // What you can do from the home page. Each gets an href when its milestone lands:
+  // typing a name in M1 and finding a Kendra in M2 (done), scanning and uploading in M3.
   const actions: { icon: LucideIcon; title: string; body: string; href?: string }[] = [
     { icon: Keyboard, title: t.typeTitle, body: t.typeBody, href: `/${locale}/search` },
+    { icon: MapPin, title: t.kendraTitle, body: t.kendraBody, href: `/${locale}/kendras` },
     { icon: Camera, title: t.scanTitle, body: t.scanBody },
     { icon: ImageUp, title: t.uploadTitle, body: t.uploadBody },
   ];
