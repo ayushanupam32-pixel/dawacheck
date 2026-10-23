@@ -165,6 +165,18 @@ class Ingredient:
     strength: Strength
 
 
+def implied_release(ingredients: list[Ingredient], form: str, release: list[str]) -> list[str]:
+    """Add 'dr' for medicines that only exist as gastro-resistant tablets/capsules.
+
+    'Pan 40 Tablet' (pantoprazole, no release word in the record) -> ['dr'], the same as
+    Jan Aushadhi's 'Pantoprazole Gastro-resistant Tablets IP 40 mg'. See synonyms.yaml.
+    """
+    always_dr = set(rules()["always_delayed_release"])
+    if form in ("tablet", "capsule") and any(i.salt in always_dr for i in ingredients):
+        return sorted(set(release) | {"dr"})
+    return sorted(release)
+
+
 def composition_key(ingredients: list[Ingredient], form: str, release: list[str]) -> str:
     """Exact-match key: sorted salts with strengths + form + release type.
 

@@ -182,3 +182,10 @@ releases:
   ir: [immediate release, ir]
   chewable: [chewable]
   effervescent: [effervescent]
+
+# Medicines whose tablets/capsules are ALWAYS gastro-resistant (delayed release, "dr"), because
+# stomach acid destroys them otherwise. The Indian Pharmacopoeia names them that way, e.g.
+# "Pantoprazole Gastro-resistant Tablets IP". Many brand records omit the word, so without this
+# rule "Pan 40" would never match Jan Aushadhi's pantoprazole. Only add a medicine here if it has
+# NO plain (non-coated) tablet form. Aspirin is deliberately absent: plain aspirin tablets exist.
+always_delayed_release: [pantoprazole, rabeprazole, esomeprazole, omeprazole, lansoprazole]

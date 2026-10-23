@@ -28,6 +28,7 @@ from dawacheck_pipeline.normalize import (
     composition_key,
     extract_phrases,
     format_decimal,
+    implied_release,
     normalize_salt,
     parse_strength,
     rules,
@@ -143,7 +144,7 @@ def parse_generic_name(name: str, group: str = "") -> ParsedName:
     if len(set(salts)) != len(salts):
         return ParsedName("unparsed", reason="same salt listed twice")
 
-    return ParsedName("ok", ingredients, forms[0], sorted(release))
+    return ParsedName("ok", ingredients, forms[0], implied_release(ingredients, forms[0], release))
 
 
 _PACK_RE = re.compile(r"^\s*(?P<n>\d+(?:\.\d+)?)\s*(?P<unit>'s|s|ml|g|gm|gms)\b", re.IGNORECASE)

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -36,12 +37,12 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const dict = await getDictionary(locale);
   const t = dict.home;
 
-  // The three ways to start a check. They become links as each milestone lands:
-  // typing a name in M1, scanning and uploading in M3.
-  const actions = [
+  // The three ways to start a check. Each gets an href when its milestone lands:
+  // typing a name in M1 (done), scanning and uploading in M3.
+  const actions: { icon: LucideIcon; title: string; body: string; href?: string }[] = [
+    { icon: Keyboard, title: t.typeTitle, body: t.typeBody, href: `/${locale}/search` },
     { icon: Camera, title: t.scanTitle, body: t.scanBody },
     { icon: ImageUp, title: t.uploadTitle, body: t.uploadBody },
-    { icon: Keyboard, title: t.typeTitle, body: t.typeBody },
   ];
 
   return (
@@ -62,22 +63,38 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 
       <main className="flex flex-col gap-8">
         <ul className="flex flex-col gap-3">
-          {actions.map(({ icon: Icon, title, body }) => (
-            <li
-              key={title}
-              className="flex min-h-20 items-center gap-4 rounded-xl border border-border bg-card p-4"
-            >
-              <Icon aria-hidden="true" className="size-8 shrink-0 text-primary" />
-              {/* min-w-0 lets long Tamil words wrap instead of pushing the card wider */}
-              <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
-                <span className="text-lg font-semibold">{title}</span>
-                <span className="text-base text-muted-foreground">{body}</span>
-                <span className="rounded-full bg-muted px-3 py-1 text-sm font-medium text-muted-foreground">
-                  {t.comingSoon}
-                </span>
-              </div>
-            </li>
-          ))}
+          {actions.map(({ icon: Icon, title, body, href }) => {
+            const content = (
+              <>
+                <Icon aria-hidden="true" className="size-8 shrink-0 text-primary" />
+                {/* min-w-0 lets long Tamil words wrap instead of pushing the card wider */}
+                <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
+                  <span className="text-lg font-semibold">{title}</span>
+                  <span className="text-base text-muted-foreground">{body}</span>
+                  {!href && (
+                    <span className="rounded-full bg-muted px-3 py-1 text-sm font-medium text-muted-foreground">
+                      {t.comingSoon}
+                    </span>
+                  )}
+                </div>
+              </>
+            );
+            const box = "flex min-h-20 items-center gap-4 rounded-xl border bg-card p-4";
+            return (
+              <li key={title}>
+                {href ? (
+                  <Link
+                    href={href}
+                    className={`${box} border-primary hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none`}
+                  >
+                    {content}
+                  </Link>
+                ) : (
+                  <div className={`${box} border-border`}>{content}</div>
+                )}
+              </li>
+            );
+          })}
         </ul>
 
         <section aria-labelledby="checks-title" className="flex flex-col gap-3">

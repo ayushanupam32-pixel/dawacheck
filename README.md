@@ -7,8 +7,10 @@ ingredients in your family's medicines, and the nearest Jan Aushadhi Kendra.
 > DawaCheck gives information from public government data. It is not medical advice. Always
 > consult your doctor or pharmacist before changing any medicine.
 
-**Status:** M0 (setup) done. See [docs/milestones](docs/milestones) for what each milestone
-built and why.
+**Live:** https://dawacheck-psi.vercel.app
+
+**Status:** M0 (setup) and M1 (type a brand → cheaper Jan Aushadhi generic) done. See
+[docs/milestones](docs/milestones) for what each milestone built and why.
 
 ## Repository layout
 

@@ -27,6 +27,7 @@ from dawacheck_pipeline.normalize import (
     composition_key,
     extract_phrases,
     format_decimal,
+    implied_release,
     normalize_salt,
     parse_strength,
 )
@@ -94,7 +95,7 @@ def parse_brand(name: str, pack_label: str, compositions: list[str]) -> ParsedBr
         return ParsedBrand("unparsed", reason=f"expected 1 dosage form, found {forms or 'none'}")
     label_release, _ = extract_phrases(clean_text(pack_label or ""), "releases")
     name_release, _ = extract_phrases(clean_text(name), "releases")
-    release = sorted(set(label_release) | set(name_release))
+    release = implied_release(ingredients, forms[0], list(set(label_release) | set(name_release)))
     return ParsedBrand("ok", ingredients, forms[0], release)
 
 

@@ -87,3 +87,17 @@ def test_parse_pack(label: str, expected: tuple) -> None:
 def test_normalize_brand_name() -> None:
     assert normalize_brand_name("Augmentin 625 Duo Tablet") == "augmentin 625 duo tablet"
     assert normalize_brand_name("Domrit-O Capsule") == "domrit o capsule"
+
+
+def test_ppi_tablets_are_always_gastro_resistant() -> None:
+    # "PAN 40 Tablet" has no release word, but pantoprazole tablets are always gastro-resistant,
+    # so it must get the same key as Jan Aushadhi's "Pantoprazole Gastro-resistant Tablets".
+    parsed = parse_brand("PAN 40 Tablet", "strip of 15 tablets", ["Pantoprazole (40mg)"])
+    assert parsed.key == "pantoprazole:40:mg#tablet#dr"
+
+
+def test_rule_does_not_touch_injections_or_other_medicines() -> None:
+    injection = parse_brand("PQ Pan 40 Injection", "vial of 1 Injection", ["Pantoprazole (40mg)"])
+    assert injection.key == "pantoprazole:40:mg#injection#ir"
+    aspirin = parse_brand("Ecosprin 75 Tablet", "strip of 14 tablets", ["Aspirin (75mg)"])
+    assert aspirin.key == "aspirin:75:mg#tablet#ir"
