@@ -1,6 +1,7 @@
 -- DawaCheck reference data. Everything here comes from public government sources
 -- and is written only by the monthly pipeline (service key). The public app can
--- only read it. Columns may change once we inspect each real source format (M1, M5).
+-- only read it. Columns were adjusted in M1 after inspecting the real sources
+-- (see docs/milestones/M1-generic-lookup.md); M5 may adjust the safety-check tables.
 
 -- Supabase keeps extensions in their own schema (it is on the default search_path).
 create extension if not exists pg_trgm with schema extensions;
@@ -13,20 +14,28 @@ create table salts (
   synonyms text[] not null default '{}'
 );
 
--- Market brands, from the public brand -> salt dataset.
+-- Market brands, from the A-Z Medicine Dataset of India (Kaggle, CC BY-SA 4.0).
+-- id = the dataset's own row id, so reloading updates rows instead of duplicating them.
 create table brands (
-  id serial primary key,
+  id int primary key,
   name text not null,
   name_norm text not null,               -- lowercase, no punctuation
   manufacturer text,
-  form text,                             -- normalized dosage form
+  form text,                             -- normalized dosage form, e.g. 'tablet'
+  release text,                          -- 'er', 'dr', ... ; null = normal release
   pack_size numeric,
   pack_unit text,
-  mrp numeric check (mrp is null or mrp > 0),
+  mrp_2022 numeric,                      -- dataset price from Nov 2022: reference only
+  discontinued boolean not null default false,
+  composition_key text,                  -- null when the composition could not be read
+  -- The dataset keeps at most 2 ingredients, so a 2-ingredient row may be cut short.
+  -- Only 1-ingredient rows are known to be complete; the app asks the user to confirm others.
+  composition_complete boolean not null default false,
   source text not null
 );
 -- Trigram index: makes fuzzy "similar name" search fast (used by /api/match).
 create index brands_name_trgm on brands using gin (name_norm extensions.gin_trgm_ops);
+create index brands_key on brands (composition_key);
 
 create table brand_ingredients (
   brand_id int not null references brands (id) on delete cascade,
@@ -36,16 +45,21 @@ create table brand_ingredients (
   primary key (brand_id, salt_id)
 );
 
--- Jan Aushadhi (PMBJP) generic products.
+-- Jan Aushadhi (PMBJP) generic products. id = the official drug code.
 create table ja_products (
-  id serial primary key,
+  id int primary key,
   drug_code text unique not null,
   generic_name text not null,
+  group_name text,
   form text,
+  release text,                          -- 'er', 'dr', ... ; null = normal release
+  unit_size text,                        -- as printed in the source, e.g. "10's"
   pack_size numeric,
   pack_unit text,
   mrp numeric not null check (mrp > 0),
-  composition_key text not null,         -- sorted 'salt_id:strength:unit|...' + form
+  -- Exact-match key built by pipeline/normalize.py, e.g.
+  -- 'glimepiride:1:mg|metformin:500:mg#tablet#ir' (sorted salts + form + release).
+  composition_key text not null,
   updated_on date not null
 );
 create index ja_products_key on ja_products (composition_key);
@@ -92,7 +106,7 @@ create index banned_fdcs_key on banned_fdcs (combination_key);
 create table ceiling_prices (
   id serial primary key,
   formulation text not null,
-  composition_key text not null,
+  composition_key text not null,       -- same format as ja_products.composition_key
   unit text not null,                    -- e.g. '1 tablet', '1 ml'
   ceiling_price numeric not null check (ceiling_price > 0),
   notified_on date,

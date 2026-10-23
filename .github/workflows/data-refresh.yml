@@ -1,0 +1,55 @@
+name: Data refresh
+
+# Monthly: download the latest official data, parse it, check it, load it into Supabase,
+# and commit the raw download so every month's data can be re-parsed later.
+on:
+  schedule:
+    - cron: "30 3 5 * *" # 03:30 UTC (09:00 IST) on the 5th of every month
+  workflow_dispatch:
+    inputs:
+      with_brands:
+        description: "Also load the brand dataset (only needed when it changes)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write # to commit pipeline/raw/<source>/<date>/
+
+concurrency:
+  group: data-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: pipeline
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - run: uv sync --locked
+
+      - name: Fetch Jan Aushadhi product list
+        run: uv run python -m dawacheck_pipeline.fetch_jan_aushadhi
+      - name: Parse Jan Aushadhi product list
+        run: uv run python -m dawacheck_pipeline.parse_jan_aushadhi
+      - name: Parse brand dataset
+        if: ${{ inputs.with_brands }}
+        run: uv run python -m dawacheck_pipeline.parse_brands
+      - name: Load into Supabase (validates first; fails without changing live data)
+        run: uv run python -m dawacheck_pipeline.load_supabase ${{ inputs.with_brands && '--with-brands' || '' }}
+
+      - name: Commit raw download
+        run: |
+          git config user.name "dawacheck-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add raw/
+          git diff --cached --quiet || git commit -m "Data refresh: raw downloads $(date -u +%F)"
+          git push
