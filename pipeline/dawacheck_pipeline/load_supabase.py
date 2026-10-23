@@ -35,13 +35,11 @@ class Supabase:
     def __init__(self, url: str, service_key: str) -> None:
         self.base = url.rstrip("/") + "/rest/v1"
         self.session = requests.Session()
-        self.session.headers.update(
-            {
-                "apikey": service_key,
-                "Authorization": f"Bearer {service_key}",
-                "Content-Type": "application/json",
-            }
-        )
+        self.session.headers.update({"apikey": service_key, "Content-Type": "application/json"})
+        # Old-style service_role keys are JWTs ("eyJ...") and also go in the Authorization header.
+        # New-style "sb_secret_..." keys are not JWTs and must only be sent as `apikey`.
+        if service_key.startswith("eyJ"):
+            self.session.headers["Authorization"] = f"Bearer {service_key}"
 
     def upsert(self, table: str, rows: list[dict], on_conflict: str) -> None:
         for start in range(0, len(rows), BATCH):
