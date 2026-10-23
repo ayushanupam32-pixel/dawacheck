@@ -209,6 +209,10 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    # A missing GitHub secret arrives as an empty string, not as a missing variable.
+    missing = [v for v in ("SUPABASE_URL", "SUPABASE_SERVICE_KEY") if not os.environ.get(v)]
+    if missing:
+        raise SystemExit(f"Missing {', '.join(missing)}: add it as a GitHub Actions secret")
     db = Supabase(os.environ["SUPABASE_URL"], os.environ["SUPABASE_SERVICE_KEY"])
 
     # Only rows that are fully understood (parsed, and priced for Jan Aushadhi) are loaded.
