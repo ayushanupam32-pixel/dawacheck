@@ -1,0 +1,31 @@
+{
+  "meta": {
+    "title": "DawaCheck — check your medicine",
+    "description": "Find a cheaper Jan Aushadhi generic, check batch safety alerts and fair prices, using public government data."
+  },
+  "home": {
+    "tagline": "Check your medicine in seconds: cheaper generic, safety alerts, fair price.",
+    "scanTitle": "Scan medicine strip",
+    "scanBody": "Take photos of the front and back",
+    "uploadTitle": "Upload photos",
+    "uploadBody": "Choose photos from your gallery",
+    "typeTitle": "Type the medicine name",
+    "typeBody": "Search by brand name",
+    "comingSoon": "Coming soon",
+    "checksTitle": "What DawaCheck checks",
+    "checks": {
+      "generic": "Cheaper Jan Aushadhi generic",
+      "batch": "Batch safety alerts",
+      "price": "Fair price (NPPA ceiling price)",
+      "banned": "Banned combinations",
+      "duplicates": "Same ingredient in two family medicines",
+      "kendra": "Nearest Jan Aushadhi Kendra"
+    },
+    "privacy": "Your photos and location stay on your phone."
+  },
+  "common": {
+    "language": "Language",
+    "largeText": "Large text",
+    "disclaimer": "DawaCheck gives information from public government data. It is not medical advice. Always consult your doctor or pharmacist before changing any medicine."
+  }
+}

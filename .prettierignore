@@ -1,0 +1,8 @@
+node_modules
+.next
+pnpm-lock.yaml
+web/components/ui
+web/next-env.d.ts
+web/AGENTS.md
+pipeline/raw
+*.sql

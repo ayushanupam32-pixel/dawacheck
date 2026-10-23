@@ -1,0 +1,8 @@
+packages:
+  - web
+
+allowBuilds:
+  sharp: false
+  unrs-resolver: false
+
+saveExact: true
