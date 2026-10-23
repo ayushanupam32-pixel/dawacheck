@@ -1,0 +1,184 @@
+# DawaCheck normalization rules. Edit freely; every change must keep `uv run pytest` green.
+#
+# Goal: two sources that describe the SAME medicine must produce the SAME normalized text.
+# We are deliberately conservative: when unsure, do NOT merge names. A missed match only means
+# "no generic found"; a wrong merge could suggest the wrong medicine.
+
+# Different spellings / names for the same active ingredient -> one canonical name.
+# Left side: any spelling seen in a source (lowercase). Right side: canonical name.
+synonyms:
+  acetaminophen: paracetamol
+  amoxycillin: amoxicillin
+  frusemide: furosemide
+  torasemide: torsemide
+  albuterol: salbutamol
+  glyburide: glibenclamide
+  vitamin d3: cholecalciferol
+  vitamin d2: ergocalciferol
+  methylcobalamine: methylcobalamin
+  mecobalamin: methylcobalamin
+  vitamin b12: cyanocobalamin
+  vitamin c: ascorbic acid
+  folate: folic acid
+  thyroxine: levothyroxine
+  l-thyroxine: levothyroxine
+  clavulanate: clavulanic acid
+  valproic acid: valproate
+  sodium valproate: valproate
+  divalproex: valproate
+  ethamsylate: etamsylate
+  flecanide: flecainide # spelling error seen in the Jan Aushadhi list
+  nicoumalone: acenocoumarol
+  lignocaine: lidocaine
+  guaiphenesin: guaifenesin
+  fluoromethalone: fluorometholone
+  vitamin b6: pyridoxine
+  vitamin b1: thiamine
+
+# Salt / ester forms removed from the END of a name, e.g.
+# "metformin hydrochloride" -> "metformin", "amlodipine besilate" -> "amlodipine".
+# Indian labels and datasets often drop these, and the strength printed on the strip is what the
+# patient compares. Only words listed here are removed.
+strip_suffixes:
+  - hydrochloride
+  - hcl
+  - dihydrochloride
+  - hydrobromide
+  - monohydrate
+  - dihydrate
+  - trihydrate
+  - sesquihydrate
+  - anhydrous
+  - besilate
+  - besylate
+  - maleate
+  - mesylate
+  - mesilate
+  - tartrate
+  - bitartrate
+  - succinate
+  - fumarate
+  - citrate
+  - sulphate
+  - sulfate
+  - phosphate
+  - acetate
+  - bromide
+  - butylbromide
+  - chloride
+  - oxalate
+  - sodium
+  - potassium
+  - magnesium
+  - calcium
+  - dipropionate
+  - propionate
+  - furoate
+  - valerate
+  - xinafoate
+  - medoxomil
+  - cilexetil
+  - axetil
+  - pivoxil
+  - proxetil
+  - diethylamine
+  - disodium
+  - arginine
+  - olamine
+  - ip
+  - bp
+  - usp
+
+# Never strip suffixes from names starting with these words: the "suffix" IS the medicine.
+# Example: "potassium chloride" must stay "potassium chloride", not become "potassium".
+protect_prefixes:
+  - sodium
+  - potassium
+  - calcium
+  - magnesium
+  - zinc
+  - ferrous
+  - ferric
+  - aluminium
+  - aluminum
+  - lithium
+  - silver
+  - ammonium
+  - oral rehydration
+
+# Description words that are not part of the ingredient name; removed before parsing.
+# Example: "Mannitol Intravenous Infusion 20%" -> ingredient "Mannitol".
+descriptor_words:
+  [
+    sterile,
+    antiseptic,
+    intravenous,
+    aqueous,
+    topical,
+    moisturising,
+    cough,
+    soft gelatin,
+    sugar free,
+    oral,
+  ]
+
+# Dosage form words -> canonical form. Longest phrases are matched first.
+forms:
+  tablet: [tablets, tablet, tab, tabs, tabelts] # 'tabelts' is a typo in the source
+  capsule: [capsules, capsule, cap, caps, soft gel capsules, softgel capsules]
+  syrup: [syrup, dry syrup, elixir, oral liquid, expectorant]
+  suspension: [oral suspension, suspension]
+  injection: [injection, inj, inection, infusion] # 'inection' is a typo in the source
+  cream: [cream, skin cream]
+  gel: [gel, oral gel]
+  ointment: [ointment]
+  lotion: [lotion]
+  eye_drops:
+    [
+      eye drops,
+      ophthalmic solution,
+      opthalmic solution,
+      ophthalmic suspension,
+      opthalmic suspension,
+      eye/ear drops,
+    ]
+  eye_ointment: [ophthalmic ointment, opthalmic ointment, eye ointment]
+  ear_drops: [ear drops, otic drops]
+  nasal_spray: [nasal spray]
+  drops: [oral drops, drops]
+  inhaler: [inhaler, metered dose inhaler]
+  inhalation_powder: [powder for inhalation, inhalation powder, rotacaps, rotacap]
+  respules: [respules, nebuliser solution, nebulizer solution]
+  powder: [powder, dusting powder, granules, sachet]
+  solution: [solution, mouthwash, gargle, antiseptic liquid]
+  paste: [toothpaste, paste]
+  spray: [spray]
+  strip: [oral disintegrating strips, orally disintegrating strips, strips, oral film]
+  patch: [transdermal patch, patch]
+  suppository: [suppositories, suppository]
+  shampoo: [shampoo]
+
+# Release-type words. A 500 mg extended-release tablet is NOT the same medicine as a
+# 500 mg normal tablet, so release type is part of the match key.
+releases:
+  er:
+    [
+      extended release,
+      prolonged release,
+      sustained release,
+      controlled release,
+      modified release,
+      er,
+      sr,
+      pr,
+      cr,
+      xr,
+      xl,
+      mr,
+    ]
+  dr: [delayed release, gastro-resistant, gastro resistant, enteric coated, enteric-coated, ec]
+  odt: [orally disintegrating, oral disintegrating, mouth dissolving, md]
+  dispersible: [dispersible, dt]
+  ir: [immediate release, ir]
+  chewable: [chewable]
+  effervescent: [effervescent]
