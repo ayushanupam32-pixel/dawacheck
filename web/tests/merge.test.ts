@@ -71,3 +71,17 @@ describe("isGoodEnough", () => {
     expect(isGoodEnough(missingBatch.fields)).toBe(false);
   });
 });
+
+describe("hiding low-confidence free text", () => {
+  it("drops a garbage brand from a blurry photo, but keeps a structured field", () => {
+    const blurry = {
+      variant: "binary",
+      text: "pe fav TRE ER Ema\nB.No. GT2304",
+      confidence: 25,
+      lines: [{ text: "Fav Tre Ema", height: 90, confidence: 61 }],
+    };
+    const { fields } = mergeReadings([blurry], [blurry]);
+    expect(fields.brand).toBeNull();
+    expect(fields.batchNo?.value).toBe("GT2304");
+  });
+});

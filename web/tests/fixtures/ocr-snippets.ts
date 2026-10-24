@@ -207,3 +207,20 @@ export const brandCases: {
   { text: "GLYCOMET 500 SR\nMetformin Hydrochloride", expected: "GLYCOMET 500 SR" },
   { text: "Each tablet contains\nIP 40 mg", expected: null },
 ];
+
+// REAL OCR output from the evaluation photos (eval/photos, Wikimedia Commons / Flickr), copied
+// from what Tesseract produced. Kept separate from the synthetic snippets above.
+export const realSnippets = {
+  mrpPerTabs: [
+    "M.R.P. FOR 10 TABS.\nR5.33-00 INCLUSIVE",
+    "MRP FOR 6 TABS.\nRs.15.00 INCL.OF ALL TAXES",
+  ],
+  batchWithNoise: "B.No.FCR 004 ii",
+  splitIngredient: "Metformin\n500mg Tablets\nMetformin hydrochloride",
+  noisyBrandLines: [
+    { text: "pe fav TRE ER Ema", height: 140, confidence: 31 },
+    { text: "— | DEMO", height: 120, confidence: 70 },
+    { text: "Metformin", height: 90, confidence: 88 },
+    { text: "500mg Tablets", height: 50, confidence: 86 },
+  ],
+};

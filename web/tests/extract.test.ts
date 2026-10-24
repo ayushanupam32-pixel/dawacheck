@@ -24,6 +24,7 @@ import {
   manufacturerCases,
   mrpCases,
   packCases,
+  realSnippets,
 } from "./fixtures/ocr-snippets";
 
 const total =
@@ -157,5 +158,60 @@ describe("extractFields (front + back together)", () => {
   it("returns nulls, not guesses, for unreadable text", () => {
     const f = extractFields("~~ ## ..", "");
     expect(Object.values(f).every((v) => v === null)).toBe(true);
+  });
+});
+
+describe("real OCR output from the evaluation photos", () => {
+  it("'MRP FOR 10 TABS. Rs.33-00' is ₹33 for 10, not ₹10", () => {
+    const [fincover, crocin] = realSnippets.mrpPerTabs.map(cleanOcrText);
+    // "R5." is how the OCR read "Rs." on the Fincover strip; the extractor can't know it was Rs.
+    expect(extractMrp(cleanOcrText("M.R.P. FOR 10 TABS.\nRs.33-00 INCLUSIVE"))?.value).toBe(33);
+    expect(extractMrp(crocin)?.value).toBe(15);
+    expect(extractPackSize(crocin)?.value).toBe(6);
+    expect(extractPackSize(fincover)?.value).toBe(10);
+  });
+
+  it("the decimal point printed as a dash", () => {
+    expect(extractMrp(cleanOcrText("M.R.P. Rs.33-00"))?.value).toBe(33);
+  });
+
+  it("drops OCR noise after a batch code", () => {
+    expect(extractBatch(realSnippets.batchWithNoise)?.value).toBe("FCR004");
+  });
+
+  it("joins a name and its strength printed on separate lines", () => {
+    expect(extractIngredients(realSnippets.splitIngredient)?.value).toEqual([
+      { salt: "Metformin", value: 500, unit: "mg" },
+    ]);
+  });
+
+  it("ignores garbage and low-confidence lines when choosing the brand", () => {
+    expect(extractBrand("", realSnippets.noisyBrandLines)?.value).toBe("Metformin");
+  });
+});
+
+describe("more real OCR output from the stamp close-ups", () => {
+  it("reads 'BR. No.' (the dot misread as R) as a batch label", () => {
+    expect(extractBatch("BR. No. XFA20002")?.value).toBe("XFA20002");
+  });
+  it("accepts a comma after the month: 'EXP NOV, 12'", () => {
+    expect(extractDates(cleanOcrText("EXP NOV, 12"))?.expDate?.value).toBe("2012-11");
+  });
+  it("flags an implausible mfg/exp pair (OCR read DEC.09 as DEC.0S)", () => {
+    const d = extractDates(cleanOcrText("MFD.DEC.0S\nEXP NOV, 12"));
+    expect(d.mfgDate?.value).toBe("2005-12");
+    expect(d.mfgDate!.confidence).toBeLessThan(0.5); // shown as "Please check"
+  });
+});
+
+describe("wrong MRPs seen on real photos", () => {
+  it("'MRPFOR6TABS.' followed by the next line's '4XP' is not ₹4", () => {
+    expect(extractMrp(cleanOcrText("MRPFOR6TABS.\n4XP.DEC.2014"))).toBeNull();
+  });
+  it("'Rs. 5TABS' is not a price", () => {
+    expect(extractMrp(cleanOcrText("Rs. 5TABS. st 7 EXP.DEC.2014"))).toBeNull();
+  });
+  it("'Rs. Sm' from a garbled reading is not ₹5", () => {
+    expect(extractMrp(cleanOcrText("ia 62 UIE Rs. Sm Ln An"))).toBeNull();
   });
 });

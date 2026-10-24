@@ -23,10 +23,16 @@ For each strip, take two photos and copy them into `eval/photos/` named:
 ```
 <id>-front.jpg    the side with the medicine name
 <id>-back.jpg     the side with batch number, expiry and MRP
+<id>-stamp.jpg    optional: a close-up of the batch / dates / MRP stamp (it may be sideways)
 ```
 
 `<id>` is anything without spaces, e.g. `telma40-a`, `glycomet-foil-2`. A strip without a back
 photo is fine (only the fields visible on the front are scored).
+
+**Current set:** 16 openly licensed web photos (`photo-sources.json` lists source, author and
+licence for each; credit them in the report) plus the demo strip. The stamp close-ups were cut
+from the same photos. The photos themselves are not in git; to set them up on another computer,
+download each one from the source page listed in `photo-sources.json`.
 
 ## 2. Label them
 

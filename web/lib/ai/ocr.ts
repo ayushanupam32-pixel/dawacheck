@@ -61,11 +61,12 @@ export async function prepare(photo: Blob): Promise<Prepared> {
 }
 
 /** Run Tesseract on one variant and keep the text, confidence and line heights. */
-async function read(prepared: Prepared, variant: Variant): Promise<OcrReading> {
-  const canvas = canvasOf(prepared.width, prepared.height);
+async function read(variant: Variant): Promise<OcrReading> {
+  // Each variant carries its own size: a variant turned 90° swaps width and height.
+  const canvas = canvasOf(variant.width, variant.height);
   canvas
     .getContext("2d")!
-    .putImageData(new ImageData(grayToRgba(variant.gray), prepared.width, prepared.height), 0, 0);
+    .putImageData(new ImageData(grayToRgba(variant.gray), variant.width, variant.height), 0, 0);
   const worker = await getWorker();
   const { data } = await worker.recognize(canvas, {}, { text: true, blocks: true });
   return pageToReading(variant.name, data);
@@ -78,11 +79,15 @@ export type StripReading = MergedResult & {
   millis: number;
 };
 
-/** Read a strip from its front photo (and the back, if given). Strategy: lib/ai/reader.ts. */
+/**
+ * Read a strip from its front photo, the back (optional) and a close-up of the batch / expiry /
+ * MRP stamp (optional; it helps a lot on shiny foil). Strategy: lib/ai/reader.ts.
+ */
 export async function readStrip(
   frontPhoto: Blob,
   backPhoto: Blob | null,
   onStage: (stage: Stage) => void = () => {},
+  stampPhoto: Blob | null = null,
 ): Promise<StripReading> {
   const started = performance.now();
   onStage("loading-model");
@@ -90,20 +95,21 @@ export async function readStrip(
 
   onStage("preparing");
   const front = await prepare(frontPhoto);
-  const back = backPhoto ? await prepare(backPhoto) : null;
+  const backs = [];
+  for (const photo of [backPhoto, stampPhoto]) if (photo) backs.push(await prepare(photo));
   await workerReady;
 
   onStage("reading");
   const result = await readProgressively(
-    { variants: front.variants, recognize: (v) => read(front, v) },
-    back ? { variants: back.variants, recognize: (v) => read(back, v) } : null,
+    { variants: front.variants, recognize: read },
+    backs.map((b) => ({ variants: b.variants, recognize: read })),
     { onMorePasses: () => onStage("reading-more") },
   );
 
   onStage("done");
   return {
     ...result,
-    skew: { front: front.skew, back: back?.skew ?? null },
+    skew: { front: front.skew, back: backs[0]?.skew ?? null },
     millis: Math.round(performance.now() - started),
   };
 }

@@ -5,25 +5,26 @@ ingredients, MRP, pack size, batch number and dates, and the user checks and cor
 
 **Done when:** fields extracted from the first 30 photos; the evaluation script runs.
 
-**Status:** everything is built and tested on a generated demo strip, and `pnpm eval` runs.
-The "first 30 photos" part needs your real strip photos (see `eval/README.md`).
+**Status:** built, evaluated on 16 real, openly licensed strip photos (plus the demo strip),
+and improved using what failed. The "30 photos" target is not reached yet: openly licensed photos
+of Indian strips are rare (see "Real photos" below), so more of your own photos are still needed.
 
 ## What was built
 
-| Stage            | File                                                      | What it does                                                                                                             |
-| ---------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| 1. Preprocessing | `web/lib/ai/preprocess.ts`                                | Resize to 1600 px, grayscale, contrast stretch (with glare clipping), adaptive black-and-white, inversion, tilt estimate |
-| 2. OCR           | `web/lib/ai/ocr.ts`, `reader.ts`                          | Tesseract.js in the browser; reads the best variant first, more only if needed                                           |
-| 2b. Merge        | `web/lib/ai/merge.ts`                                     | Per field, keeps the reading with the highest pattern confidence × OCR confidence                                        |
-| 3. Extraction    | `web/lib/ai/extract.ts`                                   | Rules for MRP, pack size, batch, dates, ingredients, form, maker, brand; a confidence for each                           |
-| Pages            | `web/app/[locale]/scan`, `web/components/scan-client.tsx` | Front → back → reading → "Check what we read" (every field editable) → find generic                                      |
-| Demo mode        | `web/public/demo`, `eval/make_demo_images.py`             | "Try a demo strip": sample images clearly labelled DEMO                                                                  |
-| Labeling         | `web/app/[locale]/eval/label`, `web/app/api/eval`         | Local-only tool to type the true values for each photo                                                                   |
-| Evaluation       | `web/scripts/eval.ts`, `web/lib/ai/score.ts`              | `pnpm eval`: accuracy and character error rate per field, against a baseline                                             |
+| Stage            | File                                                      | What it does                                                                                                                                                |
+| ---------------- | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1. Preprocessing | `web/lib/ai/preprocess.ts`                                | Resize to 1600 px, grayscale, contrast stretch (with glare clipping), adaptive black-and-white, inversion, colour "ink" image, tilt estimate, quarter turns |
+| 2. OCR           | `web/lib/ai/ocr.ts`, `reader.ts`                          | Tesseract.js in the browser; reads the best variant first, more only if needed                                                                              |
+| 2b. Merge        | `web/lib/ai/merge.ts`                                     | Per field, keeps the reading with the highest pattern confidence × OCR confidence                                                                           |
+| 3. Extraction    | `web/lib/ai/extract.ts`                                   | Rules for MRP, pack size, batch, dates, ingredients, form, maker, brand; a confidence for each                                                              |
+| Pages            | `web/app/[locale]/scan`, `web/components/scan-client.tsx` | Front → back → optional stamp close-up → reading → "Check what we read" (every field editable) → find generic                                               |
+| Demo mode        | `web/public/demo`, `eval/make_demo_images.py`             | "Try a demo strip": sample images clearly labelled DEMO                                                                                                     |
+| Labeling         | `web/app/[locale]/eval/label`, `web/app/api/eval`         | Local-only tool to type the true values for each photo                                                                                                      |
+| Evaluation       | `web/scripts/eval.ts`, `web/lib/ai/score.ts`              | `pnpm eval`: accuracy and character error rate per field, against a baseline                                                                                |
 
 All stages are pure functions with unit tests except the thin browser glue in `ocr.ts`:
-123 extraction tests (from a fixture of 112 OCR-style snippets), 11 preprocessing, 5 merge,
-10 image, 7 scoring. Web total: 198 tests.
+136 extraction tests (112 synthetic OCR-style snippets plus snippets of real OCR output),
+16 preprocessing, 6 merge, 10 image, 7 scoring. Web total: 214 tests.
 
 ## How a photo becomes fields
 
@@ -83,17 +84,66 @@ have exaggerated our improvement. Tesseract still does its own simple black-and-
 reading, people would tend to accept its mistakes, and the measured accuracy would be inflated.
 About 1 in 4 photos is frozen as the test set on first save (by a hash of its id).
 
-## Results so far
+## Real photos: what we found and fixed
 
-On the generated demo strip (`pnpm eval`, `eval/results.md`):
+**The photos.** No real photos were collected yet, so 16 openly licensed photos were downloaded:
+5 Indian strips from Wikimedia Commons and Flickr (Favipill 800, Fincover 1 mg, Suhagra-100,
+Neorelax MR, Crocin Cold & Flu) and 11 English, German, French, Czech or Turkish packs. Licences
+(CC0, public domain, CC BY, CC BY-SA) and authors are in `eval/photo-sources.json` and must be
+credited in the report. They were labelled by Claude by reading each full-size image by eye, and
+anything not clearly readable (a faded batch number, tiny or non-English ingredient text) was
+left unlabelled rather than guessed. **Spot-check a few labels before the final report.**
+3 photos are frozen as the test set; the numbers below are the 13 dev photos plus the demo.
 
-| Field                                               | DawaCheck   | Raw Tesseract |
-| --------------------------------------------------- | ----------- | ------------- |
-| brand, ingredients, MRP, pack size, batch, mfg date | 6/6 correct | 0/6           |
-| expiry                                              | correct     | correct       |
+**First run: weak.** Brand 1/14, MRP 1/5, batch 2/4. The OCR could barely read the real photos
+(20–30% confidence against 86–91% on the demo). An experiment (`web/scripts/ocr-experiment.ts`)
+ruled out image size and Tesseract's page mode as the cause, and showed three real problems:
 
-One generated image shows the pipeline works end to end; it is not evidence of accuracy.
-**Real numbers need real photos**: that is the next step.
+1. **Silver foil.** Its embossed diamond pattern turns into a black mesh when the photo is made
+   black-and-white, as dark as the letters. Fix: a new **"ink" image** that measures how
+   _colourful_ each pixel is (max − min of R, G, B). Foil is grey whatever its brightness, while
+   batch/date/MRP stamps are purple, blue or red ink, so only the ink survives. On the Favipill
+   stamp OCR confidence went from 25% to 65%.
+2. **Sideways stamps.** Indian strips often print batch, dates and MRP at 90°, and the stamp is a
+   small part of the photo. Fix: an **optional third photo, a close-up of the stamp**, which the
+   reader also tries turned 90° and 270°, then straightens again (a stamp at 78° is at 12° after a
+   quarter turn).
+3. **Extraction rules that real labels break:** "Metformin" and "500mg" on separate lines;
+   "M.R.P. FOR 10 TABS. Rs.33-00" (the first number is the count, and the decimal point is a
+   dash); OCR noise after a batch code ("FCR 004 ii"); "BR. No." for "B.No."; "NOV, 12" with a
+   comma; garbage lines like "pe fav TRE ER Ema" chosen as the brand; "Rs. 5TABS" or "Rs. Sm"
+   read as ₹5. Each fix has a unit test built from the real OCR text.
+
+**After the fixes** (`eval/results.md`):
+
+| Field        | DawaCheck correct | DawaCheck **wrong** | Raw Tesseract correct |
+| ------------ | ----------------- | ------------------- | --------------------- |
+| Batch number | 4/4 (100%)        | 0                   | 1/4                   |
+| Mfg date     | 4/5 (80%)         | 0                   | 1/5                   |
+| Expiry date  | 4/5 (80%)         | 0                   | 2/5                   |
+| MRP          | 2/5 (40%)         | 0                   | 0/5                   |
+| Pack size    | 4/11 (36%)        | 0                   | 1/11                  |
+| Ingredients  | 2/10 (20%)        | 4/10                | 0/10                  |
+| Brand        | 2/14 (14%)        | 4/14                | 0/14                  |
+
+**What this means:**
+
+- For the safety-critical stamp fields (batch, dates, MRP, pack) DawaCheck was **never wrong**:
+  when unsure it leaves the field empty and the user types it. That is the behaviour the spec
+  asks for ("a wrong answer is worse than no answer").
+- With a stamp close-up, the Indian strips' batch numbers and dates are read reliably; Favipill
+  is read completely (batch XFA20002, Nov 2020, Apr 2021, ₹1400 for 10).
+- Brand and ingredients from whole photos of busy packs are weak. Low-confidence brand and
+  ingredient readings are now hidden instead of pre-filled with garbage (wrong brands went from
+  12/14 to 4/14). In M4 the brand is matched against the brand database, and the user always
+  picks it from a list, so a misread brand never silently becomes a wrong medicine.
+- **Speed is the biggest open problem:** median 10 s per strip on a laptop (up to 17 s), against
+  the 5-second target on a phone. Most time goes into extra passes on hard photos.
+
+**Caveats for the report:** 14 strips is a small sample; web photos are not phone photos; the
+close-ups were cut from the same photos rather than taken separately; and the rules were tuned on
+these same dev photos, so the final numbers must come from the frozen test set (`pnpm eval
+--final`) and from new photos taken on a phone.
 
 ## How to test it
 
@@ -101,10 +151,12 @@ One generated image shows the pipeline works end to end; it is not evidence of a
    be filled in; open "How we read this" for timing, confidence and the raw text.
 2. On a phone: take photos of a real strip (front, then back) and check the fields.
 3. Put photos in `eval/photos/`, label them at /en/eval/label, run `pnpm eval`.
-4. `pnpm test` (198 tests).
+4. `pnpm test` (214 tests).
 
 ## Limitations
 
+- **Too slow on hard photos:** median 10 s on a laptop against a 5 s phone target.
+- Brand and ingredients are often unreadable from whole photos of busy packs.
 - Preprocessing runs on the browser's main thread (about 100–300 ms per photo). Moving it to a
   Web Worker would keep the page smoother on slow phones.
 - English labels only (Tesseract `eng`); Hindi text on labels is not read yet.

@@ -98,8 +98,8 @@
   },
   "scan": {
     "title": "Scan your medicine strip",
-    "stepFront": "Step 1 of 2: front of the strip",
-    "stepBack": "Step 2 of 2: back of the strip",
+    "stepFront": "Step 1 of 3: front of the strip",
+    "stepBack": "Step 2 of 3: back of the strip",
     "frontHint": "Photograph the side with the medicine name.",
     "backHint": "Photograph the side with the batch number, expiry date and MRP.",
     "takePhoto": "Take photo",
@@ -142,6 +142,9 @@
     "frontPhoto": "Front",
     "backPhoto": "Back",
     "demoButton": "Try a demo strip",
-    "demoNote": "Demo: uses sample photos made for testing, not a real medicine."
+    "demoNote": "Demo: uses sample photos made for testing, not a real medicine.",
+    "stepStamp": "Step 3 of 3 (optional): close-up of the stamp",
+    "stampHint": "Move close so the printed batch number, dates and MRP fill the photo. It is fine if the text is sideways. This helps a lot on shiny foil.",
+    "skipStamp": "Skip this step"
   }
 }

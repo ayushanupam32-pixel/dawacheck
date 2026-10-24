@@ -10,6 +10,8 @@ export type Label = {
   split: "dev" | "test" | "demo";
   front: string;
   back: string | null;
+  /** Optional close-up of the batch / dates / MRP stamp (the app's optional third photo). */
+  stamp?: string | null;
   brand: string;
   ingredients: string; // one per line: "Telmisartan 40 mg"
   mrp: number | null;
@@ -105,11 +107,12 @@ export function fieldCorrect(key: ScoredField, read: string, truth: string): boo
   }
 }
 
-export type FieldScore = { correct: number; total: number; cerSum: number };
+/** wrong = we showed a value and it was incorrect (worse than showing nothing). */
+export type FieldScore = { correct: number; wrong: number; total: number; cerSum: number };
 
 export function emptyScores(): Record<ScoredField, FieldScore> {
   return Object.fromEntries(
-    SCORED_FIELDS.map((k) => [k, { correct: 0, total: 0, cerSum: 0 }]),
+    SCORED_FIELDS.map((k) => [k, { correct: 0, wrong: 0, total: 0, cerSum: 0 }]),
   ) as Record<ScoredField, FieldScore>;
 }
 
@@ -126,6 +129,7 @@ export function addScores(
     const s = scores[key];
     s.total++;
     if (fieldCorrect(key, read, truth)) s.correct++;
+    else if (read) s.wrong++;
     s.cerSum += cer(canonText(read), canonText(truth));
   }
 }

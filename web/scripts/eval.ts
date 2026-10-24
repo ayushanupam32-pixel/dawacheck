@@ -26,6 +26,7 @@ import { pageToReading, readProgressively } from "../lib/ai/reader";
 import {
   addScores,
   emptyScores,
+  readValue,
   SCORED_FIELDS,
   type FieldScore,
   type Label,
@@ -64,7 +65,7 @@ function prepareFull(photo: Rgba): Variant[] {
  * grayscale), which is what "raw Tesseract" means. Tesseract still applies its own built-in
  * global black-and-white step, so this is the fair thing to compare against.
  */
-const RAW: Variant[] = [{ name: "enhanced", gray: new Uint8ClampedArray(0) }];
+const RAW: Variant[] = [{ name: "enhanced", gray: new Uint8ClampedArray(0), width: 0, height: 0 }];
 
 function toPng(gray: Uint8ClampedArray, width: number, height: number): Buffer {
   const png = new PNG({ width, height, colorType: 0, inputColorType: 0, inputHasAlpha: false });
@@ -77,6 +78,10 @@ type Row = {
   full: Record<ScoredField, FieldScore>;
   base: Record<ScoredField, FieldScore>;
   ms: number;
+  /** What DawaCheck read, per field, for error analysis. */
+  read: Record<ScoredField, string>;
+  /** OCR confidence of each reading, to spot photos the OCR could hardly read at all. */
+  ocr: string[];
 };
 
 async function main() {
@@ -86,10 +91,9 @@ async function main() {
   if (!labels.length) throw new Error(`No ${final ? "test" : "dev/demo"} labels in ${labelsPath}`);
 
   const worker = await createWorker("eng", 1, { cachePath: join(EVAL_DIR, ".cache") });
-  const recognizeWith = (photo: Rgba) => async (variant: Variant) => {
-    const { width, height } = targetSize(photo.width, photo.height);
+  const recognize = async (variant: Variant) => {
     const { data } = await worker.recognize(
-      toPng(variant.gray, width, height),
+      toPng(variant.gray, variant.width, variant.height),
       {},
       { text: true, blocks: true },
     );
@@ -103,13 +107,13 @@ async function main() {
       console.warn(`skip ${label.id}: ${label.front} not found in eval/photos`);
       continue;
     }
-    const front = decode(photoPath(label.front));
-    const back = label.back ? decode(photoPath(label.back)) : null;
+    // Back photos: the back of the strip and, if taken, the close-up of the stamp.
+    const backFiles = [label.back, label.stamp].filter((f): f is string => Boolean(f));
 
     const started = performance.now();
     const full = await readProgressively(
-      { variants: prepareFull(front), recognize: recognizeWith(front) },
-      back ? { variants: prepareFull(back), recognize: recognizeWith(back) } : null,
+      { variants: prepareFull(decode(photoPath(label.front))), recognize },
+      backFiles.map((f) => ({ variants: prepareFull(decode(photoPath(f))), recognize })),
     );
     const ms = performance.now() - started;
     const recognizeRaw = (path: string) => async () => {
@@ -118,11 +122,17 @@ async function main() {
     };
     const base = await readProgressively(
       { variants: RAW, recognize: recognizeRaw(photoPath(label.front)) },
-      label.back ? { variants: RAW, recognize: recognizeRaw(photoPath(label.back)) } : null,
+      backFiles.map((f) => ({ variants: RAW, recognize: recognizeRaw(photoPath(f)) })),
       { preprocess: false },
     );
 
-    const row: Row = { label, full: emptyScores(), base: emptyScores(), ms };
+    const read = Object.fromEntries(
+      SCORED_FIELDS.map((k) => [k, readValue(full.fields, k)]),
+    ) as Record<ScoredField, string>;
+    const ocr = [...full.front, ...full.back].map(
+      (r) => `${r.variant}:${Math.round(r.confidence)}`,
+    );
+    const row: Row = { label, full: emptyScores(), base: emptyScores(), ms, read, ocr };
     addScores(row.full, full.fields, label);
     addScores(row.base, base.fields, label);
     rows.push(row);
@@ -143,16 +153,19 @@ function sum(
       const s = pick(r)[key];
       return {
         correct: acc.correct + s.correct,
+        wrong: acc.wrong + s.wrong,
         total: acc.total + s.total,
         cerSum: acc.cerSum + s.cerSum,
       };
     },
-    { correct: 0, total: 0, cerSum: 0 },
+    { correct: 0, wrong: 0, total: 0, cerSum: 0 },
   );
 }
 
 const pct = (s: FieldScore) =>
   s.total ? `${Math.round((100 * s.correct) / s.total)}% (${s.correct}/${s.total})` : "–";
+const wrongText = (s: FieldScore) =>
+  s.total ? `${Math.round((100 * s.wrong) / s.total)}% (${s.wrong}/${s.total})` : "–";
 const cerText = (s: FieldScore) => (s.total ? (s.cerSum / s.total).toFixed(2) : "–");
 
 function writeReport(rows: Row[]) {
@@ -169,13 +182,16 @@ function writeReport(rows: Row[]) {
     ``,
     `## Field reading: exact-match accuracy and character error rate (CER)`,
     ``,
-    `| Field | DawaCheck (with preprocessing) | Baseline (raw Tesseract) | CER DawaCheck | CER baseline |`,
-    `| --- | --- | --- | --- | --- |`,
+    `| Field | DawaCheck correct | DawaCheck wrong | Baseline correct | Baseline wrong | CER DawaCheck | CER baseline |`,
+    `| --- | --- | --- | --- | --- | --- | --- |`,
     ...SCORED_FIELDS.map((k) => {
       const f = sum(rows, (r) => r.full, k);
       const b = sum(rows, (r) => r.base, k);
-      return `| ${k} | ${pct(f)} | ${pct(b)} | ${cerText(f)} | ${cerText(b)} |`;
+      return `| ${k} | ${pct(f)} | ${wrongText(f)} | ${pct(b)} | ${wrongText(b)} | ${cerText(f)} | ${cerText(b)} |`;
     }),
+    ``,
+    `"Wrong" = a value was shown and it was incorrect. The rest of each row (not correct, not`,
+    `wrong) was left empty: the user is asked to type it. A wrong value is worse than an empty one.`,
     ``,
     `## Batch number: foil vs matte packs`,
     ``,
@@ -203,6 +219,8 @@ function writeReport(rows: Row[]) {
         id: r.label.id,
         split: r.label.split,
         ms: Math.round(r.ms),
+        ocr: r.ocr,
+        read: r.read,
         full: r.full,
         base: r.base,
       })),
@@ -211,7 +229,7 @@ function writeReport(rows: Row[]) {
     ),
   );
   console.log(`\nWrote ${out}`);
-  console.log(lines.slice(6, 17).join("\n"));
+  console.log(lines.slice(6, 20).join("\n"));
 }
 
 main().catch((error) => {

@@ -101,7 +101,7 @@ export function invert(gray: Uint8ClampedArray): Uint8ClampedArray {
 }
 
 /**
- * Estimate how far the text is tilted, in degrees (-10..10). For each candidate angle, count the
+ * Estimate how far the text is tilted, in degrees (-15..15). For each candidate angle, count the
  * dark pixels on each (rotated) row: when the angle matches the text, rows are either full of
  * ink or empty, so the row counts vary the most. Works on a black-and-white image.
  */
@@ -117,7 +117,7 @@ export function estimateSkew(binary: Uint8ClampedArray, width: number, height: n
   let best = 0;
   let bestScore = -1;
   const diagonal = Math.ceil(Math.hypot(width, height));
-  for (let deg = -10; deg <= 10; deg += 0.5) {
+  for (let deg = -15; deg <= 15; deg += 0.5) {
     const rad = (deg * Math.PI) / 180;
     const sin = Math.sin(rad);
     const cos = Math.cos(rad);
@@ -133,23 +133,74 @@ export function estimateSkew(binary: Uint8ClampedArray, width: number, height: n
   return best;
 }
 
-export type Variant = { name: "enhanced" | "binary" | "inverted"; gray: Uint8ClampedArray };
+/**
+ * "Ink" image: how COLOURFUL each pixel is, not how bright.
+ *
+ * Batch numbers, dates and MRP are stamped on silver foil in coloured ink (purple, blue, red).
+ * Foil is grey however shiny or shadowed it is, so max(R,G,B) - min(R,G,B) is near 0 on foil
+ * and high on ink. Inverting it gives dark ink on a clean white background: the foil's embossed
+ * diamond pattern, which a brightness threshold turns into a black mesh, disappears.
+ * (Found on real strips: OCR confidence on a stamp went from 25% to 65%.)
+ */
+export function inkness(rgba: Uint8ClampedArray): Uint8ClampedArray {
+  const out = new Uint8ClampedArray(rgba.length / 4);
+  for (let i = 0, j = 0; i < rgba.length; i += 4, j++) {
+    const max = Math.max(rgba[i], rgba[i + 1], rgba[i + 2]);
+    const min = Math.min(rgba[i], rgba[i + 1], rgba[i + 2]);
+    out[j] = 255 - (max - min);
+  }
+  return out;
+}
+
+export type VariantName = "enhanced" | "binary" | "inverted" | "ink";
+
+export type Variant = {
+  name: string; // a VariantName, plus "-r90" / "-r270" when rotated
+  gray: Uint8ClampedArray;
+  width: number;
+  height: number;
+};
 
 /**
- * The 3 versions of each photo that OCR reads:
+ * The 4 versions of each photo that OCR may read:
  *  - enhanced: grayscale, contrast stretched (best for matte boxes)
- *  - binary:   adaptive black-and-white (best for uneven light and foil)
+ *  - binary:   adaptive black-and-white (best for uneven light)
  *  - inverted: binary, inverted (light print on dark foil)
- * Stage 2 reads all three and keeps, for each field, the most confident reading.
+ *  - ink:      colourful pixels only (coloured stamps on silver foil)
+ * Stage 2 reads them as needed and keeps, for each field, the most confident reading.
  */
 export function makeVariants(rgba: Uint8ClampedArray, width: number, height: number): Variant[] {
   const enhanced = contrastStretch(toGray(rgba));
   const binary = adaptiveThreshold(enhanced, width, height);
   return [
-    { name: "enhanced", gray: enhanced },
-    { name: "binary", gray: binary },
-    { name: "inverted", gray: invert(binary) },
+    { name: "enhanced", gray: enhanced, width, height },
+    { name: "binary", gray: binary, width, height },
+    { name: "inverted", gray: invert(binary), width, height },
+    { name: "ink", gray: contrastStretch(inkness(rgba)), width, height },
   ];
+}
+
+/**
+ * Turn a variant a quarter turn. Indian strips often have the batch/expiry/MRP stamp printed
+ * sideways, which OCR cannot read; reading the 90° and 270° versions of the close-up fixes that.
+ */
+export function rotateQuarter(v: Variant, clockwise: boolean): Variant {
+  const { width, height, gray } = v;
+  const out = new Uint8ClampedArray(gray.length);
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      // New image is height wide and width tall.
+      const nx = clockwise ? height - 1 - y : y;
+      const ny = clockwise ? x : width - 1 - x;
+      out[ny * height + nx] = gray[y * width + x];
+    }
+  }
+  return {
+    name: `${v.name}-${clockwise ? "r90" : "r270"}`,
+    gray: out,
+    width: height,
+    height: width,
+  };
 }
 
 /** One gray byte per pixel -> RGBA bytes, ready for canvas.putImageData. */
@@ -160,4 +211,33 @@ export function grayToRgba(gray: Uint8ClampedArray): Uint8ClampedArray<ArrayBuff
     rgba[j + 3] = 255;
   }
   return rgba;
+}
+
+/** Rotate a grayscale variant by a small angle around its centre (white where corners move in). */
+export function rotateSmall(v: Variant, degrees: number): Variant {
+  const { width, height, gray } = v;
+  const out = new Uint8ClampedArray(gray.length).fill(255);
+  const rad = (degrees * Math.PI) / 180;
+  const cos = Math.cos(rad);
+  const sin = Math.sin(rad);
+  const cx = (width - 1) / 2;
+  const cy = (height - 1) / 2;
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const sx = Math.round(cx + (x - cx) * cos + (y - cy) * sin);
+      const sy = Math.round(cy - (x - cx) * sin + (y - cy) * cos);
+      if (sx >= 0 && sy >= 0 && sx < width && sy < height)
+        out[y * width + x] = gray[sy * width + sx];
+    }
+  }
+  return { ...v, gray: out };
+}
+
+/**
+ * Straighten a variant using its own tilt estimate. Used after a quarter turn: a stamp that was
+ * at 78° is at 12° once turned, and needs this second, small correction.
+ */
+export function straighten(v: Variant): Variant {
+  const skew = estimateSkew(adaptiveThreshold(v.gray, v.width, v.height), v.width, v.height);
+  return Math.abs(skew) >= 1 ? rotateSmall(v, -skew) : v;
 }

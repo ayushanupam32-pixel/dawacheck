@@ -4,9 +4,12 @@ import {
   contrastStretch,
   estimateSkew,
   grayToRgba,
+  inkness,
   invert,
   makeVariants,
   percentile,
+  rotateQuarter,
+  straighten,
   targetSize,
   toGray,
 } from "@/lib/ai/preprocess";
@@ -88,10 +91,49 @@ describe("estimateSkew", () => {
 });
 
 describe("makeVariants", () => {
-  it("makes enhanced, binary and inverted versions of the same size", () => {
+  it("makes enhanced, binary, inverted and ink versions of the same size", () => {
     const rgba = grayToRgba(linesImage());
     const variants = makeVariants(rgba, W, H);
-    expect(variants.map((v) => v.name)).toEqual(["enhanced", "binary", "inverted"]);
-    for (const v of variants) expect(v.gray.length).toBe(W * H);
+    expect(variants.map((v) => v.name)).toEqual(["enhanced", "binary", "inverted", "ink"]);
+    for (const v of variants) {
+      expect(v.gray.length).toBe(W * H);
+      expect([v.width, v.height]).toEqual([W, H]);
+    }
+  });
+});
+
+describe("inkness", () => {
+  it("keeps coloured ink dark and turns grey foil white, however bright the foil is", () => {
+    const purpleInk = [110, 60, 180, 255];
+    const darkFoil = [70, 70, 72, 255];
+    const shinyFoil = [235, 236, 238, 255];
+    const out = inkness(new Uint8ClampedArray([...purpleInk, ...darkFoil, ...shinyFoil]));
+    expect(out[0]).toBeLessThan(150); // ink stands out
+    expect(out[1]).toBeGreaterThan(250); // dark foil -> white
+    expect(out[2]).toBeGreaterThan(250); // shiny foil -> white
+  });
+});
+
+describe("rotateQuarter", () => {
+  // 3 wide x 2 tall, pixels numbered 0..5: [0 1 2] / [3 4 5]
+  const v = { name: "ink", gray: new Uint8ClampedArray([0, 1, 2, 3, 4, 5]), width: 3, height: 2 };
+
+  it("90° clockwise swaps width and height and moves the left column to the top", () => {
+    const r = rotateQuarter(v, true);
+    expect([r.width, r.height, r.name]).toEqual([2, 3, "ink-r90"]);
+    expect([...r.gray]).toEqual([3, 0, 4, 1, 5, 2]);
+  });
+
+  it("a turn each way gets back the original", () => {
+    expect([...rotateQuarter(rotateQuarter(v, true), false).gray]).toEqual([...v.gray]);
+  });
+});
+
+describe("straighten", () => {
+  it("fixes a 12° tilt that remains after a quarter turn", () => {
+    const tilted = { name: "ink", gray: linesImage(12), width: W, height: H };
+    const fixed = straighten(tilted);
+    const bw = adaptiveThreshold(fixed.gray, W, H, 15);
+    expect(Math.abs(estimateSkew(bw, W, H))).toBeLessThanOrEqual(1);
   });
 });

@@ -71,18 +71,42 @@ const PRICE_ONLY_RE = new RegExp(
   "i",
 );
 
+// "M.R.P. FOR 10 TABS. Rs.33-00" (common on Indian strips): the first number after "MRP" is the
+// tablet count, not the price. Read the count as pack size and the number after "Rs." as MRP.
+// The decimal point is sometimes printed as a dash ("33-00").
+const MRP_FOR_RE = new RegExp(
+  String.raw`M\s*\.?\s*R\s*\.?\s*P\s*\.?\s*(?:for|per)\s*(\d{1,3})\s*(?:tabs?|tablets?|caps?|capsules?)\.?` +
+    // "Rs." is required here: without it, "MRPFOR6TABS.\n4XP.DEC" gave a price of ₹4.
+    String.raw`\s*Rs\.?\s*(${DIGITISH}{1,5}(?:[.,\-]${DIGITISH}{2})?)`,
+  "i",
+);
+
 export function parsePrice(raw: string): number | null {
-  const fixed = fixDigits(raw.replace(/\s/g, "")).replace(",", ".");
+  const fixed = fixDigits(raw.replace(/\s/g, ""))
+    .replace(/-(?=\d{2}$)/, ".") // "33-00" -> "33.00"
+    .replace(",", ".");
   const value = Number(fixed);
   // Indian strip MRPs: from ₹0.50 to a few thousand. Anything else is a misread.
   return Number.isFinite(value) && value >= 0.5 && value <= 20000 ? value : null;
 }
 
 export function extractMrp(text: string): Field<number> {
-  const labelled = MRP_RE.exec(text);
   // "1,245.00" matches only as "1,24" (the comma looks like a decimal point). If digits continue
-  // straight after what we read, the number was cut: refuse rather than report ₹1.24.
-  const continues = (m: RegExpExecArray) => /^[.,]?\d/.test(text.slice(m.index + m[0].length));
+  // straight after what we read, the number was cut: refuse rather than report ₹1.24. Letters
+  // straight after it ("Rs. 5TABS", real OCR output) mean it was never a price.
+  const continues = (m: RegExpExecArray) => {
+    const numberEnd = m.index + m[0].lastIndexOf(m.at(-1)!) + m.at(-1)!.length;
+    return (
+      /^[.,]?\d/.test(text.slice(m.index + m[0].length)) || /^[A-Za-z]/.test(text.slice(numberEnd))
+    );
+  };
+
+  const perPack = MRP_FOR_RE.exec(text);
+  if (perPack && !continues(perPack)) {
+    const value = parsePrice(perPack[2]);
+    if (value !== null) return { value, confidence: 0.9 };
+  }
+  const labelled = MRP_RE.exec(text);
   if (labelled && continues(labelled)) return null;
   if (labelled) {
     const value = parsePrice(labelled[1]);
@@ -94,13 +118,17 @@ export function extractMrp(text: string): Field<number> {
   }
   // "Rs. 125.00" without an MRP label: could be MRP or something else, so lower confidence.
   const bare = PRICE_ONLY_RE.exec(text);
-  const value = bare && !continues(bare) ? parsePrice(bare[1]) : null;
+  // Without an MRP label nearby, only trust a price that starts with a real digit: "Rs. Sm" from
+  // a garbled reading must not become ₹5 through the S -> 5 fix.
+  const value = bare && /^\d/.test(bare[1]) && !continues(bare) ? parsePrice(bare[1]) : null;
   return value !== null ? { value, confidence: 0.5 } : null;
 }
 
 const PACK_RES = [
   // "strip of 10 tablets", "pack of 15 capsules", "10 x 10 tablets" (the first number is strips)
   /\b(?:strip|pack|blister|box)\s+of\s+(\d{1,3})\b/i,
+  // "M.R.P. FOR 10 TABS.", "Rs.1400.00 (10 TABS)": the price is for this many
+  /(?:\bfor|\bper|\()\s*(\d{1,3})\s*(?:tabs?|tablets?|caps?|capsules?)\b/i,
   /\b\d{1,3}\s*[xX×]\s*(\d{1,3})\s*(?:tablets?|tabs?|capsules?|caps?)\b/i,
   /\b(\d{1,3})\s*(?:tablets?|tabs?|capsules?|caps?)\b(?!\s*(?:contains|IP|BP|USP))/i,
   /\b(\d{1,3})\s*['’]s\b/i, // "10's"
@@ -111,7 +139,7 @@ export function extractPackSize(text: string): Field<number> {
     const m = re.exec(text);
     if (!m) continue;
     const n = Number(m[1]);
-    if (n >= 1 && n <= 200) return { value: n, confidence: i < 2 ? 0.9 : 0.6 };
+    if (n >= 1 && n <= 200) return { value: n, confidence: i < 3 ? 0.9 : 0.6 };
   }
   return null;
 }
@@ -119,7 +147,8 @@ export function extractPackSize(text: string): Field<number> {
 // ------------------------------------------------------------------ batch number
 
 // "B.No.", "B. No", "Batch No.", "Batch", "Lot No.", "LOT", "B.N." followed by the code.
-const BATCH_LABEL = String.raw`(?:B\s*\.?\s*No\s*\.?|B\s*\.\s*N\s*\.?|Batch\s*(?:No\.?|Number)?|Lot\s*(?:No\.?)?)`;
+// OCR sometimes reads the dot in "B.No." as an R ("BR. No.", seen on a real strip).
+const BATCH_LABEL = String.raw`(?:B\s*[R.]?\s*\.?\s*No\s*\.?|B\s*\.\s*N\s*\.?|Batch\s*(?:No\.?|Number)?|Lot\s*(?:No\.?)?)`;
 const BATCH_RE = new RegExp(`${BATCH_LABEL}\\s*[:.\\-]?\\s*([A-Z0-9][A-Z0-9\\-/ ]{2,18})`, "i");
 // Words that often follow a batch code on the same line and must not be glued onto it.
 const BATCH_STOP = /\s+(?:MFG|MFD|MANUF|EXP|USE|M\.?R\.?P|DATE|D\.?O\.?M|RS)\b.*$/i;
@@ -133,8 +162,15 @@ export function extractBatch(text: string): Field<string> {
   for (const line of text.split("\n")) {
     const m = BATCH_RE.exec(line);
     if (!m) continue;
-    const raw = m[1].replace(BATCH_STOP, "").trim();
-    const value = normalizeBatch(raw);
+    // "FCR 004 ii": OCR noise after the code. Keep the first word, then only following words
+    // that contain a digit ("3001 2345" is one code printed with a space).
+    const [first, ...rest] = m[1].replace(BATCH_STOP, "").trim().split(/\s+/);
+    const kept = [first];
+    for (const word of rest) {
+      if (!/\d/.test(word)) break;
+      kept.push(word);
+    }
+    const value = normalizeBatch(kept.join(""));
     // A real batch code is 4-15 characters and has at least one digit ("BATCH" alone is not one).
     if (value.length < 4 || value.length > 15 || !/\d/.test(value)) continue;
     // Letters that look like digits (O vs 0) can't be fixed here: batch codes mix both.
@@ -165,7 +201,7 @@ const MONTHS: Record<string, number> = {
 
 const MFG_LABEL = String.raw`(?:M(?:fg|fd|anuf(?:actured)?)\.?\s*(?:Date|Dt|On)?\.?|D\.?\s*O\.?\s*M\.?|M\.\s*D\.?)`;
 const EXP_LABEL = String.raw`(?:Exp(?:iry)?\.?\s*(?:Date|Dt)?\.?|E\.\s*D\.?|Use\s*before|Best\s*before)`;
-const DATE_VALUE = String.raw`([A-Za-z]{3,4}\.?\s*[-/.]?\s*(?:${DIGITISH}{2}){1,2}|${DIGITISH}{1,2}\s*[-/.]\s*(?:${DIGITISH}{1,2}\s*[-/.]\s*)?(?:${DIGITISH}{2}){1,2})`;
+const DATE_VALUE = String.raw`([A-Za-z]{3,4}\.?\s*[-/.,]?\s*(?:${DIGITISH}{2}){1,2}|${DIGITISH}{1,2}\s*[-/.]\s*(?:${DIGITISH}{1,2}\s*[-/.]\s*)?(?:${DIGITISH}{2}){1,2})`;
 
 /** "08/2027", "Aug. 2027", "AUG-27", "12/08/2027", "O8/2O27" -> "2027-08"; null if invalid. */
 export function parseMonthYear(raw: string): string | null {
@@ -173,7 +209,7 @@ export function parseMonthYear(raw: string): string | null {
   let month: number | undefined;
   let year: number | undefined;
 
-  const named = /^([A-Z]{3,4})\.?\s*[-/.]?\s*(\S+)$/.exec(s);
+  const named = /^([A-Z]{3,4})\.?\s*[-/.,]?\s*(\S+)$/.exec(s); // "NOV, 12" seen on a real strip
   if (named && MONTHS[named[1]] !== undefined) {
     month = MONTHS[named[1]];
     year = Number(fixDigits(named[2]));
@@ -241,6 +277,8 @@ function cleanSaltName(raw: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+const STARTS_WITH_STRENGTH = new RegExp(`^\\s*${STRENGTH}`, "i");
+
 /**
  * "Each film coated tablet contains: Metformin Hydrochloride IP 500 mg, Glimepiride IP 1 mg"
  * -> [{salt: "Metformin Hydrochloride", value: 500, unit: "mg"}, {salt: "Glimepiride", ...}]
@@ -252,7 +290,25 @@ export function extractIngredients(text: string): Field<Ingredient[]> {
   const block = containsAt >= 0 ? text.slice(containsAt) : text;
   const found: Ingredient[] = [];
 
-  for (const line of block.split(/\n|;/)) {
+  // "Metformin\n500mg Tablets": a name on one line and its strength at the start of the next.
+  // Join such pairs first, so the name and its strength are read together.
+  const lines = block.split(/\n|;/);
+  const joined: string[] = [];
+  for (const line of lines) {
+    const previous = joined.at(-1);
+    if (
+      previous !== undefined &&
+      !/\d/.test(previous) &&
+      /[A-Za-z]{4}/.test(previous) &&
+      STARTS_WITH_STRENGTH.test(line)
+    ) {
+      joined[joined.length - 1] = `${previous} ${line}`;
+    } else {
+      joined.push(line);
+    }
+  }
+
+  for (const line of joined) {
     if (NOT_ACTIVE.test(line)) continue;
     for (const m of line
       .replaceAll(/\s+\+\s+|\s*&\s*|\s+and\s+/gi, " , ")
@@ -317,6 +373,8 @@ export function extractManufacturer(text: string): Field<string> {
   return null;
 }
 
+const BRAND_MIN_OCR = 60;
+
 const NOT_BRAND =
   /\b(each|contains|tablets?|capsules?|ip|bp|usp|mrp|batch|exp|mfg|rx|schedule|warning|store|keep|dosage|manufactured|marketed|composition|only|prescription|drug)\b/i;
 
@@ -328,10 +386,15 @@ const NOT_BRAND =
 export function extractBrand(text: string, lines?: OcrLine[]): Field<string> {
   const plausible = (s: string) => {
     const t = s.trim();
-    return t.length >= 3 && t.length <= 40 && /[A-Za-z]{3}/.test(t) && !NOT_BRAND.test(t);
+    // Real OCR of busy photos produces lines like "pe fav TRE ER Ema" or "— | DEMO". A brand
+    // has a word of 4+ letters with a vowel, and is mostly letters and digits.
+    const wordy = /\b[A-Za-z]*[AEIOUaeiou][A-Za-z]*\b/.test(t) && /[A-Za-z]{4}/.test(t);
+    const clean = t.replace(/[^A-Za-z0-9]/g, "").length / Math.max(1, t.replace(/\s/g, "").length);
+    return t.length >= 3 && t.length <= 40 && wordy && clean >= 0.8 && !NOT_BRAND.test(t);
   };
   if (lines?.length) {
-    const candidates = lines.filter((l) => plausible(l.text));
+    // Lines the OCR itself was unsure about are noise more often than not.
+    const candidates = lines.filter((l) => l.confidence >= BRAND_MIN_OCR && plausible(l.text));
     if (candidates.length) {
       const tallest = candidates.reduce((a, b) => (b.height > a.height ? b : a));
       const ratio = tallest.height / Math.max(...lines.map((l) => l.height));

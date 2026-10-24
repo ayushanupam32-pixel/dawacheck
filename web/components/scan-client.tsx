@@ -13,6 +13,7 @@ type T = Dictionary["scan"];
 type Step =
   | { name: "front" }
   | { name: "back" }
+  | { name: "stamp" }
   | { name: "reading"; stage: Stage }
   | { name: "confirm"; reading: StripReading }
   | { name: "error" };
@@ -86,15 +87,19 @@ export function ScanClient({ t, locale }: { t: T; locale: string }) {
   const [step, setStep] = useState<Step>({ name: "front" });
   const [front, setFront] = useState<Blob | null>(null);
   const [back, setBack] = useState<Blob | null>(null);
+  const [stamp, setStamp] = useState<Blob | null>(null);
 
-  async function read(backPhoto: Blob | null) {
+  async function read(stampPhoto: Blob | null) {
     if (!front) return;
     setStep({ name: "reading", stage: "loading-model" });
     try {
       // Loaded only now, so people who never scan don't download the OCR code.
       const { readStrip } = await import("@/lib/ai/ocr");
-      const reading = await readStrip(front, backPhoto, (stage) =>
-        setStep({ name: "reading", stage }),
+      const reading = await readStrip(
+        front,
+        back,
+        (stage) => setStep({ name: "reading", stage }),
+        stampPhoto,
       );
       setStep({ name: "confirm", reading });
     } catch {
@@ -124,6 +129,7 @@ export function ScanClient({ t, locale }: { t: T; locale: string }) {
   function startOver() {
     setFront(null);
     setBack(null);
+    setStamp(null);
     setStep({ name: "front" });
   }
 
@@ -146,32 +152,47 @@ export function ScanClient({ t, locale }: { t: T; locale: string }) {
     </p>
   );
 
-  if (step.name === "front" || step.name === "back") {
-    const isFront = step.name === "front";
+  if (step.name === "front" || step.name === "back" || step.name === "stamp") {
+    const page = {
+      front: { title: t.stepFront, hint: t.frontHint, photo: front, setPhoto: setFront },
+      back: { title: t.stepBack, hint: t.backHint, photo: back, setPhoto: setBack },
+      stamp: { title: t.stepStamp, hint: t.stampHint, photo: stamp, setPhoto: setStamp },
+    }[step.name];
     return (
       <div className="flex flex-col gap-4">
-        <h2 className="text-xl font-semibold">{isFront ? t.stepFront : t.stepBack}</h2>
-        <p className="text-base">{isFront ? t.frontHint : t.backHint}</p>
-        <PhotoPicker t={t} photo={isFront ? front : back} onPhoto={isFront ? setFront : setBack} />
+        <h2 className="text-xl font-semibold">{page.title}</h2>
+        <p className="text-base">{page.hint}</p>
+        <PhotoPicker t={t} photo={page.photo} onPhoto={page.setPhoto} />
         <div className="flex flex-wrap gap-2">
-          {isFront ? (
+          {step.name === "front" && (
             <Button disabled={!front} onClick={() => setStep({ name: "back" })}>
               {t.next}
             </Button>
-          ) : (
+          )}
+          {step.name === "back" && (
             <>
-              <Button disabled={!back} onClick={() => read(back)}>
+              <Button disabled={!back} onClick={() => setStep({ name: "stamp" })}>
+                {t.next}
+              </Button>
+              <Button variant="outline" onClick={() => setStep({ name: "stamp" })}>
+                {t.skipBack}
+              </Button>
+            </>
+          )}
+          {step.name === "stamp" && (
+            <>
+              <Button disabled={!stamp} onClick={() => read(stamp)}>
                 {t.next}
               </Button>
               <Button variant="outline" onClick={() => read(null)}>
-                {t.skipBack}
+                {t.skipStamp}
               </Button>
             </>
           )}
         </div>
         {tips}
         {privacy}
-        {isFront && (
+        {step.name === "front" && (
           <div className="flex flex-col gap-1 rounded-xl border border-dashed border-border p-3">
             <Button variant="outline" onClick={readDemo} className="w-fit">
               {t.demoButton}
