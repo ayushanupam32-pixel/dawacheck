@@ -257,7 +257,9 @@ def load_banned_fdcs(db: Supabase, banned: pd.DataFrame) -> int:
     today = date.today().isoformat()
     rows = {}
     for r in banned.itertuples(index=False):
-        key = row_id(r.combination_key, r.strengths, r.description, r.notification)
+        key = row_id(
+            r.combination_key, r.salt_strengths, r.forms, r.releases, r.description, r.notification
+        )
         rows[key] = {
             "id": key,
             "combination_key": clean(r.combination_key) or None,
@@ -266,6 +268,9 @@ def load_banned_fdcs(db: Supabase, banned: pd.DataFrame) -> int:
             "status": r.status,
             "description": r.description,
             "strengths": clean(r.strengths) or None,
+            "salt_strengths": json.loads(r.salt_strengths or "{}"),
+            "forms": json.loads(r.forms or "[]"),
+            "releases": json.loads(r.releases or "[]"),
             "notification": clean(r.notification) or None,
             "notified_on": clean(r.notified_on) or None,
             "status_note": clean(r.status_note) or None,

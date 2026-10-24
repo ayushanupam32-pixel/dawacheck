@@ -4,17 +4,17 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { normalizeBatch } from "./ai/extract";
-import { normalizeSalt, parseCompositionKey } from "./ai/normalize";
-import { checkBanned, combinationKey, type BannedResult } from "./checks/banned";
+import { normalizeSalt, parseCompositionKey, type Composition } from "./ai/normalize";
+import { checkBanned, combinationKey, type BannedResult, type Medicine } from "./checks/banned";
 import { checkBatch, type BatchResult } from "./checks/batch";
 import type { AlertRow, BannedRow } from "./checks/types";
 
 export type ChecksInput = {
   /** The brand chosen after matching (gives the composition), or null. */
   brandId: number | null;
-  /** Ingredients confirmed from the strip: used instead of the brand's when given (the dataset
-   * may have cut a brand's list short, e.g. Neorelax MR). */
-  stripSalts: string[];
+  /** Ingredients confirmed from the strip, with strengths: used instead of the brand's when
+   * they include all of them (the dataset may have cut a brand's list short, e.g. Neorelax MR). */
+  stripIngredients: { salt: string; value: number; unit: string }[];
   batchNo: string;
   batchConfidence: number;
   names: string[];
@@ -42,23 +42,65 @@ export function chooseSalts(strip: string[], brand: string[]): string[] {
   return brand.every((b) => s.includes(b)) ? s : brand;
 }
 
+/**
+ * The medicine as the banned check sees it: salts (chooseSalts), strength per salt (the brand's
+ * record first, then the strip's), form and release type (from the brand's record; unknown
+ * without one).
+ */
+export function describeMedicine(
+  composition: Composition | null,
+  strip: { salt: string; value: number; unit: string }[],
+  brandComplete = true,
+): Medicine {
+  const brand = composition?.ingredients ?? [];
+  const fromStrip = strip.map((i) => ({ ...i, salt: normalizeSalt(i.salt) }));
+  const salts = chooseSalts(
+    fromStrip.map((i) => i.salt),
+    brand.map((i) => i.salt),
+  );
+  const strengths: Medicine["strengths"] = {};
+  for (const i of [...brand, ...fromStrip]) {
+    if (salts.includes(i.salt) && !strengths[i.salt]) {
+      strengths[i.salt] = { value: i.value, unit: i.unit };
+    }
+  }
+  // Are these ALL the salts? Yes if the brand record is complete. Otherwise only if the strip
+  // lists more salts than the record (proof the record was cut short, and the strip was
+  // confirmed by the user). A strip listing the same salts as a cut-short record proves
+  // nothing: the reader misses ingredients often, and the user may not add them.
+  const saltsComplete =
+    (!!composition && brandComplete) ||
+    (fromStrip.length > brand.length && salts.length > brand.length);
+  return {
+    salts,
+    saltsComplete,
+    strengths,
+    form: composition?.form ?? null,
+    releases: composition
+      ? composition.release === "ir"
+        ? []
+        : composition.release.split("+")
+      : null,
+  };
+}
+
 export async function runChecks(db: SupabaseClient, input: ChecksInput): Promise<ChecksResponse> {
   let brandKey: string | null = null;
   let brandMaker: string | null = null;
+  let brandComplete = false;
   if (input.brandId) {
     const { data } = await db
       .from("brands")
-      .select("composition_key, manufacturer")
+      .select("composition_key, composition_complete, manufacturer")
       .eq("id", input.brandId)
       .maybeSingle();
     brandKey = data?.composition_key ?? null;
     brandMaker = data?.manufacturer ?? null;
+    brandComplete = data?.composition_complete ?? false;
   }
   const composition = brandKey ? parseCompositionKey(brandKey) : null;
-  const salts = chooseSalts(
-    input.stripSalts.map(normalizeSalt),
-    composition?.ingredients.map((i) => i.salt) ?? [],
-  );
+  const medicine = describeMedicine(composition, input.stripIngredients, brandComplete);
+  const salts = medicine.salts;
   const batchNo = normalizeBatch(input.batchNo);
 
   const [alerts, latest, banned, generics, sources] = await Promise.all([
@@ -106,7 +148,7 @@ export async function runChecks(db: SupabaseClient, input: ChecksInput): Promise
       (alerts.data ?? []) as AlertRow[],
       checkedThrough,
     ),
-    banned: checkBanned(salts, (banned.data ?? []) as BannedRow[], !!lastRun("cdsco_fdc")),
+    banned: checkBanned(medicine, (banned.data ?? []) as BannedRow[], !!lastRun("cdsco_fdc")),
     sources: {
       alerts: { url: ALERTS_URL, updatedOn: lastRun("cdsco_alerts") },
       fdc: { url: FDC_URL, updatedOn: lastRun("cdsco_fdc") },
@@ -132,7 +174,13 @@ export function parseChecksInput(body: unknown): ChecksInput | null {
   return {
     brandId:
       Number.isInteger(b.brandId) && (b.brandId as number) > 0 ? (b.brandId as number) : null,
-    stripSalts: list(b.stripSalts, 8, 80),
+    stripIngredients: Array.isArray(b.stripIngredients)
+      ? b.stripIngredients
+          .slice(0, 8)
+          .map((i) => i as Record<string, unknown>)
+          .filter((i) => text(i?.salt, 80) && Number.isFinite(i.value) && text(i.unit, 10))
+          .map((i) => ({ salt: text(i.salt, 80), value: Number(i.value), unit: text(i.unit, 10) }))
+      : [],
     batchNo: text(b.batchNo, 30),
     batchConfidence: Number.isFinite(confidence) ? Math.min(1, Math.max(0, confidence)) : 0,
     names: list(b.names, 4, 80),

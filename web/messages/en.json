@@ -217,6 +217,7 @@
     "source": "Source",
     "updated": "Updated",
     "noData": "Couldn't check: this government list is not loaded into DawaCheck yet.",
-    "statusAvailable": "Available"
+    "statusAvailable": "Available",
+    "bannedMaybe": "may apply: we could not confirm all its details (the full list of ingredients, the form, release type or strength). Compare with your strip"
   }
 }

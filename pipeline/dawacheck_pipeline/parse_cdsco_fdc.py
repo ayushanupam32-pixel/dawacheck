@@ -25,13 +25,21 @@ Run: uv run python -m dawacheck_pipeline.parse_cdsco_fdc
 
 import json
 import re
+from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
 
 import pandas as pd
 import pdfplumber
 
-from dawacheck_pipeline.normalize import clean_text, extract_phrases, normalize_salt
+from dawacheck_pipeline.normalize import (
+    STRENGTH_RE,
+    clean_text,
+    extract_phrases,
+    format_decimal,
+    normalize_salt,
+    parse_strength,
+)
 from dawacheck_pipeline.paths import CLEAN_DIR, latest_raw_dir
 
 # The consolidated list's footnotes (page 33-34 of "Updated Banned Drugs List.pdf"):
@@ -66,6 +74,9 @@ COLUMNS = [
     "status",
     "description",
     "strengths",
+    "salt_strengths",
+    "forms",
+    "releases",
     "notification",
     "notified_on",
     "status_note",
@@ -159,32 +170,59 @@ def _distance(a: str, b: str) -> int:
     return previous[-1]
 
 
-def split_salts(description: str, vocabulary: set[str]) -> tuple[list[str], str, str]:
-    """ "Glimepiride 1mg/2mg + Pioglitazone 15mg (as HCl)" -> (salts, kind, strengths text)."""
+@dataclass
+class Parsed:
+    """What an entry bans. Every restriction it names is kept, because each one narrows the ban:
+    "Aceclofenac (SR) + Paracetamol" bans only the sustained-release form; "Diclofenac +
+    Paracetamol injection" only the injection; "Gliclazide 80mg + Metformin 325 mg" only those
+    strengths. Matching on the salts alone would call thousands of legal medicines banned.
+    """
+
+    salts: list[str]
+    kind: str  # combination | single | category
+    strengths: str = ""  # as written, for display
+    salt_strengths: dict[str, list[str]] = field(default_factory=dict)  # "50:mg", like keys
+    forms: list[str] = field(default_factory=list)  # canonical forms named ("injection")
+    releases: list[str] = field(default_factory=list)  # release types named ("er", "dr")
+
+
+def strengths_in(text: str) -> list[str]:
+    """ "Glimepiride 1mg/2mg/3mg" -> ["1:mg", "2:mg", "3:mg"]; "250mg/5ml" -> ["50:mg/ml"]."""
+    return [
+        f"{format_decimal(st.value)}:{st.unit}"
+        for st in (parse_strength(m) for m in STRENGTH_RE.finditer(text))
+    ]
+
+
+def split_salts(description: str, vocabulary: set[str]) -> Parsed:
+    """ "Glimepiride 1mg/2mg + Pioglitazone 15mg (as HCl)" -> salts, kind and restrictions."""
     text = clean_text(description).rstrip(". ")
     group = re.match(r"^fixed\s+dose\s+combinations?\s+of\s+", text, flags=re.I)
     text = text[group.end() :] if group else text
     # "S(+) Etodolac": the (+) names the S-enantiomer, it is not a separator.
     text = re.sub(r"\b([SRLD])\s*\(\s*[+-]\s*\)\s*-?\s*", lambda m: f"{m[1].lower()}-", text)
     strengths = " ; ".join(m.group(0) for m in _STRENGTH.finditer(text))
+    forms, _ = extract_phrases(text, "forms")
+    releases, _ = extract_phrases(text, "releases")
+    restrictions = {"forms": sorted(forms), "releases": sorted(set(releases) - {"ir"})}
     parts = [p for p in re.split(r"\s*\+\s*", text) if p.strip()]
     if len(parts) < 2 and group:
-        return [], "category", strengths  # "FDCs of vitamins with analgesics": a description
+        return Parsed([], "category", strengths)  # "FDCs of vitamins with analgesics"
     if len(parts) < 2 and _FORM_LIMITED.search(text):
         # "Tetracycline Liquid Oral preparations": only some forms are banned. Matching on the
         # drug alone would wrongly flag legal tetracycline capsules, so this is not matched.
-        return [], "category", strengths
+        return Parsed([], "category", strengths)
     if len(parts) < 2:
-        # One named drug ("Phenacetin", "Analgin and all formulations containing analgin") or a
-        # description of a group ("... of vitamins with anti-inflammatory agents").
+        # One named drug ("Phenacetin") or a description of a group.
         words = re.sub(r",?\s*(its salts|as a drug)\b", " ", text, flags=re.I)
         words = _DESCRIPTORS.sub(" ", re.sub(r"\([^)]*\)", " ", words))
         words = re.sub(r"\s+", " ", words).strip(" ,.")
         if re.search(r"\b(of|in|and|or|any|other|group|agents?|than|except)\b", words, re.I):
-            return [], "category", strengths
-        return [repair(normalize_salt(words), vocabulary)], "single", strengths
+            return Parsed([], "category", strengths)
+        return Parsed([repair(normalize_salt(words), vocabulary)], "single", strengths)
 
-    salts = []
+    salts: list[str] = []
+    salt_strengths: dict[str, list[str]] = {}
     for part in parts:
         p = re.sub(r"\([^)]*\)?", " ", part)  # "(As enteric coated tablet)", "(A)"
         p = re.sub(r"\b(?:eq\.?|equivalent)\s+to\b.*$", " ", p, flags=re.I)
@@ -197,12 +235,20 @@ def split_salts(description: str, vocabulary: set[str]) -> tuple[list[str], str,
         salt = repair(normalize_salt(p), vocabulary) if p else ""
         if salt:
             salts.append(salt)
+            if found := strengths_in(part):
+                salt_strengths[salt] = found
     # A part that is a description, not a drug ("Corticosteroids + any other drug excluding
-    # ...", "Combikit of ..."): the entry cannot be matched exactly, so it is a category.
-    if any(_VAGUE.search(s) for s in salts):
-        return [], "category", strengths
-    salts = sorted(set(salts))
-    return salts, ("combination" if len(salts) >= 2 else "single"), strengths
+    # ...", "Combikit of ..."), or two parts naming the same salt ("Chlorpheniramine +
+    # Chlorpheniramine maleate"): we cannot tell exactly what is banned, so it is not matched.
+    if any(_VAGUE.search(x) for x in salts) or len(set(salts)) < len(salts):
+        return Parsed([], "category", strengths)
+    return Parsed(
+        sorted(salts),
+        "combination" if len(salts) >= 2 else "single",
+        strengths,
+        salt_strengths,
+        **restrictions,
+    )
 
 
 def table_rows(pdf_path: Path) -> list[list[str]]:
@@ -271,16 +317,19 @@ def parse(folder: Path, vocabulary: set[str]) -> pd.DataFrame:
             number = re.search(r"S\.?\s*O\.?\s*(?:No\.?)?\s*(\d+)", entry["notification"])
             if number and number[1] in DESCRIPTION_FROM_LEGEND:
                 entry["description"] = DESCRIPTION_FROM_LEGEND[number[1]]
-            salts, kind, strengths = split_salts(entry["description"], vocabulary)
+            parsed = split_salts(entry["description"], vocabulary)
             status = status_of(entry, restricted)
             rows.append(
                 {
-                    "combination_key": "|".join(salts) if kind != "category" else "",
-                    "salts": json.dumps(salts),
-                    "kind": kind,
+                    "combination_key": "|".join(parsed.salts) if parsed.kind != "category" else "",
+                    "salts": json.dumps(parsed.salts),
+                    "kind": parsed.kind,
                     "status": status,
                     "description": entry["description"],
-                    "strengths": strengths,
+                    "strengths": parsed.strengths,
+                    "salt_strengths": json.dumps(parsed.salt_strengths),
+                    "forms": json.dumps(parsed.forms),
+                    "releases": json.dumps(parsed.releases),
                     "notification": entry["notification"],
                     "notified_on": latest_date(entry["notification"]),
                     "status_note": NOTE_TEXT[status],
@@ -293,7 +342,9 @@ def parse(folder: Path, vocabulary: set[str]) -> pd.DataFrame:
     # same salts AND same strengths: Glimepiride + Pioglitazone + Metformin is prohibited in some
     # strengths and quashed (sub judice) in others, and those must stay separate entries.
     matchable = df[df["combination_key"] != ""].sort_values("notified_on", kind="stable")
-    latest = matchable.drop_duplicates(["combination_key", "strengths"], keep="last")
+    latest = matchable.drop_duplicates(
+        ["combination_key", "salt_strengths", "forms", "releases"], keep="last"
+    )
     return pd.concat([latest, df[df["combination_key"] == ""]], ignore_index=True)
 
 

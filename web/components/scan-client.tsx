@@ -338,7 +338,7 @@ function Confirm({
   // left as read keeps the reader's confidence (low = "Please check" = not looked up).
   const readBatch = f.batchNo?.value ?? "";
   const facts: StripFacts = {
-    stripSalts: stripIngredients.map((i) => i.salt),
+    stripIngredients: stripIngredients.map(({ salt, value, unit }) => ({ salt, value, unit })),
     batchNo: values.batchNo.trim(),
     batchConfidence:
       values.batchNo.trim() && values.batchNo.trim() !== readBatch

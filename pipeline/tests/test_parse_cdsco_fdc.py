@@ -48,35 +48,64 @@ def test_repair(raw: str, expected: str) -> None:
 
 
 def test_split_salts_removes_strengths_forms_and_descriptors() -> None:
-    salts, kind, strengths = split_salts(
-        "Glimepiride 1mg/2mg + Pioglitazone 15mg/15mg + Metformin 850mg/850mg", VOCAB
-    )
-    assert (salts, kind) == (["glimepiride", "metformin", "pioglitazone"], "combination")
-    assert "850mg/850mg" in strengths
-    salts, _, _ = split_salts("Cetir izine HCl + Paracetamol + Phenylephrine HCl", VOCAB)
-    assert salts == ["cetirizine", "paracetamol", "phenylephrine"]
-    salts, _, _ = split_salts(
+    p = split_salts("Glimepiride 1mg/2mg + Pioglitazone 15mg/15mg + Metformin 850mg/850mg", VOCAB)
+    assert (p.salts, p.kind) == (["glimepiride", "metformin", "pioglitazone"], "combination")
+    assert "850mg/850mg" in p.strengths
+    assert p.salt_strengths["glimepiride"] == ["1:mg", "2:mg"]
+    assert split_salts("Cetir izine HCl + Paracetamol + Phenylephrine HCl", VOCAB).salts == [
+        "cetirizine",
+        "paracetamol",
+        "phenylephrine",
+    ]
+    p = split_salts(
         "Rabeprazole Sodium (As enteric coated tablet) + Domperidone (sustained release)", VOCAB
     )
-    assert salts == ["domperidone", "rabeprazole"]
+    assert p.salts == ["domperidone", "rabeprazole"]
+    assert p.releases == ["dr", "er"]
+
+
+@pytest.mark.parametrize(
+    ("description", "forms", "releases", "strengths"),
+    [
+        # Real entries that look like common legal medicines unless their restriction is kept.
+        ("Aceclofenac (SR) + Paracetamol", [], ["er"], {}),
+        ("Diclofenac + Paracetamol injection", ["injection"], [], {}),
+        ("Nimesulide+ Paracetamol dispersible tablets", ["tablet"], ["dispersible"], {}),
+        (
+            "Gliclazide 80mg + Metformin 325 mg",
+            [],
+            [],
+            {"gliclazide": ["80:mg"], "metformin": ["325:mg"]},
+        ),
+        ("Norfloxacin + Tinidazole (with Betacyclodextrin) Eye ointment", ["eye_ointment"], [], {}),
+    ],
+)
+def test_restrictions_are_kept(description, forms, releases, strengths) -> None:
+    vocab = VOCAB | {"aceclofenac", "diclofenac", "nimesulide", "gliclazide", "norfloxacin"}
+    p = split_salts(description, vocab)
+    assert (p.forms, p.releases, p.salt_strengths) == (forms, releases, strengths)
 
 
 def test_s_plus_is_part_of_the_name_not_a_separator() -> None:
-    salts, kind, _ = split_salts("S(+) Etodolac + Paracetamol", VOCAB)
-    assert (salts, kind) == (["paracetamol", "s-etodolac"], "combination")
+    p = split_salts("S(+) Etodolac + Paracetamol", VOCAB)
+    assert (p.salts, p.kind) == (["paracetamol", "s-etodolac"], "combination")
 
 
 def test_single_drugs_and_categories() -> None:
-    assert split_salts("Phenacetin.", VOCAB)[:2] == (["phenacetin"], "single")
-    assert split_salts("Fixed dose combinations of Vitamins with Analgesics.", VOCAB)[1] == (
+    p = split_salts("Phenacetin.", VOCAB)
+    assert (p.salts, p.kind) == (["phenacetin"], "single")
+    assert split_salts("Fixed dose combinations of Vitamins with Analgesics.", VOCAB).kind == (
         "category"
     )
     # Only some forms banned: shown, never matched (tetracycline capsules are legal).
-    assert split_salts("Tetracycline Liquid Oral preparations.", VOCAB)[1] == "category"
-    assert split_salts("Methapyrilene, its salts.", VOCAB)[:2] == (["methapyrilene"], "single")
-    assert split_salts("Chloral Hydrate as a drug.", VOCAB)[:2] == (["chloral hydrate"], "single")
-    salts, kind, _ = split_salts("Corticosteroids + any other drug excluding Tamsulosin", VOCAB)
-    assert (salts, kind) == ([], "category")
+    assert split_salts("Tetracycline Liquid Oral preparations.", VOCAB).kind == "category"
+    assert split_salts("Methapyrilene, its salts.", VOCAB).salts == ["methapyrilene"]
+    assert split_salts("Chloral Hydrate as a drug.", VOCAB).salts == ["chloral hydrate"]
+    p = split_salts("Corticosteroids + any other drug excluding Tamsulosin", VOCAB)
+    assert (p.salts, p.kind) == ([], "category")
+    # Two parts naming the same salt: what exactly is banned is unclear, so never matched.
+    p = split_salts("Dextromethorphan + Chlorpheniramine + Chlorpheniramine maleate", VOCAB)
+    assert p.kind == "category"
 
 
 def test_entries_join_rows_and_collect_footnotes() -> None:

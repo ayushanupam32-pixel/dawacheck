@@ -27,7 +27,8 @@ type T = Dictionary["checks"];
 
 export type ResultCardInput = {
   brandId: number;
-  stripSalts: string[];
+  /** Ingredients confirmed from the strip, with strengths (the banned check compares them). */
+  stripIngredients: { salt: string; value: number; unit: string }[];
   batchNo: string;
   batchConfidence: number;
   names: string[];
@@ -204,6 +205,8 @@ export function ResultCard({
                     {legal(m.status)}: {m.description}
                     {m.notification && ` (${m.notification})`}
                     {m.strengths && `. ${fill(t.bannedStrengths, { strengths: m.strengths })}`}
+                    {/* The entry names a form, release type or strength we could not confirm. */}
+                    {!m.certain && ` (${t.bannedMaybe})`}
                   </li>
                 ))}
               </ul>

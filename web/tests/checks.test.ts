@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { checkBanned, combinationKey } from "@/lib/checks/banned";
+import { parseCompositionKey } from "@/lib/ai/normalize";
+import { checkBanned, combinationKey, type Medicine } from "@/lib/checks/banned";
 import { checkBatch, type BatchInput } from "@/lib/checks/batch";
 import type { AlertRow, BannedRow } from "@/lib/checks/types";
-import { chooseSalts, parseChecksInput } from "@/lib/run-checks";
+import { chooseSalts, describeMedicine, parseChecksInput } from "@/lib/run-checks";
 
 // Rows as loaded from the real CDSCO data (pipeline/clean/cdsco_alerts.csv, banned_fdcs.csv).
 const alert = (over: Partial<AlertRow>): AlertRow => ({
@@ -144,11 +145,37 @@ const banned = (over: Partial<BannedRow>): BannedRow => ({
   status: "prohibited",
   description: "",
   strengths: null,
+  salt_strengths: {},
+  forms: [],
+  releases: [],
   notification: null,
   notified_on: null,
   status_note: null,
   source_url: "https://cdsco.gov.in/",
   ...over,
+});
+// Real entries (pipeline/clean/banned_fdcs.csv), including the ones that, matched on salts
+// alone, called thousands of legal medicines banned on the live site.
+const ACECLO_SR = banned({
+  combination_key: "aceclofenac|paracetamol",
+  description: "Aceclofenac (SR) + Paracetamol",
+  releases: ["er"],
+});
+const ACECLO_50_125 = banned({
+  combination_key: "aceclofenac|paracetamol",
+  description: "Aceclofenac 50mg + Paracetamol 125mg tablet",
+  salt_strengths: { aceclofenac: ["50:mg"], paracetamol: ["125:mg"] },
+  forms: ["tablet"],
+});
+const DICLO_INJ = banned({
+  combination_key: "diclofenac|paracetamol",
+  description: "Diclofenac + Paracetamol injection",
+  forms: ["injection"],
+});
+const GLICLA_80_325 = banned({
+  combination_key: "gliclazide|metformin",
+  description: "Gliclazide 80mg + Metformin 325 mg",
+  salt_strengths: { gliclazide: ["80:mg"], metformin: ["325:mg"] },
 });
 const S_ETODOLAC = banned({
   combination_key: "paracetamol|s-etodolac",
@@ -160,62 +187,198 @@ const PARA_PHENYL_CAFF = banned({
   status: "under_examination",
   description: "Paracetamol + Phenylephrine +Caffeine",
 });
-const GLIM_2016 = banned({ combination_key: "glimepiride|metformin|pioglitazone" });
 const GLIM_QUASHED = banned({
   combination_key: "glimepiride|metformin|pioglitazone",
   status: "quashed",
-  strengths: "1mg/2mg ; 15mg/15mg ; 850mg/850mg",
+  salt_strengths: { glimepiride: ["1:mg", "2:mg"], pioglitazone: ["15:mg"], metformin: ["850:mg"] },
 });
 const ROSIGLITAZONE = banned({ combination_key: "rosiglitazone", kind: "single" });
 const CATEGORY = banned({
   kind: "category",
   description: "Fixed dose combinations of vitamins with analgesics",
 });
-const ALL = [S_ETODOLAC, PARA_PHENYL_CAFF, GLIM_2016, GLIM_QUASHED, ROSIGLITAZONE, CATEGORY];
+const ALL = [
+  ACECLO_SR,
+  ACECLO_50_125,
+  DICLO_INJ,
+  GLICLA_80_325,
+  S_ETODOLAC,
+  PARA_PHENYL_CAFF,
+  GLIM_QUASHED,
+  ROSIGLITAZONE,
+  CATEGORY,
+];
+
+/** A medicine as a brand record describes it: "aceclofenac:100:mg|paracetamol:325:mg#tablet#ir". */
+const med = (
+  strengths: Record<string, number>,
+  form: string | null = "tablet",
+  releases: string[] | null = [],
+  saltsComplete = true,
+): Medicine => ({
+  salts: Object.keys(strengths),
+  saltsComplete,
+  strengths: Object.fromEntries(
+    Object.entries(strengths)
+      .filter(([, v]) => v > 0)
+      .map(([k, v]) => [k, { value: v, unit: "mg" }]),
+  ),
+  form,
+  releases,
+});
 
 describe("checkBanned", () => {
-  it("matches the set of salts in any order", () => {
-    expect(combinationKey(["s-etodolac", "paracetamol"])).toBe("paracetamol|s-etodolac");
-    expect(checkBanned(["s-etodolac", "paracetamol"], ALL)).toMatchObject({
-      status: "alert",
-      reason: "prohibited",
+  it("does not call ordinary aceclofenac + paracetamol tablets banned", () => {
+    // e.g. 100 mg + 325 mg immediate-release tablets: sold legally by thousands of brands.
+    expect(checkBanned(med({ aceclofenac: 100, paracetamol: 325 }), ALL)).toMatchObject({
+      status: "ok",
+      reason: "not_listed",
     });
   });
 
-  it("does not treat ordinary etodolac as S(+) etodolac", () => {
-    expect(checkBanned(["etodolac", "paracetamol"], ALL).status).toBe("ok");
+  it("matches the sustained-release form and the banned strengths", () => {
+    expect(
+      checkBanned(med({ aceclofenac: 200, paracetamol: 500 }, "tablet", ["er"]), ALL).status,
+    ).toBe("alert");
+    expect(checkBanned(med({ aceclofenac: 50, paracetamol: 125 }), ALL).status).toBe("alert");
   });
 
-  it("a different combination (an extra salt) is not a match", () => {
+  it("an injection-only ban does not apply to tablets", () => {
+    expect(checkBanned(med({ diclofenac: 50, paracetamol: 325 }), ALL).status).toBe("ok");
+    expect(checkBanned(med({ diclofenac: 75, paracetamol: 150 }, "injection"), ALL).status).toBe(
+      "alert",
+    );
+  });
+
+  it("a strength-specific ban applies only to those strengths", () => {
+    expect(checkBanned(med({ gliclazide: 80, metformin: 500 }), ALL).status).toBe("ok");
+    expect(checkBanned(med({ gliclazide: 80, metformin: 325 }), ALL).status).toBe("alert");
+  });
+
+  it("a brand record that may be cut short cannot confirm an exact combination", () => {
+    // "Acemiz-MR": aceclofenac + paracetamol + chlorzoxazone, recorded with only 2 salts.
+    const r = checkBanned(
+      med({ aceclofenac: 100, paracetamol: 325 }, "tablet", ["er"], false),
+      ALL,
+    );
+    expect(r.status).toBe("warn");
+    expect(r.matches[0].certain).toBe(false);
+    // A single-drug ban only needs the drug to be there: still certain.
     expect(
-      checkBanned(["caffeine", "chlorpheniramine", "paracetamol", "phenylephrine"], ALL).status,
+      checkBanned(med({ metformin: 500, rosiglitazone: 2 }, "tablet", [], false), ALL).status,
+    ).toBe("alert");
+  });
+
+  it("when a restriction cannot be checked, it is 'may apply', never 'prohibited'", () => {
+    // Strengths unknown (strip without a brand record): the 50+125 mg entry may apply.
+    const r = checkBanned(med({ aceclofenac: 0, paracetamol: 0 }, null, null), ALL);
+    expect(r.status).toBe("warn");
+    expect(r.matches.every((m) => !m.certain)).toBe(true);
+  });
+
+  it("matches the set of salts in any order, S(+) etodolac distinct from etodolac", () => {
+    expect(combinationKey(["s-etodolac", "paracetamol"])).toBe("paracetamol|s-etodolac");
+    expect(checkBanned(med({ "s-etodolac": 400, paracetamol: 325 }), ALL).status).toBe("alert");
+    expect(checkBanned(med({ etodolac: 400, paracetamol: 325 }), ALL).status).toBe("ok");
+  });
+
+  it("an extra salt makes a different combination", () => {
+    expect(
+      checkBanned(
+        med({ caffeine: 30, chlorpheniramine: 2, paracetamol: 500, phenylephrine: 10 }),
+        ALL,
+      ).status,
     ).toBe("ok");
   });
 
   it("court or committee status is a warning, not a ban", () => {
-    expect(checkBanned(["paracetamol", "phenylephrine", "caffeine"], ALL)).toMatchObject({
+    expect(
+      checkBanned(med({ paracetamol: 500, phenylephrine: 10, caffeine: 30 }), ALL),
+    ).toMatchObject({
       status: "warn",
       reason: "review",
     });
-  });
-
-  it("warns when entries differ by strength and status", () => {
-    const r = checkBanned(["metformin", "glimepiride", "pioglitazone"], ALL);
-    expect(r.status).toBe("warn");
-    expect(r.matches).toHaveLength(2);
+    expect(checkBanned(med({ glimepiride: 2, pioglitazone: 15, metformin: 850 }), ALL).status).toBe(
+      "warn",
+    );
+    // Strengths not in the quashed entry: it does not apply at all.
+    expect(checkBanned(med({ glimepiride: 2, pioglitazone: 15, metformin: 500 }), ALL).status).toBe(
+      "ok",
+    );
   });
 
   it("a single-drug ban matches any medicine containing it", () => {
-    expect(checkBanned(["metformin", "rosiglitazone"], ALL).status).toBe("alert");
+    expect(checkBanned(med({ metformin: 500, rosiglitazone: 2 }), ALL).status).toBe("alert");
   });
 
-  it("never matches categories, and needs a composition", () => {
-    expect(checkBanned(["paracetamol"], [CATEGORY]).status).toBe("ok");
-    expect(checkBanned([], ALL)).toMatchObject({ status: "unknown", reason: "no_composition" });
-    // Lists not loaded: "not listed" would be a guess.
-    expect(checkBanned(["paracetamol"], [], false)).toMatchObject({
+  it("never matches categories; needs a composition and loaded lists", () => {
+    expect(checkBanned(med({ paracetamol: 500 }), [CATEGORY]).status).toBe("ok");
+    expect(checkBanned(med({}), ALL)).toMatchObject({
+      status: "unknown",
+      reason: "no_composition",
+    });
+    expect(checkBanned(med({ paracetamol: 500 }), [], false)).toMatchObject({
       status: "unknown",
       reason: "no_data",
+    });
+  });
+});
+
+describe("describeMedicine", () => {
+  it("takes strengths, form and release from the brand record", () => {
+    const m = describeMedicine(
+      parseCompositionKey("aceclofenac:100:mg|paracetamol:325:mg#tablet#ir"),
+      [],
+    );
+    expect(m).toEqual({
+      salts: ["aceclofenac", "paracetamol"],
+      saltsComplete: true,
+      strengths: {
+        aceclofenac: { value: 100, unit: "mg" },
+        paracetamol: { value: 325, unit: "mg" },
+      },
+      form: "tablet",
+      releases: [],
+    });
+  });
+
+  it("adds the strip's extra ingredient, and knows nothing about form without a brand", () => {
+    const m = describeMedicine(
+      parseCompositionKey("aceclofenac:100:mg|thiocolchicoside:4:mg#tablet#er"),
+      [
+        { salt: "Paracetamol IP", value: 325, unit: "mg" },
+        { salt: "Aceclofenac", value: 100, unit: "mg" },
+        { salt: "Thiocolchicoside", value: 4, unit: "mg" },
+      ],
+    );
+    expect(m.salts).toHaveLength(3);
+    // From the strip, as confirmed by the user: complete, even if the brand record is not.
+    expect(m.saltsComplete).toBe(true);
+    expect(m.strengths.paracetamol).toEqual({ value: 325, unit: "mg" });
+    expect(m.releases).toEqual(["er"]);
+    // The strip lists the same 2 salts as a cut-short record: still not proven complete (the
+    // reader may have missed the third, as on "Acemiz-MR").
+    expect(
+      describeMedicine(
+        parseCompositionKey("aceclofenac:100:mg|paracetamol:325:mg#tablet#er"),
+        [
+          { salt: "Aceclofenac", value: 100, unit: "mg" },
+          { salt: "Paracetamol", value: 325, unit: "mg" },
+        ],
+        false,
+      ).saltsComplete,
+    ).toBe(false);
+    // A brand record the dataset marks incomplete, with no strip ingredients: not complete.
+    expect(
+      describeMedicine(
+        parseCompositionKey("aceclofenac:100:mg|paracetamol:325:mg#tablet#er"),
+        [],
+        false,
+      ).saltsComplete,
+    ).toBe(false);
+    expect(describeMedicine(null, [{ salt: "Metformin", value: 500, unit: "mg" }])).toMatchObject({
+      form: null,
+      releases: null,
     });
   });
 });
@@ -244,7 +407,7 @@ describe("parseChecksInput", () => {
       }),
     ).toEqual({
       brandId: 7,
-      stripSalts: [],
+      stripIngredients: [],
       batchNo: "ab-12",
       batchConfidence: 1,
       names: ["Telma"],

@@ -223,42 +223,45 @@ corrections): 1/5 matched, 0 wrong: the M3 reader rarely reads the brand name.
   `pipeline/raw/nppa/<date>/`; the pipeline parses it (like the Kaggle file). Ceiling prices
   **exclude GST**; the app must say so.
 
-### M5 progress (2026-10-24, not committed)
+### M5 progress (end of 2026-10-24)
 
 See `docs/milestones/M5-safety-checks.md`.
 
-- **Built and tested:** alerts pipeline (6,944 alerts), banned-FDC pipeline (682 entries,
-  pdfplumber 0.11.7), tables (`supabase/migrations/20261024040000_safety_check_tables.sql`,
-  applied), loader, 4 new steps in `data-refresh.yml` (brand parsing now runs every month),
-  `web/lib/checks/{batch,banned}.ts`, `web/lib/run-checks.ts`, `POST /api/checks`, the six-row
-  `components/result-card.tsx` in the scan flow (en/hi/ta). Pipeline 147 tests, web 275.
-- **Not loaded yet:** the new tables are empty until the data-refresh Action runs (it holds the
-  secret key). The card says "Couldn't check: not loaded yet" until then.
+- **Committed and live (`5b52369`):** alerts + banned-FDC pipelines, tables, loader, refresh
+  steps, `web/lib/checks/*`, `POST /api/checks`, the six-row result card. The data-refresh run of
+  2026-10-24 loaded 6,905 alerts and 682 banned entries; live checks verified for batch safety
+  (Paracet 500 batch APRCT-2501 and Cufcott LS batch UFL251248K give alerts; other batches "not
+  found"; uncertain or missing batch gives "couldn't check").
+- **Banned-list false alarm (2026-10-24), fixed 2026-10-25:** the first deployed banned check
+  matched on salts only and called common legal medicines banned (e.g. 6,444 aceclofenac +
+  paracetamol brands; the ban is on the SR form and a 50+125 mg product). It was switched off
+  live (deleted `data_sources` row `cdsco_fdc`), then fixed: entries keep `salt_strengths`,
+  `forms`, `releases` (migration `20261024050000_banned_fdc_restrictions.sql`); `applies()` in
+  `web/lib/checks/banned.ts` compares all of them ("yes" / "maybe" / "no"); a combination ban
+  on a cut-short 2-ingredient brand record is only "maybe" (`saltsComplete`, see
+  `describeMedicine` in `web/lib/run-checks.ts`). Measured over all 241,046 brands: 18,278
+  flagged before → 62 certain alerts (all withdrawn single drugs) + 4,885 "show your pharmacist".
+  Details in `docs/milestones/M5-safety-checks.md`. Web tests 281, pipeline 152.
 - **Waiting on the user:** the NPPA "Compendium of Prices 2026" Excel in
-  `pipeline/raw/nppa/<date>/`. Not found on 2026-10-24 (searched the project, Downloads and the
-  home folder). Fair price row says "Not available yet".
+  `pipeline/raw/nppa/<date>/` (not found on 2026-10-24).
 - `web/.prettierignore` exists because Prettier only reads the ignore file of the folder it runs
   in; `web/lib/ai/salt-rules.json` must never be reformatted (a pytest checks it).
 
 ## Exact next steps
 
-1. **Commit M5 so far** (with the user's OK), push, then run the refresh to load the data:
-   `GH_CONFIG_DIR=$HOME/.gh gh workflow run data-refresh.yml` and check its log. Then test on the
-   live site: batch `60098` + name `Alzomac 0.5` should show the Sep 2026 alert.
+1. **Check the banned-check fix is live** (if this session ended before it): CI green, data
+   refresh run, `data_sources` has `cdsco_fdc` again, and on the live site aceclofenac 100 +
+   paracetamol 325 tablets are "not listed" while a rosiglitazone brand is an alert.
 2. **NPPA:** when the Excel is in `pipeline/raw/nppa/<date>/`, inspect it, show the user a sample,
    then `parse_nppa.py`, the `ceiling_prices` table (redesign the M0 draft), `checkPrice`
    (per-unit MRP vs ceiling, saying clearly that ceiling prices exclude GST), and the card row.
-3. **M5: safety checks.** Inspect each source first and show the user a sample before parsing:
-   CDSCO monthly NSQ / spurious alerts (PDFs), NPPA ceiling prices, CDSCO banned FDC lists.
-   Then pure check functions (`checkBatch`, `checkPrice`, `checkBanned`) with tests, pipeline
-   jobs in `data-refresh.yml`, and the six-row result card.
-4. **Speed:** move preprocessing and OCR into a Web Worker; try a smaller first-pass image; skip
+3. **Speed:** move preprocessing and OCR into a Web Worker; try a smaller first-pass image; skip
    the inverted variant when the ink variant already found the key fields; measure on a phone.
-5. **Brand reading:** use the matcher to confirm brand guesses before the confirm screen.
-6. **More photos:** the user takes ~15–20 strip photos with their own phone (front, back, stamp
+4. **Brand reading:** use the matcher to confirm brand guesses before the confirm screen.
+5. **More photos:** the user takes ~15–20 strip photos with their own phone (front, back, stamp
    close-up), copies them into `eval/photos/`, labels them at `/en/eval/label` (including the
    new "match brand": the exact brand name in the database, or empty if not in it).
-7. **Spot-check `eval/labels.json`** (human) before any numbers go into the report.
-8. Then M6 (cabinet + PWA), M7 (evaluation, About page, accessibility, final
+6. **Spot-check `eval/labels.json`** (human) before any numbers go into the report.
+7. Then M6 (cabinet + PWA), M7 (evaluation, About page, accessibility, final
    `pnpm eval -- --final` and `pnpm eval:match -- --final`), and the deliverables (README GIF,
    architecture diagram, report, slides, viva Q&A).

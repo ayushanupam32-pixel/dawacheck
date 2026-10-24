@@ -61,17 +61,51 @@ different companies reuse numbers. Results:
 - **unknown**: no batch number, a batch number the reader was unsure of (below the confirm
   screen's 60% "Please check" level and not corrected by the user), or no alerts loaded.
 
-**Banned combination.** The medicine's salts as a set ("A + B" = "B + A"). A medicine with an
-extra salt is a different combination. A single-drug ban (phenacetin, rosiglitazone…) matches
-any medicine containing it. Only one case is an **alert**: one matching entry, plainly
-prohibited, with no strengths named. Everything else that matches is a **warn** for the
-pharmacist, with the legal status in words:
+**Banned combination.** An entry applies only if everything it names matches the medicine:
 
-- the ban was **stayed** or **quashed** by a High Court, is **under examination**, was **revoked
-  with conditions**, or is **restricted** (from the consolidated list's own footnotes 1#–6#);
-- the entry names **strengths** (we do not compare strengths automatically);
-- **several entries** differ by strength and status (glimepiride + pioglitazone + metformin is
-  prohibited in some strengths and quashed in others).
+- the **salts**, as a set ("A + B" = "B + A"; an extra salt makes a different combination); a
+  single-drug ban (phenacetin, rosiglitazone…) applies to any medicine containing the drug;
+- the **form**, if named ("Diclofenac + Paracetamol **injection**" bans only the injection);
+- the **release type**, if named ("Aceclofenac **(SR)** + Paracetamol");
+- the **strengths**, if named ("Gliclazide **80mg** + Metformin **325 mg**").
+
+Each entry is then **certain** (everything confirmed), **may apply** (something it names cannot be
+confirmed for this medicine) or does not apply. Only a certain match with a plainly prohibited
+entry is an **alert**. Everything else that applies is a **warn** for the pharmacist, with the
+legal status in words: stayed or quashed by a High Court, under examination, revoked with
+conditions, restricted (from the consolidated list's footnotes 1#–6#), or "may apply".
+
+"These salts and nothing else" can only be confirmed when the ingredient list is complete. The
+brand dataset keeps at most 2 ingredients per brand (M1 marks those records "may be
+incomplete"): "Acemiz-MR" is aceclofenac + paracetamol + chlorzoxazone but is recorded with two.
+So a combination ban on an incomplete record is "may apply", unless the strip, as confirmed by the
+user, lists more salts than the record.
+
+## The banned-list false alarm (found on the live site, fixed)
+
+The first version (commit `5b52369`) compared salts only. After the first data load, checking the
+live site showed it calling **aceclofenac + paracetamol** banned: 6,444 brands of one of India's
+most common legal pain-relief combinations. The ban is on the **sustained-release** form and on a
+50 mg + 125 mg product, not on the combination. The same was true of diclofenac + paracetamol
+(injection only), nimesulide + paracetamol (dispersible tablets, suspension, injection), gliclazide
+
+- metformin (two strength pairs) and others. The check was switched off on the live site within
+  the hour (it said "couldn't check"), and fixed:
+
+| Brands in the dataset (241,046) | Salts only (deployed first) | Fixed check                         |
+| ------------------------------- | --------------------------- | ----------------------------------- |
+| Flagged as banned (alert)       | 18,278                      | **62**                              |
+| "Show your pharmacist" (warn)   | (included above)            | 4,885 ("may apply" or court status) |
+
+The 62 certain alerts are all single drugs withdrawn in India (rosiglitazone, rimonabant,
+terfenadine, astemizole, phenformin, fenfluramine). The 4,885 warnings are combinations that are
+on the lists but whose ingredient list, form or strength the record cannot confirm, or whose ban
+is stayed, quashed or under examination; in the scan flow, the strip's confirmed ingredients
+settle many of them. Measured by running the real check (`web/lib/checks/banned.ts`) over every
+composition in `pipeline/clean/brands.csv`.
+
+Lesson for the report: test a safety check against the whole population it will see, not only
+against the cases it should catch.
 
 ## Key decisions, in plain words
 
@@ -114,7 +148,8 @@ brand's when the strip lists fewer (the reader missed one).
 
 ## Limitations
 
-- Strengths named in banned-list entries are shown, not compared.
+- A 2-ingredient brand record cannot confirm an exact combination, so many banned combinations
+  show as "may apply" (warn) rather than "prohibited" unless the strip lists more ingredients.
 - Banned entries whose ingredient names we cannot match to our salt list are missed (a missed
   ban says "not on the lists we could match", never "safe").
 - Older alerts (before 2025) often have no brand name; they match on ingredients or manufacturer.

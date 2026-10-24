@@ -41,6 +41,10 @@ export type BannedRow = {
     | "restricted";
   description: string;
   strengths: string | null;
+  /** What the ban is limited to (empty = any): strengths per salt ("80:mg"), forms, releases. */
+  salt_strengths: Record<string, string[]>;
+  forms: string[];
+  releases: string[];
   notification: string | null;
   notified_on: string | null;
   status_note: string | null;
