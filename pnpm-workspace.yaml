@@ -1,8 +1,14 @@
 packages:
   - web
 
+# Packages whose install scripts may run. pnpm 12 refuses unlisted ones (CI fails), so each
+# new one is a deliberate decision:
+#   esbuild: true      checks/installs its platform binary (needed by tsx for `pnpm eval`)
+#   tesseract.js: false  only prints an OpenCollective donation message
 allowBuilds:
+  esbuild: true
   sharp: false
+  tesseract.js: false
   unrs-resolver: false
 
 saveExact: true
