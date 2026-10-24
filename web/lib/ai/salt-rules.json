@@ -1,0 +1,271 @@
+{
+ "_generated_by": "pipeline/dawacheck_pipeline/export_rules.py from synonyms.yaml",
+ "synonyms": {
+  "acetaminophen": "paracetamol",
+  "amoxycillin": "amoxicillin",
+  "frusemide": "furosemide",
+  "torasemide": "torsemide",
+  "albuterol": "salbutamol",
+  "glyburide": "glibenclamide",
+  "vitamin d3": "cholecalciferol",
+  "vitamin d2": "ergocalciferol",
+  "methylcobalamine": "methylcobalamin",
+  "mecobalamin": "methylcobalamin",
+  "vitamin b12": "cyanocobalamin",
+  "vitamin c": "ascorbic acid",
+  "folate": "folic acid",
+  "thyroxine": "levothyroxine",
+  "l-thyroxine": "levothyroxine",
+  "clavulanate": "clavulanic acid",
+  "valproic acid": "valproate",
+  "sodium valproate": "valproate",
+  "divalproex": "valproate",
+  "ethamsylate": "etamsylate",
+  "flecanide": "flecainide",
+  "nicoumalone": "acenocoumarol",
+  "lignocaine": "lidocaine",
+  "guaiphenesin": "guaifenesin",
+  "fluoromethalone": "fluorometholone",
+  "vitamin b6": "pyridoxine",
+  "vitamin b1": "thiamine"
+ },
+ "strip_suffixes": [
+  "hydrochloride",
+  "hcl",
+  "dihydrochloride",
+  "hydrobromide",
+  "monohydrate",
+  "dihydrate",
+  "trihydrate",
+  "sesquihydrate",
+  "anhydrous",
+  "besilate",
+  "besylate",
+  "maleate",
+  "mesylate",
+  "mesilate",
+  "tartrate",
+  "bitartrate",
+  "succinate",
+  "fumarate",
+  "citrate",
+  "sulphate",
+  "sulfate",
+  "phosphate",
+  "acetate",
+  "bromide",
+  "butylbromide",
+  "chloride",
+  "oxalate",
+  "sodium",
+  "potassium",
+  "magnesium",
+  "calcium",
+  "dipropionate",
+  "propionate",
+  "furoate",
+  "valerate",
+  "xinafoate",
+  "medoxomil",
+  "cilexetil",
+  "axetil",
+  "pivoxil",
+  "proxetil",
+  "diethylamine",
+  "disodium",
+  "arginine",
+  "olamine",
+  "ip",
+  "bp",
+  "usp"
+ ],
+ "protect_prefixes": [
+  "sodium",
+  "potassium",
+  "calcium",
+  "magnesium",
+  "zinc",
+  "ferrous",
+  "ferric",
+  "aluminium",
+  "aluminum",
+  "lithium",
+  "silver",
+  "ammonium",
+  "oral rehydration"
+ ],
+ "forms": {
+  "tablet": [
+   "tablets",
+   "tablet",
+   "tab",
+   "tabs",
+   "tabelts"
+  ],
+  "capsule": [
+   "capsules",
+   "capsule",
+   "cap",
+   "caps",
+   "soft gel capsules",
+   "softgel capsules"
+  ],
+  "syrup": [
+   "syrup",
+   "dry syrup",
+   "elixir",
+   "oral liquid",
+   "expectorant"
+  ],
+  "suspension": [
+   "oral suspension",
+   "suspension"
+  ],
+  "injection": [
+   "injection",
+   "inj",
+   "inection",
+   "infusion"
+  ],
+  "cream": [
+   "cream",
+   "skin cream"
+  ],
+  "gel": [
+   "gel",
+   "oral gel"
+  ],
+  "ointment": [
+   "ointment"
+  ],
+  "lotion": [
+   "lotion"
+  ],
+  "eye_drops": [
+   "eye drops",
+   "ophthalmic solution",
+   "opthalmic solution",
+   "ophthalmic suspension",
+   "opthalmic suspension",
+   "eye/ear drops"
+  ],
+  "eye_ointment": [
+   "ophthalmic ointment",
+   "opthalmic ointment",
+   "eye ointment"
+  ],
+  "ear_drops": [
+   "ear drops",
+   "otic drops"
+  ],
+  "nasal_spray": [
+   "nasal spray"
+  ],
+  "drops": [
+   "oral drops",
+   "drops"
+  ],
+  "inhaler": [
+   "inhaler",
+   "metered dose inhaler"
+  ],
+  "inhalation_powder": [
+   "powder for inhalation",
+   "inhalation powder",
+   "rotacaps",
+   "rotacap"
+  ],
+  "respules": [
+   "respules",
+   "nebuliser solution",
+   "nebulizer solution"
+  ],
+  "powder": [
+   "powder",
+   "dusting powder",
+   "granules",
+   "sachet"
+  ],
+  "solution": [
+   "solution",
+   "mouthwash",
+   "gargle",
+   "antiseptic liquid"
+  ],
+  "paste": [
+   "toothpaste",
+   "paste"
+  ],
+  "spray": [
+   "spray"
+  ],
+  "strip": [
+   "oral disintegrating strips",
+   "orally disintegrating strips",
+   "strips",
+   "oral film"
+  ],
+  "patch": [
+   "transdermal patch",
+   "patch"
+  ],
+  "suppository": [
+   "suppositories",
+   "suppository"
+  ],
+  "shampoo": [
+   "shampoo"
+  ]
+ },
+ "releases": {
+  "er": [
+   "extended release",
+   "prolonged release",
+   "sustained release",
+   "controlled release",
+   "modified release",
+   "er",
+   "sr",
+   "pr",
+   "cr",
+   "xr",
+   "xl",
+   "mr"
+  ],
+  "dr": [
+   "delayed release",
+   "gastro-resistant",
+   "gastro resistant",
+   "enteric coated",
+   "enteric-coated",
+   "ec"
+  ],
+  "odt": [
+   "orally disintegrating",
+   "oral disintegrating",
+   "mouth dissolving",
+   "md"
+  ],
+  "dispersible": [
+   "dispersible",
+   "dt"
+  ],
+  "ir": [
+   "immediate release",
+   "ir"
+  ],
+  "chewable": [
+   "chewable"
+  ],
+  "effervescent": [
+   "effervescent"
+  ]
+ },
+ "always_delayed_release": [
+  "pantoprazole",
+  "rabeprazole",
+  "esomeprazole",
+  "omeprazole",
+  "lansoprazole"
+ ]
+}

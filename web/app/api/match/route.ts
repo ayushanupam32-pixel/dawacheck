@@ -1,46 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { matchStrip, parseMatchInput, toCandidate, type BrandRow } from "@/lib/find-match";
 import {
   MIN_SEARCH_SCORE,
-  type BrandCandidate,
   type Generic,
   type GenericResponse,
-  type Ingredient,
+  type ScanMatchResponse,
   type SearchResponse,
 } from "@/lib/match";
 import { supabase } from "@/lib/supabase";
 
 const JA_SOURCE_URL = "https://janaushadhi.gov.in/product-portfolio/product-mrp-list";
-
-type BrandRow = {
-  id: number;
-  name: string;
-  manufacturer: string | null;
-  form: string | null;
-  release: string | null;
-  pack_size: number | null;
-  pack_unit: string | null;
-  mrp_2022: number | null;
-  composition_key: string | null;
-  composition_complete: boolean;
-  ingredients: Ingredient[] | null;
-  score: number;
-};
-
-function toCandidate(row: BrandRow): BrandCandidate {
-  return {
-    id: row.id,
-    name: row.name,
-    manufacturer: row.manufacturer,
-    form: row.form,
-    release: row.release,
-    packSize: row.pack_size,
-    packUnit: row.pack_unit,
-    mrp2022: row.mrp_2022,
-    compositionComplete: row.composition_complete,
-    ingredients: row.ingredients ?? [],
-    score: row.score,
-  };
-}
 
 /**
  * GET /api/match?q=telma        -> up to 8 brands whose names look like the query
@@ -77,7 +46,7 @@ async function genericFor(brandId: number) {
   const { data: brand, error } = await db
     .from("brands")
     .select(
-      "id, name, manufacturer, form, release, pack_size, pack_unit, mrp_2022, composition_key, composition_complete, brand_ingredients(strength_value, strength_unit, salts(display_name))",
+      "id, name, manufacturer, form, release, pack_size, pack_unit, mrp_2022, composition_key, composition_complete, discontinued, brand_ingredients(strength_value, strength_unit, salts(display_name))",
     )
     .eq("id", brandId)
     .maybeSingle();
@@ -131,5 +100,37 @@ async function genericFor(brandId: number) {
       updatedOn: source?.last_run_at ?? null,
     },
   };
+  return NextResponse.json(body);
+}
+
+/**
+ * POST /api/match  body: what the scan read and the user confirmed (lib/ai/rerank.ts MatchInput)
+ *               -> the matched brand, or "abstain" with up to 3 options to pick from
+ *
+ * POST, not GET, so the medicine details are not written into URLs (and server logs).
+ * Nothing is stored or logged.
+ */
+export async function POST(request: NextRequest) {
+  const input = parseMatchInput(await request.json().catch(() => null));
+  if (!input) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+
+  let decision;
+  try {
+    decision = await matchStrip(supabase(), input);
+  } catch {
+    return NextResponse.json({ error: "Match failed" }, { status: 502 });
+  }
+  const options = decision.ranked
+    .slice(0, 3)
+    .map((r) => ({ brand: r.candidate, probability: r.probability, features: r.features }));
+  const body: ScanMatchResponse =
+    decision.status === "match"
+      ? {
+          status: "match",
+          brand: decision.best.candidate,
+          confidence: decision.confidence,
+          options,
+        }
+      : { status: "abstain", reason: decision.reason, confidence: decision.confidence, options };
   return NextResponse.json(body);
 }

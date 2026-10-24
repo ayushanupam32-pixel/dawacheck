@@ -2,7 +2,7 @@
   {
     "id": "demo",
     "split": "demo",
-    "ms": 759,
+    "ms": 742,
     "ocr": ["binary:86", "binary:91"],
     "read": {
       "brand": "DEMOTEL 40",
@@ -12,6 +12,10 @@
       "batchNo": "DM2504",
       "mfgDate": "2025-09",
       "expDate": "2027-08"
+    },
+    "match": {
+      "got": "abstain (no_candidates)",
+      "outcome": "abstained"
     },
     "full": {
       "brand": {
@@ -105,7 +109,7 @@
   {
     "id": "favipill800",
     "split": "dev",
-    "ms": 17169,
+    "ms": 16456,
     "ocr": [
       "binary:25",
       "ink:42",
@@ -126,6 +130,10 @@
       "batchNo": "XFA20002",
       "mfgDate": "2020-11",
       "expDate": "2021-04"
+    },
+    "match": {
+      "got": "abstain (no_brand)",
+      "outcome": "abstained"
     },
     "full": {
       "brand": {
@@ -219,7 +227,7 @@
   {
     "id": "fincover1",
     "split": "dev",
-    "ms": 16372,
+    "ms": 15940,
     "ocr": [
       "binary:26",
       "ink:29",
@@ -240,6 +248,10 @@
       "batchNo": "FCR004",
       "mfgDate": "2009-12",
       "expDate": "2012-11"
+    },
+    "match": {
+      "got": "abstain (no_brand)",
+      "outcome": "abstained"
     },
     "full": {
       "brand": {
@@ -333,7 +345,7 @@
   {
     "id": "suhagra100",
     "split": "dev",
-    "ms": 2797,
+    "ms": 2740,
     "ocr": ["binary:21", "ink:39", "enhanced:30", "inverted:20"],
     "read": {
       "brand": "| Suhagra-100",
@@ -343,6 +355,10 @@
       "batchNo": "",
       "mfgDate": "",
       "expDate": ""
+    },
+    "match": {
+      "got": "Suhagra 100 Tablet",
+      "outcome": "right"
     },
     "full": {
       "brand": {
@@ -436,7 +452,7 @@
   {
     "id": "neorelax-mr",
     "split": "dev",
-    "ms": 12907,
+    "ms": 12611,
     "ocr": [
       "binary:28",
       "ink:38",
@@ -457,6 +473,10 @@
       "batchNo": "",
       "mfgDate": "",
       "expDate": ""
+    },
+    "match": {
+      "got": "abstain (no_brand)",
+      "outcome": "abstained"
     },
     "full": {
       "brand": {
@@ -550,7 +570,7 @@
   {
     "id": "crocin-cold-flu",
     "split": "dev",
-    "ms": 10054,
+    "ms": 9885,
     "ocr": [
       "binary:22",
       "ink:40",
@@ -571,6 +591,10 @@
       "batchNo": "R3002",
       "mfgDate": "2013-01",
       "expDate": "2014-12"
+    },
+    "match": {
+      "got": "abstain (no_brand)",
+      "outcome": "abstained"
     },
     "full": {
       "brand": {
@@ -664,7 +688,7 @@
   {
     "id": "metformin500-zanza",
     "split": "dev",
-    "ms": 2213,
+    "ms": 2194,
     "ocr": ["binary:33", "ink:19", "enhanced:32", "inverted:33"],
     "read": {
       "brand": "rmin",
@@ -674,6 +698,10 @@
       "batchNo": "",
       "mfgDate": "",
       "expDate": ""
+    },
+    "match": {
+      "got": "abstain (unsure)",
+      "outcome": "abstained"
     },
     "full": {
       "brand": {
@@ -767,7 +795,7 @@
   {
     "id": "warfarin2-label",
     "split": "dev",
-    "ms": 2929,
+    "ms": 2899,
     "ocr": ["binary:56", "ink:69", "enhanced:57", "inverted:54"],
     "read": {
       "brand": "—— WARFARIN",
@@ -777,6 +805,10 @@
       "batchNo": "",
       "mfgDate": "",
       "expDate": ""
+    },
+    "match": {
+      "got": "abstain (contradiction)",
+      "outcome": "abstained"
     },
     "full": {
       "brand": {
@@ -870,7 +902,7 @@
   {
     "id": "azithromycin250-sandoz",
     "split": "dev",
-    "ms": 11358,
+    "ms": 11204,
     "ocr": ["binary:21", "ink:22", "enhanced:27", "inverted:21"],
     "read": {
       "brand": "",
@@ -880,6 +912,10 @@
       "batchNo": "",
       "mfgDate": "",
       "expDate": ""
+    },
+    "match": {
+      "got": "abstain (no_brand)",
+      "outcome": "abstained"
     },
     "full": {
       "brand": {
@@ -973,7 +1009,7 @@
   {
     "id": "anterone50",
     "split": "dev",
-    "ms": 2198,
+    "ms": 2212,
     "ocr": ["binary:39", "ink:31", "enhanced:60", "inverted:36"],
     "read": {
       "brand": "cyproterone acetate 50 mg EE one 50",
@@ -983,6 +1019,10 @@
       "batchNo": "",
       "mfgDate": "",
       "expDate": ""
+    },
+    "match": {
+      "got": "abstain (no_candidates)",
+      "outcome": "abstained"
     },
     "full": {
       "brand": {
@@ -1076,7 +1116,7 @@
   {
     "id": "citalopram20",
     "split": "dev",
-    "ms": 10329,
+    "ms": 10213,
     "ocr": ["binary:23", "ink:90", "enhanced:40", "inverted:24"],
     "read": {
       "brand": "HEUMANN Jf",
@@ -1086,6 +1126,10 @@
       "batchNo": "",
       "mfgDate": "",
       "expDate": ""
+    },
+    "match": {
+      "got": "abstain (no_candidates)",
+      "outcome": "abstained"
     },
     "full": {
       "brand": {
@@ -1179,7 +1223,7 @@
   {
     "id": "cialis20",
     "split": "dev",
-    "ms": 4166,
+    "ms": 4135,
     "ocr": ["binary:22", "ink:35", "enhanced:27", "inverted:22"],
     "read": {
       "brand": "",
@@ -1189,6 +1233,10 @@
       "batchNo": "",
       "mfgDate": "",
       "expDate": ""
+    },
+    "match": {
+      "got": "abstain (no_brand)",
+      "outcome": "abstained"
     },
     "full": {
       "brand": {
@@ -1282,7 +1330,7 @@
   {
     "id": "dexedrine5",
     "split": "dev",
-    "ms": 3732,
+    "ms": 3722,
     "ocr": ["binary:25", "ink:23", "enhanced:31", "inverted:25"],
     "read": {
       "brand": "",
@@ -1292,6 +1340,10 @@
       "batchNo": "",
       "mfgDate": "",
       "expDate": ""
+    },
+    "match": {
+      "got": "abstain (no_brand)",
+      "outcome": "abstained"
     },
     "full": {
       "brand": {
@@ -1385,7 +1437,7 @@
   {
     "id": "androcur50",
     "split": "dev",
-    "ms": 17031,
+    "ms": 16818,
     "ocr": ["binary:24", "ink:22", "enhanced:21", "inverted:25"],
     "read": {
       "brand": "",
@@ -1395,6 +1447,10 @@
       "batchNo": "",
       "mfgDate": "",
       "expDate": ""
+    },
+    "match": {
+      "got": "abstain (no_brand)",
+      "outcome": "abstained"
     },
     "full": {
       "brand": {

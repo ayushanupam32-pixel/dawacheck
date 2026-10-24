@@ -27,8 +27,34 @@ wrong) was left empty: the user is asked to type it. A wrong value is worse than
 
 ## Speed (this computer, not a phone)
 
-Median 10054 ms, p95 17169 ms per strip (front + back). Phone timing is measured
+Median 9885 ms, p95 16818 ms per strip (front + back). Phone timing is measured
 separately in the app ("How we read this" shows the time).
 
 CER = edits needed / length of the true value (0 = perfect). Exact match ignores case,
 spaces and punctuation. A field left empty in the label is not scored.
+
+## Photo → medicine, fully automatic (no corrections on the confirm screen)
+
+The reader's fields go straight into the matcher, as if the user tapped "Find" without
+fixing anything. 5 of 14 strips are in the brand dataset; for the
+others, abstaining is the right answer. In the app the user can fix the name first, which
+`pnpm eval:match` measures.
+
+Right: 1 · Wrong: 0 · Abstained: 4 in dataset, 9 not in dataset
+
+| Photo                  | Expected                     | DawaCheck               |           |
+| ---------------------- | ---------------------------- | ----------------------- | --------- |
+| demo                   | (abstain: not in dataset)    | abstain (no_candidates) | abstained |
+| favipill800            | (abstain: not in dataset)    | abstain (no_brand)      | abstained |
+| fincover1              | Fincover 1mg Tablet          | abstain (no_brand)      | abstained |
+| suhagra100             | Suhagra 100 Tablet           | Suhagra 100 Tablet      | right     |
+| neorelax-mr            | Neorelax MR Tablet           | abstain (no_brand)      | abstained |
+| crocin-cold-flu        | Crocin Cold & Flu Max Tablet | abstain (no_brand)      | abstained |
+| metformin500-zanza     | (abstain: not in dataset)    | abstain (unsure)        | abstained |
+| warfarin2-label        | (abstain: not in dataset)    | abstain (contradiction) | abstained |
+| azithromycin250-sandoz | (abstain: not in dataset)    | abstain (no_brand)      | abstained |
+| anterone50             | (abstain: not in dataset)    | abstain (no_candidates) | abstained |
+| citalopram20           | (abstain: not in dataset)    | abstain (no_candidates) | abstained |
+| cialis20               | Cialis 20mg Tablet           | abstain (no_brand)      | abstained |
+| dexedrine5             | (abstain: not in dataset)    | abstain (no_brand)      | abstained |
+| androcur50             | (abstain: not in dataset)    | abstain (no_brand)      | abstained |

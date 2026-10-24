@@ -10,7 +10,8 @@ ingredients in your family's medicines, and the nearest Jan Aushadhi Kendra.
 **Live:** https://dawacheck-psi.vercel.app
 
 **Status:** M0 (setup), M1 (type a brand → cheaper Jan Aushadhi generic), M2 (nearest Jan
-Aushadhi Kendra, computed on your phone) and M3 (reading strips from photos, on the phone) done. See
+Aushadhi Kendra, computed on your phone), M3 (reading strips from photos, on the phone) and M4
+(matching a scanned strip to a medicine, or saying "not sure") done. See
 [docs/milestones](docs/milestones) for what each milestone built and why.
 
 ## Repository layout

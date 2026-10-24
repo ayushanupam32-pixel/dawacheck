@@ -23,6 +23,9 @@ import {
 } from "../lib/ai/image";
 import { estimateSkew, makeVariants, targetSize, type Variant } from "../lib/ai/preprocess";
 import { pageToReading, readProgressively } from "../lib/ai/reader";
+import { buildMatchInput, nameIdentity } from "../lib/ai/rerank";
+import { matchStrip } from "../lib/find-match";
+import { createClient } from "@supabase/supabase-js";
 import {
   addScores,
   emptyScores,
@@ -35,6 +38,17 @@ import {
 
 const EVAL_DIR = resolve(__dirname, "..", "..", "eval");
 const final = process.argv.includes("--final");
+
+// Matching (M4) needs the read-only database key from web/.env.local; without it the reading
+// is still evaluated and the matching section is skipped.
+const envFile = resolve(__dirname, "..", ".env.local");
+if (existsSync(envFile)) process.loadEnvFile(envFile);
+const db =
+  process.env.SUPABASE_URL && process.env.SUPABASE_PUBLISHABLE_KEY
+    ? createClient(process.env.SUPABASE_URL, process.env.SUPABASE_PUBLISHABLE_KEY, {
+        auth: { persistSession: false },
+      })
+    : null;
 
 function decode(path: string): Rgba {
   const bytes = readFileSync(path);
@@ -82,6 +96,8 @@ type Row = {
   read: Record<ScoredField, string>;
   /** OCR confidence of each reading, to spot photos the OCR could hardly read at all. */
   ocr: string[];
+  /** Photo -> medicine with no corrections by the user (M4), if the label says what to expect. */
+  match?: { got: string; outcome: "right" | "wrong" | "abstained" };
 };
 
 async function main() {
@@ -133,6 +149,30 @@ async function main() {
       (r) => `${r.variant}:${Math.round(r.confidence)}`,
     );
     const row: Row = { label, full: emptyScores(), base: emptyScores(), ms, read, ocr };
+    if (db && label.matchBrand !== undefined) {
+      // Exactly what the app sends when the user taps "Find" without correcting anything.
+      const d = await matchStrip(
+        db,
+        buildMatchInput({
+          brand: full.fields.brand?.value ?? "",
+          ingredients: full.fields.ingredients?.value ?? [],
+          form: full.fields.form?.value ?? null,
+          manufacturer: full.fields.manufacturer?.value ?? null,
+          ocrText: [...full.front, ...full.back].map((r) => r.text).join("\n"),
+        }),
+      );
+      row.match =
+        d.status === "match"
+          ? {
+              got: d.best.candidate.name,
+              outcome:
+                label.matchBrand &&
+                nameIdentity(d.best.candidate.name) === nameIdentity(label.matchBrand)
+                  ? "right"
+                  : "wrong",
+            }
+          : { got: `abstain (${d.reason})`, outcome: "abstained" };
+    }
     addScores(row.full, full.fields, label);
     addScores(row.base, base.fields, label);
     rows.push(row);
@@ -141,6 +181,38 @@ async function main() {
   await worker.terminate();
 
   writeReport(rows);
+}
+
+/** Photo -> medicine, fully automatic: the reader's output straight into the matcher. */
+function matchSection(rows: Row[]): string[] {
+  const matched = rows.filter((r) => r.match);
+  if (!matched.length)
+    return ["", "## Photo → medicine", "", "Skipped: no database key or no `matchBrand` labels."];
+  const count = (outcome: string, inDataset?: boolean) =>
+    matched.filter(
+      (r) =>
+        r.match!.outcome === outcome &&
+        (inDataset === undefined || Boolean(r.label.matchBrand) === inDataset),
+    ).length;
+  const inDataset = matched.filter((r) => r.label.matchBrand).length;
+  return [
+    ``,
+    `## Photo → medicine, fully automatic (no corrections on the confirm screen)`,
+    ``,
+    `The reader's fields go straight into the matcher, as if the user tapped "Find" without`,
+    `fixing anything. ${inDataset} of ${matched.length} strips are in the brand dataset; for the`,
+    `others, abstaining is the right answer. In the app the user can fix the name first, which`,
+    `\`pnpm eval:match\` measures.`,
+    ``,
+    `Right: ${count("right")} · Wrong: ${count("wrong")} · Abstained: ${count("abstained", true)} in dataset, ${count("abstained", false)} not in dataset`,
+    ``,
+    `| Photo | Expected | DawaCheck | |`,
+    `| --- | --- | --- | --- |`,
+    ...matched.map(
+      (r) =>
+        `| ${r.label.id} | ${r.label.matchBrand ?? "(abstain: not in dataset)"} | ${r.match!.got} | ${r.match!.outcome === "wrong" ? "**wrong**" : r.match!.outcome} |`,
+    ),
+  ];
 }
 
 function sum(
@@ -209,6 +281,7 @@ function writeReport(rows: Row[]) {
     ``,
     `CER = edits needed / length of the true value (0 = perfect). Exact match ignores case,`,
     `spaces and punctuation. A field left empty in the label is not scored.`,
+    ...matchSection(rows),
   ];
   const out = join(EVAL_DIR, final ? "results-final.md" : "results.md");
   writeFileSync(out, lines.join("\n") + "\n");
@@ -221,6 +294,7 @@ function writeReport(rows: Row[]) {
         ms: Math.round(r.ms),
         ocr: r.ocr,
         read: r.read,
+        match: r.match,
         full: r.full,
         base: r.base,
       })),

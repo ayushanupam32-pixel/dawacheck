@@ -1,5 +1,7 @@
 // Shapes returned by /api/match, shared by the route and the search page.
 
+import type { AbstainReason, Features } from "./ai/rerank";
+
 export type Ingredient = { salt: string; value: number; unit: string };
 
 export type BrandCandidate = {
@@ -12,8 +14,12 @@ export type BrandCandidate = {
   packUnit: string | null;
   /** From the Nov 2022 dataset: a starting value for the user to correct, never "today's price". */
   mrp2022: number | null;
+  /** Exact-match key, e.g. "diazepam:10:mg#tablet#ir" (pipeline/normalize.py). */
+  compositionKey: string | null;
   /** False when the dataset may have cut the ingredient list short (2-ingredient rows). */
   compositionComplete: boolean;
+  /** The dataset marks it as no longer sold (old stock may still be in a cabinet). */
+  discontinued: boolean;
   ingredients: Ingredient[];
   score: number;
 };
@@ -36,6 +42,25 @@ export type GenericResponse = {
   generics: Generic[];
   source: { name: string; url: string; updatedOn: string | null };
 };
+
+/** One option the scan matcher considered, with its probability (shown as "How sure"). */
+export type ScanOption = {
+  brand: BrandCandidate;
+  probability: number;
+  /** The evidence behind the probability, shown in "Why we think so". */
+  features: Features;
+};
+
+/** POST /api/match: what the scan matcher decided. */
+export type ScanMatchResponse =
+  | { status: "match"; brand: BrandCandidate; confidence: number; options: ScanOption[] }
+  | {
+      status: "abstain";
+      reason: AbstainReason;
+      confidence: number;
+      /** Up to 3 brands for the user to pick from. */
+      options: ScanOption[];
+    };
 
 /**
  * Below this score a typed name is too far from every brand to be trusted, so we show nothing

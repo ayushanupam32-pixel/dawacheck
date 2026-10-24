@@ -14,6 +14,11 @@ export type Label = {
   stamp?: string | null;
   brand: string;
   ingredients: string; // one per line: "Telmisartan 40 mg"
+  /**
+   * The brand-database name this strip should match (M4), or null when the medicine is not in
+   * the Indian dataset, so the right answer is to abstain. Undefined = not labelled yet.
+   */
+  matchBrand?: string | null;
   mrp: number | null;
   packSize: number | null;
   batchNo: string;

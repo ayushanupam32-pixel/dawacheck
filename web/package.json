@@ -10,7 +10,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "eval": "tsx scripts/eval.ts"
+    "eval": "tsx scripts/eval.ts",
+    "eval:match": "tsx scripts/eval-match.ts"
   },
   "dependencies": {
     "@base-ui/react": "1.9.0",

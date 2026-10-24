@@ -3,13 +3,17 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Camera, ChevronDown, ImageUp, Loader2, Lock, RotateCcw, Search } from "lucide-react";
+import { BrandButton, BrandResult, fill, Notice } from "@/components/generic-result";
 import { Button, buttonVariants } from "@/components/ui/button";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
-import type { ExtractedFields, Ingredient } from "@/lib/ai/extract";
+import { extractIngredients, type ExtractedFields, type Ingredient } from "@/lib/ai/extract";
 import type { FieldKey } from "@/lib/ai/merge";
+import { buildMatchInput, type Features } from "@/lib/ai/rerank";
 import type { Stage, StripReading } from "@/lib/ai/ocr";
+import type { BrandCandidate, ScanMatchResponse, ScanOption } from "@/lib/match";
 
 type T = Dictionary["scan"];
+type TSearch = Dictionary["search"];
 type Step =
   | { name: "front" }
   | { name: "back" }
@@ -83,7 +87,7 @@ function PhotoPicker({
   );
 }
 
-export function ScanClient({ t, locale }: { t: T; locale: string }) {
+export function ScanClient({ t, tSearch, locale }: { t: T; tSearch: TSearch; locale: string }) {
   const [step, setStep] = useState<Step>({ name: "front" });
   const [front, setFront] = useState<Blob | null>(null);
   const [back, setBack] = useState<Blob | null>(null);
@@ -237,7 +241,15 @@ export function ScanClient({ t, locale }: { t: T; locale: string }) {
     );
   }
 
-  return <Confirm t={t} locale={locale} reading={step.reading} onStartOver={startOver} />;
+  return (
+    <Confirm
+      t={t}
+      tSearch={tSearch}
+      locale={locale}
+      reading={step.reading}
+      onStartOver={startOver}
+    />
+  );
 }
 
 // ------------------------------------------------------------------ confirm screen
@@ -250,11 +262,13 @@ const toMonthYear = (yyyyMm: string | undefined) =>
 
 function Confirm({
   t,
+  tSearch,
   locale,
   reading,
   onStartOver,
 }: {
   t: T;
+  tSearch: TSearch;
   locale: string;
   reading: StripReading;
   onStartOver: () => void;
@@ -284,6 +298,46 @@ function Confirm({
 
   const best = [...reading.back, ...reading.front].sort((a, b) => b.confidence - a.confidence);
 
+  // What the user confirmed, as the matcher's input (lib/ai/rerank.ts).
+  const stripIngredients = useMemo(
+    () => extractIngredients(values.ingredients)?.value ?? [],
+    [values.ingredients],
+  );
+  const matchInput = () =>
+    buildMatchInput({
+      brand: values.brand,
+      ingredients: stripIngredients,
+      form: f.form?.value ?? null,
+      manufacturer: f.manufacturer?.value ?? null,
+      ocrText: [...reading.front, ...reading.back].map((r) => r.text).join("\n"),
+    });
+
+  const [match, setMatch] = useState<
+    | { step: "idle" | "matching" | "error" }
+    | { step: "done"; response: ScanMatchResponse; chosen: BrandCandidate | null }
+  >({ step: "idle" });
+
+  async function findMedicine() {
+    setMatch({ step: "matching" });
+    try {
+      // POST: the medicine details go in the body, not the URL.
+      const res = await fetch("/api/match", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(matchInput()),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      const response = (await res.json()) as ScanMatchResponse;
+      setMatch({
+        step: "done",
+        response,
+        chosen: response.status === "match" ? response.brand : null,
+      });
+    } catch {
+      setMatch({ step: "error" });
+    }
+  }
+
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
@@ -307,18 +361,37 @@ function Confirm({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Link
-          href={`/${locale}/search?q=${encodeURIComponent(values.brand)}`}
-          aria-disabled={!values.brand.trim()}
-          className={buttonVariants({ variant: "default" })}
-        >
+        <Button onClick={findMedicine} disabled={!values.brand.trim() || match.step === "matching"}>
           <Search aria-hidden="true" />
           {t.lookUp}
-        </Link>
+        </Button>
         <Button variant="outline" onClick={onStartOver}>
           <RotateCcw aria-hidden="true" />
           {t.startOver}
         </Button>
+      </div>
+
+      {/* Screen readers announce the matching result when it arrives. */}
+      <div aria-live="polite" className="flex flex-col gap-4">
+        {match.step === "matching" && (
+          <p className="flex items-center gap-2 text-base">
+            <Loader2 aria-hidden="true" className="size-5 animate-spin" />
+            {t.matching}
+          </p>
+        )}
+        {match.step === "error" && <Notice kind="unknown">{t.matchError}</Notice>}
+        {match.step === "done" && (
+          <MatchResult
+            t={t}
+            tSearch={tSearch}
+            locale={locale}
+            response={match.response}
+            chosen={match.chosen}
+            onChoose={(chosen) => setMatch({ ...match, chosen })}
+            brandRead={values.brand}
+            stripIngredients={stripIngredients}
+          />
+        )}
       </div>
 
       {/* Explainability: what the reader saw and which image version each field came from. */}
@@ -359,6 +432,134 @@ function Confirm({
         </div>
       </details>
     </div>
+  );
+}
+
+// ------------------------------------------------------------------ matching result
+
+function MatchResult({
+  t,
+  tSearch,
+  locale,
+  response,
+  chosen,
+  onChoose,
+  brandRead,
+  stripIngredients,
+}: {
+  t: T;
+  tSearch: TSearch;
+  locale: string;
+  response: ScanMatchResponse;
+  chosen: BrandCandidate | null;
+  onChoose: (brand: BrandCandidate | null) => void;
+  brandRead: string;
+  stripIngredients: Ingredient[];
+}) {
+  const percent = (p: number) => `${Math.round(p * 100)}%`;
+  const typeLink = (
+    <Link
+      href={`/${locale}/search?q=${encodeURIComponent(brandRead)}`}
+      className={`${buttonVariants({ variant: "outline" })} w-fit`}
+    >
+      {t.typeInstead}
+    </Link>
+  );
+
+  // A medicine is chosen (by the matcher, or by the user from the options).
+  if (chosen) {
+    const option = response.options.find((o) => o.brand.id === chosen.id);
+    const auto = response.status === "match" && response.brand.id === chosen.id;
+    return (
+      <section className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2 rounded-xl border border-border p-4">
+          <p className="text-base">{auto ? t.matchedTitle : t.youChose}</p>
+          <p className="text-xl font-semibold">{chosen.name}</p>
+          {chosen.manufacturer && <p className="text-base">{chosen.manufacturer}</p>}
+          {auto && (
+            <p className="text-base">
+              {fill(t.matchSure, { percent: percent(response.confidence) })}
+            </p>
+          )}
+          {chosen.discontinued && (
+            <p className="text-sm text-muted-foreground">{t.discontinuedNote}</p>
+          )}
+          {option && <Evidence t={t} features={option.features} />}
+          <Button variant="outline" className="w-fit" onClick={() => onChoose(null)}>
+            {t.notThisOne}
+          </Button>
+        </div>
+        <BrandResult
+          t={tSearch}
+          locale={locale}
+          brandId={chosen.id}
+          stripIngredients={stripIngredients}
+        />
+      </section>
+    );
+  }
+
+  const reason = response.status === "abstain" ? response.reason : null;
+  const message = {
+    no_brand: t.abstainNoBrand,
+    no_candidates: t.abstainNoCandidates,
+    contradiction: t.abstainContradiction,
+    strength_unknown: t.abstainStrength,
+    unsure: t.abstainUnsure,
+  }[reason ?? "unsure"];
+  return (
+    <section className="flex flex-col gap-3">
+      {response.status === "abstain" && <Notice kind="unknown">{message}</Notice>}
+      {response.options.length > 0 && (
+        <>
+          <h3 className="text-lg font-semibold">{t.pickFromThese}</h3>
+          <ul className="flex flex-col gap-2">
+            {response.options.map((o: ScanOption) => (
+              <li key={o.brand.id}>
+                <BrandButton
+                  t={tSearch}
+                  brand={o.brand}
+                  onChoose={() => onChoose(o.brand)}
+                  extra={fill(t.optionSure, { percent: percent(o.probability) })}
+                />
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      {typeLink}
+    </section>
+  );
+}
+
+/** "Why we think so": each piece of evidence in words, never colour alone. */
+function Evidence({ t, features }: { t: T; features: Features }) {
+  const word = (value: number) =>
+    value > 0 ? t.evAgrees : value < 0 ? t.evContradicts : t.evUnknown;
+  const rows: [string, string][] = [
+    [t.evName, fill(t.evNameScore, { percent: `${Math.round(features.name * 100)}%` })],
+    [t.evStrength, word(features.strength)],
+    [t.evIngredients, word(features.ingredients)],
+    [t.evForm, word(features.form)],
+    [t.evRelease, word(features.release)],
+    [t.evMaker, features.maker > 0 ? t.evAgrees : t.evUnknown],
+  ];
+  return (
+    <details className="text-base">
+      <summary className="flex min-h-12 cursor-pointer items-center gap-2 font-semibold">
+        <ChevronDown aria-hidden="true" className="size-5" />
+        {t.evidenceTitle}
+      </summary>
+      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 pt-1">
+        {rows.map(([label, value]) => (
+          <div key={label} className="contents">
+            <dt className="text-muted-foreground">{label}</dt>
+            <dd>{value}</dd>
+          </div>
+        ))}
+      </dl>
+      <p className="pt-2 text-sm text-muted-foreground">{t.evidenceNote}</p>
+    </details>
   );
 }
 

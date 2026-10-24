@@ -10,7 +10,8 @@
     "test": "pnpm --filter web test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "eval": "pnpm --filter web eval"
+    "eval": "pnpm --filter web eval",
+    "eval:match": "pnpm --filter web eval:match"
   },
   "devDependencies": {
     "prettier": "3.9.10",

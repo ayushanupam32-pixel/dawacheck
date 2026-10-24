@@ -29,7 +29,7 @@ export default async function ScanPage({ params }: PageProps<"/[locale]/scan">) 
       <h1 className="text-3xl font-bold tracking-tight">{dict.scan.title}</h1>
 
       <main>
-        <ScanClient t={dict.scan} locale={locale} />
+        <ScanClient t={dict.scan} tSearch={dict.search} locale={locale} />
       </main>
 
       <footer className="mt-auto flex gap-3 rounded-xl border border-border bg-muted/40 p-4 text-base leading-relaxed">

@@ -17,6 +17,8 @@ const EMPTY = {
   foil: false,
   lighting: "good" as "good" | "poor",
   notes: "",
+  /** "?" = not labelled yet; empty = not in the brand database (abstaining is right). */
+  matchBrand: "?",
 };
 type Form = typeof EMPTY;
 
@@ -33,6 +35,7 @@ const fromLabel = (l: Label | null): Form =>
         foil: l.foil,
         lighting: l.lighting,
         notes: l.notes ?? "",
+        matchBrand: l.matchBrand === undefined ? "?" : (l.matchBrand ?? ""),
       }
     : EMPTY;
 
@@ -89,6 +92,7 @@ export function LabelTool() {
       foil: form.foil,
       lighting: form.lighting,
       notes: form.notes.trim() || undefined,
+      matchBrand: form.matchBrand.trim() === "?" ? undefined : form.matchBrand.trim() || null,
     };
     const res = await fetch("/api/eval", { method: "POST", body: JSON.stringify(label) });
     const body = (await res.json()) as { saved?: Label; error?: string };
@@ -163,6 +167,15 @@ export function LabelTool() {
           </select>
         </label>
       </div>
+      <label className="flex flex-col gap-1 text-base">
+        matchBrand (M4)
+        <input className={input} value={form.matchBrand} onChange={set("matchBrand")} />
+        <span className="text-sm text-muted-foreground">
+          The exact brand name in the database (search it at /en/search, e.g. &quot;Telma 40
+          Tablet&quot;). Empty = not in the database, so the right answer is to abstain. ? = not
+          labelled yet.
+        </span>
+      </label>
       <label className="flex flex-col gap-1 text-base">
         notes
         <input className={input} value={form.notes} onChange={set("notes")} />

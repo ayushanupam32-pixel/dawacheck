@@ -71,8 +71,9 @@ export async function POST(request: NextRequest) {
   }
   const labels = readLabels();
   const existing = labels.find((l) => l.id === label.id);
-  // The split is decided the first time and never changes afterwards.
-  const saved: Label = { ...label, split: existing?.split ?? splitFor(label.id) };
+  // The split is decided the first time and never changes afterwards. Fields the form does not
+  // show (e.g. `stamp`) are kept from the existing label.
+  const saved: Label = { ...existing, ...label, split: existing?.split ?? splitFor(label.id) };
   const next = existing ? labels.map((l) => (l.id === label.id ? saved : l)) : [...labels, saved];
   writeFileSync(LABELS, JSON.stringify(next, null, 1) + "\n");
   return NextResponse.json({ saved });

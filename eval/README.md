@@ -48,6 +48,11 @@ The first time a photo is saved it is put in the **dev** set (3 in 4) or the fro
 set (1 in 4). Use dev photos while improving the reader. Don't look at test photos' results
 until the final report.
 
+For matching (M4), also fill in **matchBrand**: the exact name of this medicine in the brand
+database (look it up at http://localhost:3000/en/search, e.g. `Telma 40 Tablet`), or leave it
+empty if it is not in the database (a foreign or new brand). Then the right answer is for the
+app to abstain.
+
 ## 3. Run the evaluation
 
 ```bash
@@ -58,3 +63,14 @@ pnpm eval --final    # the frozen test photos, once, for the final report
 Each strip is read twice: by DawaCheck (with preprocessing) and by raw Tesseract (the original
 photo, untouched: the baseline). `results.md` shows exact-match accuracy and character error rate
 per field, batch-number accuracy for foil vs matte packs, and timing.
+
+## 4. Matching (M4)
+
+```bash
+pnpm eval:match          # about a minute; needs web/.env.local (read-only database key)
+pnpm eval:match --fit    # refit the matcher's weights and threshold on the dev cases first
+```
+
+Writes `match-results.md`: top-1 / top-3, wrong answers, abstentions and calibration on 800
+simulated strips (real brands from the database, made to look like OCR output) and on every
+labelled photo, compared with simpler baselines. See `docs/milestones/M4-matching.md`.
