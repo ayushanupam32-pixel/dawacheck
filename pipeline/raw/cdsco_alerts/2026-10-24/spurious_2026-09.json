@@ -1,0 +1,22 @@
+{
+ "iTotalDisplayRecords": 1,
+ "iTotalRecords": 1,
+ "aaData": [
+  {
+   "product_name_from_dtl": "Lactic Acid Bacillus Tablets (120 M)",
+   "str_brand_name": "(Sporlac-DS)",
+   "str_batch_no": "BDS25003",
+   "dt_manufacturing_date": "Feb-2025",
+   "dt_expiry_date": "Jan-2027",
+   "str_manufactured_by": "Under Investigation",
+   "str_nsq_result": "The sample does not  conform to Manufacturer's specification  with respect to test for Average weight and Assay of Lactic Acid Bacillus'.",
+   "str_reporting_source": "CDSCO Labs",
+   "str_reported_by_lab_or_state": "CDL, Kolkata",
+   "dt_reporting_month_year": "SEP-2026",
+   "str_nsq_remarks": "The product is purported to be spurious. However, the same is subject to outcome of investigation.",
+   "str_firm_reply": "The actual manufacturer (as per label claim) has informed that the impugned batch of the product has not been manufactured by them and that it is a spurious drug.",
+   "str_spurious_manufactured_by": "Under Investigation",
+   "str_spurious_manufacturer_name": "Under Investigation"
+  }
+ ]
+}

@@ -40,13 +40,22 @@ jobs:
         run: uv run python -m dawacheck_pipeline.fetch_jan_aushadhi
       - name: Parse Jan Aushadhi product list
         run: uv run python -m dawacheck_pipeline.parse_jan_aushadhi
+      # Parsed every month (cheap): the banned-FDC parser uses its salt names. Loading the
+      # brands into Supabase stays optional (--with-brands below).
       - name: Parse brand dataset
-        if: ${{ inputs.with_brands }}
         run: uv run python -m dawacheck_pipeline.parse_brands
       - name: Fetch Jan Aushadhi Kendra list
         run: uv run python -m dawacheck_pipeline.fetch_kendras
       - name: Parse Kendras (geocodes only new or misplaced addresses, with a cache)
         run: uv run python -m dawacheck_pipeline.parse_kendras
+      - name: Fetch CDSCO NSQ and spurious drug alerts (latest 3 months + new months)
+        run: uv run python -m dawacheck_pipeline.fetch_cdsco_alerts
+      - name: Parse CDSCO alerts
+        run: uv run python -m dawacheck_pipeline.parse_cdsco_alerts
+      - name: Fetch CDSCO lists of prohibited FDCs
+        run: uv run python -m dawacheck_pipeline.fetch_cdsco_fdc
+      - name: Parse prohibited FDCs
+        run: uv run python -m dawacheck_pipeline.parse_cdsco_fdc
       - name: Load into Supabase (validates first; fails without changing live data)
         run: uv run python -m dawacheck_pipeline.load_supabase ${{ inputs.with_brands && '--with-brands' || '' }}
       - name: Build static Kendra files for the website

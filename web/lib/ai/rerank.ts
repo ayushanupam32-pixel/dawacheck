@@ -31,7 +31,7 @@ import {
   nameSimilarity,
   normalizeSalt,
   parseCompositionKey,
-  similarity,
+  sameMaker,
   type Composition,
 } from "./normalize";
 
@@ -187,16 +187,6 @@ export function strengthEvidence(brand: string, candidate: MatchCandidate, c: Co
   return read.every((n) => known.has(n)) ? 1 : -1;
 }
 
-const MAKER_NOISE =
-  /\b(ltd|limited|pvt|private|pharma|pharmaceuticals?|laboratories|labs?|healthcare|india|inc|llp|co|and)\b/g;
-const makerCore = (name: string) =>
-  name
-    .toLowerCase()
-    .replace(/[^a-z\s]/g, " ")
-    .replace(MAKER_NOISE, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-
 export function features(input: MatchInput, candidate: MatchCandidate): Features {
   const composition = candidate.compositionKey
     ? parseCompositionKey(candidate.compositionKey)
@@ -204,11 +194,10 @@ export function features(input: MatchInput, candidate: MatchCandidate): Features
   const brand = input.brand ?? "";
   const release = composition?.release ?? "ir";
 
-  let maker = 0;
-  if (input.manufacturer && candidate.manufacturer) {
-    const [a, b] = [makerCore(input.manufacturer), makerCore(candidate.manufacturer)];
-    maker = a && b && (a.includes(b) || b.includes(a) || similarity(a, b) >= 0.6) ? 1 : 0;
-  }
+  const maker =
+    input.manufacturer && candidate.manufacturer
+      ? Number(sameMaker(input.manufacturer, candidate.manufacturer))
+      : 0;
 
   return {
     name: nameSimilarity(brand, candidate.name),

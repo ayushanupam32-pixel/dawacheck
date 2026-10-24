@@ -192,6 +192,27 @@ export function nameNumbers(name: string): number[] {
   return numbers;
 }
 
+const MAKER_NOISE =
+  /\b(m s|ltd|limited|pvt|private|pharma|pharmaceuticals?|laboratories|labs?|healthcare|india|inc|llp|co|and)\b/g;
+const makerCore = (name: string) =>
+  name
+    .toLowerCase()
+    .replace(/[^a-z\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(MAKER_NOISE, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+/**
+ * Same manufacturer? "Meyer Organics Pvt Ltd" = "MEYER ORGANICS PVT. LTD.". Containment counts,
+ * because alerts add the factory address: "M/s. Uniza Lifecare Pvt. Ltd., Sr. No. 919/7, ...".
+ */
+export function sameMaker(a: string, b: string): boolean {
+  const [x, y] = [makerCore(a), makerCore(b)];
+  if (x.length < 3 || y.length < 3) return false;
+  return x.includes(y) || y.includes(x) || similarity(x, y) >= 0.6;
+}
+
 /** Edit distance: how many letters must be added, removed or changed to turn a into b. */
 export function levenshtein(a: string, b: string): number {
   let previous = Array.from({ length: b.length + 1 }, (_, j) => j);

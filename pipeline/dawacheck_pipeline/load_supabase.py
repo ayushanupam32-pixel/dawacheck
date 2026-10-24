@@ -13,6 +13,7 @@ Run: uv run python -m dawacheck_pipeline.load_supabase [--with-brands]
 """
 
 import argparse
+import hashlib
 import json
 import math
 import os
@@ -21,9 +22,11 @@ from datetime import UTC, date, datetime
 import pandas as pd
 import requests
 
+from dawacheck_pipeline.fetch_cdsco_fdc import PAGE as FDC_SOURCE_PAGE
 from dawacheck_pipeline.fetch_jan_aushadhi import SOURCE_PAGE as JA_SOURCE_PAGE
 from dawacheck_pipeline.fetch_kendras import SOURCE_PAGE as KENDRAS_SOURCE_PAGE
 from dawacheck_pipeline.parse_brands import SOURCE_NAME as BRANDS_SOURCE
+from dawacheck_pipeline.parse_cdsco_alerts import SOURCE_URL as ALERTS_SOURCE_PAGE
 from dawacheck_pipeline.paths import CLEAN_DIR
 
 BATCH = 1000
@@ -208,6 +211,74 @@ def load_kendras(db: Supabase, kendras: pd.DataFrame) -> int:
     return len(rows)
 
 
+def row_id(*parts) -> str:
+    """A stable id from a row's content: the same alert gets the same id on every reload."""
+    return hashlib.sha1("|".join(str(p) for p in parts).encode()).hexdigest()[:24]
+
+
+def check_size(db: Supabase, table: str, new: int) -> None:
+    """Validate step: a sudden jump or drop usually means the source changed format."""
+    live = db.count(table)
+    if live and not 0.8 * live <= new <= 1.2 * live:
+        raise SystemExit(f"Refusing to load: {new} {table} rows vs {live} live (±20%)")
+
+
+def load_alerts(db: Supabase, alerts: pd.DataFrame) -> int:
+    today = date.today().isoformat()
+    rows = {}
+    for r in alerts.itertuples(index=False):
+        key = row_id(r.kind, r.alert_month, r.batch_no_norm, r.product_name, r.reported_by)
+        rows[key] = {
+            "id": key,
+            "kind": r.kind,
+            "alert_month": f"{r.alert_month}-01",
+            "product_name": clean(r.product_name) or "",
+            "brand_name": clean(r.brand_name) or None,
+            "batch_no": r.batch_no,
+            "batch_no_norm": r.batch_no_norm,
+            "mfg_date": clean(r.mfg_date) or None,
+            "exp_date": clean(r.exp_date) or None,
+            "manufacturer": clean(r.manufacturer) or None,
+            "failed_parameter": clean(r.failed_parameter) or None,
+            "reporting_source": clean(r.reporting_source) or None,
+            "reported_by": clean(r.reported_by) or None,
+            "remarks": clean(r.remarks) or None,
+            "source_url": r.source_url,
+            "last_seen": today,
+        }
+    check_size(db, "nsq_alerts", len(rows))
+    db.upsert("nsq_alerts", list(rows.values()), on_conflict="id")
+    # Alerts CDSCO has withdrawn are no longer in today's download.
+    db.delete_where("nsq_alerts", "last_seen", f"lt.{today}")
+    return len(rows)
+
+
+def load_banned_fdcs(db: Supabase, banned: pd.DataFrame) -> int:
+    today = date.today().isoformat()
+    rows = {}
+    for r in banned.itertuples(index=False):
+        key = row_id(r.combination_key, r.strengths, r.description, r.notification)
+        rows[key] = {
+            "id": key,
+            "combination_key": clean(r.combination_key) or None,
+            "salts": json.loads(r.salts),
+            "kind": r.kind,
+            "status": r.status,
+            "description": r.description,
+            "strengths": clean(r.strengths) or None,
+            "notification": clean(r.notification) or None,
+            "notified_on": clean(r.notified_on) or None,
+            "status_note": clean(r.status_note) or None,
+            "source_title": r.source_title,
+            "source_url": clean(r.source_url) or FDC_SOURCE_PAGE,
+            "last_seen": today,
+        }
+    check_size(db, "banned_fdcs", len(rows))
+    db.upsert("banned_fdcs", list(rows.values()), on_conflict="id")
+    db.delete_where("banned_fdcs", "last_seen", f"lt.{today}")
+    return len(rows)
+
+
 def record_run(db: Supabase, source: str, rows_loaded: int, url: str) -> None:
     db.upsert(
         "data_sources",
@@ -282,6 +353,17 @@ def main() -> None:
     n = load_kendras(db, kendras)
     record_run(db, "kendras", n, KENDRAS_SOURCE_PAGE)
     print(f"kendras: {n}")
+
+    # Safety-check data (M5). Text columns stay text: "" means "not given", never NaN.
+    alerts = pd.read_csv(CLEAN_DIR / "cdsco_alerts.csv", dtype=str, keep_default_na=False)
+    n = load_alerts(db, alerts)
+    record_run(db, "cdsco_alerts", n, ALERTS_SOURCE_PAGE)
+    print(f"nsq_alerts: {n}")
+
+    banned = pd.read_csv(CLEAN_DIR / "banned_fdcs.csv", dtype=str, keep_default_na=False)
+    n = load_banned_fdcs(db, banned)
+    record_run(db, "cdsco_fdc", n, FDC_SOURCE_PAGE)
+    print(f"banned_fdcs: {n}")
 
     if brands is not None:
         n = load_brands(db, salt_ids, brands)

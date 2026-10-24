@@ -1,0 +1,41 @@
+{
+  "iTotalRecords": 3,
+  "aaData": [
+    {
+      "str_product_name": "Alprazolam Tablets IP 0.5 mg",
+      "str_batch_no": "60098",
+      "dt_manufacturing_date": "Feb-2026",
+      "dt_expiry_date": "Jan-2028",
+      "str_manufactured_by": "Uniza Lifecare Pvt. Ltd.  , Sr. No. 919/7, (Old Sr. No. 404), Kadi-Detroj Road, Balasar, Tal. Kadi, Dist. Mehsana, Gujarat-382715, India.",
+      "str_nsq_result": "The sample does not conform to IP in respect of Dissolution",
+      "str_reporting_source": "State lab",
+      "str_reported_by_lab_or_state": "LUCKNOW, Uttar Pradesh",
+      "dt_reporting_month_year": "SEP-2026",
+      "str_brand_name": "Alzomac-0.5 Tablets"
+    },
+    {
+      "str_product_name": "Absorbent Cotton wool IP",
+      "str_batch_no": "2121",
+      "dt_manufacturing_date": "Dec-2025",
+      "dt_expiry_date": "Nov-2029",
+      "str_manufactured_by": "Jind Surgicals, 24-27, HSIIDC Industrial Area, New Hansi Road, Jind-126102(Haryana)",
+      "str_nsq_result": "Fluorescence, Neps and Sulphated Ash",
+      "str_reporting_source": "State lab",
+      "str_reported_by_lab_or_state": "Drug Testing Laboratory, Chennai-6",
+      "dt_reporting_month_year": "SEP-2026",
+      "str_brand_name": "NA"
+    },
+    {
+      "str_product_name": "Aceclofenac, Paracetamol & Chlorzoxazone Tablets",
+      "str_batch_no": "AT25-0938A",
+      "dt_manufacturing_date": "Nov-2025",
+      "dt_expiry_date": "Oct-2027",
+      "str_manufactured_by": "Aspo Pharmaceuticals LLP  , Plot No. 10, HIMUDA Industrial Area, Phase-IV, Bhatoli Kalan, Baddi, Solan (H.P.)-173205",
+      "str_nsq_result": "The sample does not conform to declared formula, in respect of content of Aceclofenac.",
+      "str_reporting_source": "State lab",
+      "str_reported_by_lab_or_state": "LUCKNOW, Uttar Pradesh",
+      "dt_reporting_month_year": "SEP-2026",
+      "str_brand_name": "Namik-MR"
+    }
+  ]
+}

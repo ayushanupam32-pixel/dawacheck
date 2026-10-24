@@ -4,6 +4,7 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { Camera, ChevronDown, ImageUp, Loader2, Lock, RotateCcw, Search } from "lucide-react";
 import { BrandButton, BrandResult, fill, Notice } from "@/components/generic-result";
+import { ResultCard, type ResultCardInput } from "@/components/result-card";
 import { Button, buttonVariants } from "@/components/ui/button";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { extractIngredients, type ExtractedFields, type Ingredient } from "@/lib/ai/extract";
@@ -14,6 +15,9 @@ import type { BrandCandidate, ScanMatchResponse, ScanOption } from "@/lib/match"
 
 type T = Dictionary["scan"];
 type TSearch = Dictionary["search"];
+type TChecks = Dictionary["checks"];
+/** What the result card needs besides the chosen brand. */
+type StripFacts = Omit<ResultCardInput, "brandId">;
 type Step =
   | { name: "front" }
   | { name: "back" }
@@ -87,7 +91,19 @@ function PhotoPicker({
   );
 }
 
-export function ScanClient({ t, tSearch, locale }: { t: T; tSearch: TSearch; locale: string }) {
+export function ScanClient({
+  t,
+  tSearch,
+  tChecks,
+  disclaimer,
+  locale,
+}: {
+  t: T;
+  tSearch: TSearch;
+  tChecks: TChecks;
+  disclaimer: string;
+  locale: string;
+}) {
   const [step, setStep] = useState<Step>({ name: "front" });
   const [front, setFront] = useState<Blob | null>(null);
   const [back, setBack] = useState<Blob | null>(null);
@@ -245,6 +261,8 @@ export function ScanClient({ t, tSearch, locale }: { t: T; tSearch: TSearch; loc
     <Confirm
       t={t}
       tSearch={tSearch}
+      tChecks={tChecks}
+      disclaimer={disclaimer}
       locale={locale}
       reading={step.reading}
       onStartOver={startOver}
@@ -263,12 +281,16 @@ const toMonthYear = (yyyyMm: string | undefined) =>
 function Confirm({
   t,
   tSearch,
+  tChecks,
+  disclaimer,
   locale,
   reading,
   onStartOver,
 }: {
   t: T;
   tSearch: TSearch;
+  tChecks: TChecks;
+  disclaimer: string;
   locale: string;
   reading: StripReading;
   onStartOver: () => void;
@@ -311,6 +333,20 @@ function Confirm({
       manufacturer: f.manufacturer?.value ?? null,
       ocrText: [...reading.front, ...reading.back].map((r) => r.text).join("\n"),
     });
+
+  // For the safety checks. A batch number the user typed or corrected counts as certain; one
+  // left as read keeps the reader's confidence (low = "Please check" = not looked up).
+  const readBatch = f.batchNo?.value ?? "";
+  const facts: StripFacts = {
+    stripSalts: stripIngredients.map((i) => i.salt),
+    batchNo: values.batchNo.trim(),
+    batchConfidence:
+      values.batchNo.trim() && values.batchNo.trim() !== readBatch
+        ? 1
+        : (f.batchNo?.confidence ?? 0),
+    names: [values.brand.trim()].filter(Boolean),
+    manufacturer: f.manufacturer?.value ?? null,
+  };
 
   const [match, setMatch] = useState<
     | { step: "idle" | "matching" | "error" }
@@ -390,6 +426,9 @@ function Confirm({
             onChoose={(chosen) => setMatch({ ...match, chosen })}
             brandRead={values.brand}
             stripIngredients={stripIngredients}
+            facts={facts}
+            tChecks={tChecks}
+            disclaimer={disclaimer}
           />
         )}
       </div>
@@ -446,6 +485,9 @@ function MatchResult({
   onChoose,
   brandRead,
   stripIngredients,
+  facts,
+  tChecks,
+  disclaimer,
 }: {
   t: T;
   tSearch: TSearch;
@@ -455,6 +497,9 @@ function MatchResult({
   onChoose: (brand: BrandCandidate | null) => void;
   brandRead: string;
   stripIngredients: Ingredient[];
+  facts: StripFacts;
+  tChecks: TChecks;
+  disclaimer: string;
 }) {
   const percent = (p: number) => `${Math.round(p * 100)}%`;
   const typeLink = (
@@ -489,6 +534,12 @@ function MatchResult({
             {t.notThisOne}
           </Button>
         </div>
+        <ResultCard
+          t={tChecks}
+          locale={locale}
+          disclaimer={disclaimer}
+          input={{ ...facts, brandId: chosen.id, names: [...facts.names, chosen.name] }}
+        />
         <BrandResult
           t={tSearch}
           locale={locale}

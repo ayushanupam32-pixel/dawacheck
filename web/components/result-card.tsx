@@ -1,0 +1,298 @@
+"use client";
+
+// The result card (M5): six checks for one strip, each a row with an icon AND words for its
+// status (never colour alone). The checks run on the server (/api/checks); this file only shows
+// them. Wording follows the medical-safety rules: "show this to your pharmacist", never
+// "stop taking" or "unsafe for you"; "not found in the lists we checked", never "safe".
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  CircleHelp,
+  Loader2,
+  MapPin,
+  MinusCircle,
+  OctagonAlert,
+  RotateCcw,
+} from "lucide-react";
+import { fill } from "@/components/generic-result";
+import { Button } from "@/components/ui/button";
+import type { CheckStatus } from "@/lib/checks/types";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
+import type { ChecksResponse } from "@/lib/run-checks";
+
+type T = Dictionary["checks"];
+
+export type ResultCardInput = {
+  brandId: number;
+  stripSalts: string[];
+  batchNo: string;
+  batchConfidence: number;
+  names: string[];
+  manufacturer: string | null;
+};
+
+const STATUS_ICON: Record<CheckStatus, typeof CheckCircle2> = {
+  ok: CheckCircle2,
+  warn: AlertTriangle,
+  alert: OctagonAlert,
+  na: MinusCircle,
+  unknown: CircleHelp,
+};
+const STATUS_COLOR: Record<CheckStatus, string> = {
+  ok: "text-status-ok",
+  warn: "text-status-warn",
+  alert: "text-status-alert",
+  na: "text-status-na",
+  unknown: "text-status-warn",
+};
+
+/** "2026-09" -> "Sep 2026" in the user's language. */
+const monthName = (yyyyMm: string, locale: string) =>
+  new Date(`${yyyyMm.slice(0, 7)}-01T00:00:00`).toLocaleDateString(`${locale}-IN`, {
+    month: "short",
+    year: "numeric",
+  });
+
+export function ResultCard({
+  t,
+  locale,
+  input,
+  disclaimer,
+}: {
+  t: T;
+  locale: string;
+  input: ResultCardInput;
+  disclaimer: string;
+}) {
+  const key = JSON.stringify(input);
+  const [state, setState] = useState<
+    | { key: string; step: "loading" }
+    | { key: string; step: "done"; data: ChecksResponse }
+    | { key: string; step: "error" }
+  >({ key, step: "loading" });
+  const [attempt, setAttempt] = useState(0);
+  const current = state.key === key ? state : { key, step: "loading" as const };
+
+  useEffect(() => {
+    let cancelled = false;
+    // POST: batch numbers and medicine details go in the body, not the URL.
+    fetch("/api/checks", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: key,
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(String(res.status));
+        return res.json() as Promise<ChecksResponse>;
+      })
+      .then((data) => !cancelled && setState({ key, step: "done", data }))
+      .catch(() => !cancelled && setState({ key, step: "error" }));
+    return () => {
+      cancelled = true;
+    };
+  }, [key, attempt]);
+
+  if (current.step === "loading") {
+    return (
+      <p className="flex items-center gap-2 text-base">
+        <Loader2 aria-hidden="true" className="size-5 animate-spin" />
+        {t.loading}
+      </p>
+    );
+  }
+  if (current.step === "error") {
+    return (
+      <div className="flex flex-col gap-2 rounded-xl border-2 border-status-warn p-4">
+        <p className="text-base">{t.error}</p>
+        <Button variant="outline" className="w-fit" onClick={() => setAttempt((a) => a + 1)}>
+          <RotateCcw aria-hidden="true" />
+          {t.checkAgain}
+        </Button>
+      </div>
+    );
+  }
+
+  const { data } = current;
+  const batch = data.batch;
+  const batchNo = input.batchNo.toUpperCase();
+  const legal = (status: string) => t[`legal_${status}` as keyof T] ?? status;
+  const updated = (iso: string | null) =>
+    iso ? `${t.updated}: ${new Date(iso).toLocaleDateString(`${locale}-IN`)}` : "";
+
+  return (
+    <section
+      aria-labelledby="checks-title"
+      className="flex flex-col gap-3 rounded-xl border border-border p-4"
+    >
+      <h2 id="checks-title" className="text-xl font-semibold">
+        {t.title}
+      </h2>
+      <ul className="flex flex-col divide-y divide-border">
+        <Row
+          t={t}
+          title={t.genericTitle}
+          status={data.generic.found ? "ok" : "na"}
+          label={data.generic.found ? t.statusAvailable : undefined}
+        >
+          <p>{data.generic.found ? t.genericFound : t.genericNone}</p>
+        </Row>
+
+        <Row t={t} title={t.batchTitle} status={batch.status}>
+          {batch.reason === "match" ? (
+            <>
+              <p className="font-medium">
+                {batch.matches.some((m) => m.kind === "spurious") ? t.batchSpurious : t.batchAlert}
+              </p>
+              <ul className="list-inside list-disc">
+                {batch.matches.slice(0, 3).map((m, i) => (
+                  <li key={i}>
+                    {fill(t.batchAlertDetail, {
+                      month: monthName(m.alert_month, locale),
+                      product: m.brand_name
+                        ? `${m.brand_name} (${m.product_name})`
+                        : m.product_name,
+                      batch: m.batch_no,
+                      failed: m.failed_parameter ?? "—",
+                      lab: m.reported_by ?? "—",
+                    })}
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <p>
+              {fill(
+                {
+                  not_found: t.batchNotFound,
+                  batch_only: t.batchOnly,
+                  no_batch: t.batchNoBatch,
+                  uncertain_batch: t.batchUncertain,
+                  no_data: t.noData,
+                  match: t.batchAlert,
+                }[batch.reason],
+                { batch: batchNo },
+              )}
+            </p>
+          )}
+          {batch.checkedThrough && batch.status !== "unknown" && (
+            <Source
+              t={t}
+              url={data.sources.alerts.url}
+              note={`${fill(t.checkedThrough, { month: monthName(batch.checkedThrough, locale) })} ${updated(data.sources.alerts.updatedOn)}`}
+            />
+          )}
+        </Row>
+
+        <Row t={t} title={t.priceTitle} status="na">
+          <p>{t.priceNotYet}</p>
+        </Row>
+
+        <Row t={t} title={t.bannedTitle} status={data.banned.status}>
+          {data.banned.reason === "prohibited" ? (
+            <p className="font-medium">
+              {fill(t.bannedAlert, { notification: data.banned.matches[0].notification ?? "" })}
+            </p>
+          ) : data.banned.reason === "review" ? (
+            <>
+              <p className="font-medium">{t.bannedReview}</p>
+              <ul className="list-inside list-disc">
+                {data.banned.matches.map((m, i) => (
+                  <li key={i}>
+                    {legal(m.status)}: {m.description}
+                    {m.notification && ` (${m.notification})`}
+                    {m.strengths && `. ${fill(t.bannedStrengths, { strengths: m.strengths })}`}
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <p>
+              {
+                {
+                  no_composition: t.bannedNoComposition,
+                  no_data: t.noData,
+                  not_listed: t.bannedNotListed,
+                }[data.banned.reason]
+              }
+            </p>
+          )}
+          {data.banned.status !== "unknown" && (
+            <Source t={t} url={data.sources.fdc.url} note={updated(data.sources.fdc.updatedOn)} />
+          )}
+        </Row>
+
+        <Row t={t} title={t.cabinetTitle} status="na">
+          <p>{t.cabinetNotYet}</p>
+        </Row>
+
+        <Row t={t} title={t.kendraTitle} status="na" hideStatus>
+          <Link
+            href={`/${locale}/kendras`}
+            className="inline-flex min-h-12 items-center gap-2 font-medium underline underline-offset-4"
+          >
+            <MapPin aria-hidden="true" className="size-5" />
+            {t.kendraLink}
+          </Link>
+        </Row>
+      </ul>
+      <p className="rounded-lg bg-muted/60 p-3 text-sm">{disclaimer}</p>
+    </section>
+  );
+}
+
+function Row({
+  t,
+  title,
+  status,
+  label: ownLabel,
+  hideStatus = false,
+  children,
+}: {
+  t: T;
+  title: string;
+  status: CheckStatus;
+  /** For rows where "ok" means "found" (the generic), not "no problem found". */
+  label?: string;
+  hideStatus?: boolean;
+  children: React.ReactNode;
+}) {
+  const Icon = STATUS_ICON[status];
+  const label =
+    ownLabel ??
+    {
+      ok: t.statusOk,
+      warn: t.statusWarn,
+      alert: t.statusAlert,
+      na: t.statusNa,
+      unknown: t.statusUnknown,
+    }[status];
+  return (
+    <li className="flex flex-col gap-1 py-3 text-base">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="font-semibold">{title}</h3>
+        {!hideStatus && (
+          <span className={`flex items-center gap-1 text-sm font-semibold ${STATUS_COLOR[status]}`}>
+            <Icon aria-hidden="true" className="size-5" />
+            <span className="text-foreground">{label}</span>
+          </span>
+        )}
+      </div>
+      {children}
+    </li>
+  );
+}
+
+function Source({ t, url, note }: { t: T; url: string; note: string }) {
+  return (
+    <p className="text-sm text-muted-foreground">
+      {t.source}:{" "}
+      <a href={url} target="_blank" rel="noreferrer" className="underline">
+        CDSCO
+      </a>
+      {note && ` · ${note.trim()}`}
+    </p>
+  );
+}

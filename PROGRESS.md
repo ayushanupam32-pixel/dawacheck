@@ -198,22 +198,67 @@ corrections): 1/5 matched, 0 wrong: the M3 reader rarely reads the brand name.
 - **pnpm `allowBuilds`:** esbuild allowed (needed by tsx); sharp, tesseract.js and unrs-resolver
   denied (not needed; fewer install scripts running on the machine).
 
+## M5 (safety checks): sources inspected and agreed (2026-10-24)
+
+- **NSQ + spurious alerts:** CDSCO's public JSON behind
+  https://cdsco.gov.in/opencms/opencms/en/Notifications/nsq-drugs/ (the page embeds
+  `cdscoonline.gov.in/CDSCO/viewPublicNSQDrug`). Endpoints: `reportingYears?tab=nsq|spurious`,
+  `publicReportingMonths?year=&tab=`, `filteredNsqDrugTable?month=Sep-2026&source=All&tab=nsq`,
+  `filteredSpuriousDrugTable?…&tab=spurious`. Responses are **Latin-1** JSON (`aaData` rows:
+  brand, product, batch, mfg/exp "Feb-2026", maker, result, source, lab/state, month). NSQ from
+  2019, spurious from 2025. No robots.txt, no login. Agreed: fetch everything once, then monthly,
+  2 s apart. (The old Alerts page PDFs stop at June 2025.)
+- **Banned FDCs:** CDSCO PDFs on https://cdsco.gov.in/opencms/opencms/en/Drugs/FDC/ : the
+  consolidated list (as on 22.11.2021, 34 pages) + 14 (2023), 156 (2024), S(+)-etodolac +
+  paracetamol (2024) and 16 (11.06.2026) FDCs. The consolidated list has footnotes: 1# stayed by
+  Madras HC, 2#/6# revoked with conditions, 3#/4# under examination (SC orders), 5# quashed by
+  Delhi HC (appeal pending). Agreed: **active bans** say "prohibited by S.O. …, show this to your
+  pharmacist"; **stayed / quashed / under examination** get a softer "under legal review" note
+  with the status; **revoked with conditions** show the condition. 1983-era category bans
+  ("FDCs of vitamins with analgesics") cannot be matched exactly.
+- **NPPA ceiling prices:** nppa.gov.in HTML returns 403 to scripts (PDFs download fine). The
+  downloadable lists are NLEM 2015 (30.09.2020; compendium till 10.08.2022). Current prices are
+  only in the "Compendium of Prices 2026" dashboard (nppaipdms.gov.in), which has an Excel export.
+  Agreed: **the user exports the Excel** in their own browser and saves it in
+  `pipeline/raw/nppa/<date>/`; the pipeline parses it (like the Kaggle file). Ceiling prices
+  **exclude GST**; the app must say so.
+
+### M5 progress (2026-10-24, not committed)
+
+See `docs/milestones/M5-safety-checks.md`.
+
+- **Built and tested:** alerts pipeline (6,944 alerts), banned-FDC pipeline (682 entries,
+  pdfplumber 0.11.7), tables (`supabase/migrations/20261024040000_safety_check_tables.sql`,
+  applied), loader, 4 new steps in `data-refresh.yml` (brand parsing now runs every month),
+  `web/lib/checks/{batch,banned}.ts`, `web/lib/run-checks.ts`, `POST /api/checks`, the six-row
+  `components/result-card.tsx` in the scan flow (en/hi/ta). Pipeline 147 tests, web 275.
+- **Not loaded yet:** the new tables are empty until the data-refresh Action runs (it holds the
+  secret key). The card says "Couldn't check: not loaded yet" until then.
+- **Waiting on the user:** the NPPA "Compendium of Prices 2026" Excel in
+  `pipeline/raw/nppa/<date>/`. Not found on 2026-10-24 (searched the project, Downloads and the
+  home folder). Fair price row says "Not available yet".
+- `web/.prettierignore` exists because Prettier only reads the ignore file of the folder it runs
+  in; `web/lib/ai/salt-rules.json` must never be reformatted (a pytest checks it).
+
 ## Exact next steps
 
-1. **Ask the user what next:** M5 (safety checks) or speed / brand reading first.
-   Recommendation: M5, since every remaining milestone builds on the result card; speed and
-   brand reading can be one focused session later.
-2. **M5: safety checks.** Inspect each source first and show the user a sample before parsing:
+1. **Commit M5 so far** (with the user's OK), push, then run the refresh to load the data:
+   `GH_CONFIG_DIR=$HOME/.gh gh workflow run data-refresh.yml` and check its log. Then test on the
+   live site: batch `60098` + name `Alzomac 0.5` should show the Sep 2026 alert.
+2. **NPPA:** when the Excel is in `pipeline/raw/nppa/<date>/`, inspect it, show the user a sample,
+   then `parse_nppa.py`, the `ceiling_prices` table (redesign the M0 draft), `checkPrice`
+   (per-unit MRP vs ceiling, saying clearly that ceiling prices exclude GST), and the card row.
+3. **M5: safety checks.** Inspect each source first and show the user a sample before parsing:
    CDSCO monthly NSQ / spurious alerts (PDFs), NPPA ceiling prices, CDSCO banned FDC lists.
    Then pure check functions (`checkBatch`, `checkPrice`, `checkBanned`) with tests, pipeline
    jobs in `data-refresh.yml`, and the six-row result card.
-3. **Speed:** move preprocessing and OCR into a Web Worker; try a smaller first-pass image; skip
+4. **Speed:** move preprocessing and OCR into a Web Worker; try a smaller first-pass image; skip
    the inverted variant when the ink variant already found the key fields; measure on a phone.
-4. **Brand reading:** use the matcher to confirm brand guesses before the confirm screen.
-5. **More photos:** the user takes ~15–20 strip photos with their own phone (front, back, stamp
+5. **Brand reading:** use the matcher to confirm brand guesses before the confirm screen.
+6. **More photos:** the user takes ~15–20 strip photos with their own phone (front, back, stamp
    close-up), copies them into `eval/photos/`, labels them at `/en/eval/label` (including the
    new "match brand": the exact brand name in the database, or empty if not in it).
-6. **Spot-check `eval/labels.json`** (human) before any numbers go into the report.
-7. Then M6 (cabinet + PWA), M7 (evaluation, About page, accessibility, final
+7. **Spot-check `eval/labels.json`** (human) before any numbers go into the report.
+8. Then M6 (cabinet + PWA), M7 (evaluation, About page, accessibility, final
    `pnpm eval -- --final` and `pnpm eval:match -- --final`), and the deliverables (README GIF,
    architecture diagram, report, slides, viva Q&A).

@@ -1,0 +1,7 @@
+# Prettier reads the ignore file of the folder it runs in; this mirrors ../.prettierignore for
+# commands run inside web/.
+components/ui
+next-env.d.ts
+AGENTS.md
+public/data
+lib/ai/salt-rules.json
