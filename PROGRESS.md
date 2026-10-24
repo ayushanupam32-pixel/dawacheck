@@ -261,7 +261,11 @@ See `docs/milestones/M5-safety-checks.md`.
 
 1. **Finish M5** when the NPPA file arrives (step 2). Then write the M5 milestone notes' final
    results and mark M5 done; the brief's "Done when" (all check tests pass, monthly Action runs)
-   is met for batch and banned checks.
+   is met for batch and banned checks. Also still open in M5 (or do them in M7): the brief's
+   accuracy checks: NSQ rows vs 3 monthly PDFs checked by hand (≥ 98%), the banned check on 20
+   banned + 20 legal medicines (100%), the fair-price check on 30 medicines (100%). If the NPPA
+   Excel can't be exported, fall back to the downloadable 2022 compendium PDF, labelled as
+   August 2022 prices.
 2. **NPPA:** when the Excel is in `pipeline/raw/nppa/<date>/`, inspect it, show the user a sample,
    then `parse_nppa.py`, the `ceiling_prices` table (redesign the M0 draft), `checkPrice`
    (per-unit MRP vs ceiling, saying clearly that ceiling prices exclude GST), and the card row.
