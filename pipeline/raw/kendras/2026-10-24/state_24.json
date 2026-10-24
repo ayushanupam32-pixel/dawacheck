@@ -18006,6 +18006,24 @@
     "longitude": "72.1729",
     "serialNo": null,
     "applicationId": null
+   },
+   {
+    "id": 21763,
+    "contactNumber": "8128438414",
+    "storeCode": "PMBJK24746",
+    "pinCode": 382421,
+    "stateId": 24,
+    "districtId": 446,
+    "stateName": "Gujarat",
+    "districtName": "Gandhinagar",
+    "kendraAddress": "Shop No.9, Sahjanand Sayona, Sargasan Dandhinagar, Sargasan",
+    "createdDate": "null",
+    "updatedDate": "null",
+    "status": 1,
+    "latitude": "23.1923470256074",
+    "longitude": "72.6015308907821",
+    "serialNo": null,
+    "applicationId": null
    }
   ]
  },

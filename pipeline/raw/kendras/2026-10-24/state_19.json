@@ -20724,6 +20724,24 @@
     "longitude": "88.0114000932383",
     "serialNo": null,
     "applicationId": null
+   },
+   {
+    "id": 21762,
+    "contactNumber": "9038007227",
+    "storeCode": "PMBJK24745",
+    "pinCode": 711101,
+    "stateId": 19,
+    "districtId": 313,
+    "stateName": "West Bengal",
+    "districtName": "Howrah",
+    "kendraAddress": "holding No.-200(Part=G3, Ground Floor), Panchanantala Road, Ward No.-18, Howrah, Howrah Sardar",
+    "createdDate": "null",
+    "updatedDate": "null",
+    "status": 1,
+    "latitude": "22.5856462699244",
+    "longitude": "88.3280113835916",
+    "serialNo": null,
+    "applicationId": null
    }
   ]
  },

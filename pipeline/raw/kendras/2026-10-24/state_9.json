@@ -80916,6 +80916,42 @@
     "longitude": "81.04322",
     "serialNo": null,
     "applicationId": null
+   },
+   {
+    "id": 21754,
+    "contactNumber": "8860001255",
+    "storeCode": "PMBJK24737",
+    "pinCode": 247001,
+    "stateId": 9,
+    "districtId": 177,
+    "stateName": "Uttar Pradesh",
+    "districtName": "Saharanpur",
+    "kendraAddress": "Village- Malhipur, Khasra No.-415, 100 Meter To UCO Bank, Badgaon Road, Saharanpur",
+    "createdDate": "null",
+    "updatedDate": "null",
+    "status": 1,
+    "latitude": "29.8967274441057",
+    "longitude": "77.5515392018523",
+    "serialNo": null,
+    "applicationId": null
+   },
+   {
+    "id": 21755,
+    "contactNumber": "7991378646",
+    "storeCode": "PMBJK24738",
+    "pinCode": 242127,
+    "stateId": 9,
+    "districtId": 180,
+    "stateName": "Uttar Pradesh",
+    "districtName": "Shahjahanpur",
+    "kendraAddress": "Ganga Nagar Near Hero Agency Kalan, Shahjahanpur",
+    "createdDate": "null",
+    "updatedDate": "null",
+    "status": 1,
+    "latitude": "27.70117",
+    "longitude": "79.45208",
+    "serialNo": null,
+    "applicationId": null
    }
   ]
  },

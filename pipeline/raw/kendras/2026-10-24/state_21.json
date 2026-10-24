@@ -16836,6 +16836,24 @@
     "longitude": "86.9289784410939",
     "serialNo": null,
     "applicationId": null
+   },
+   {
+    "id": 21760,
+    "contactNumber": "8260261277",
+    "storeCode": "PMBJK24743",
+    "pinCode": 761200,
+    "stateId": 21,
+    "districtId": 353,
+    "stateName": "Odisha",
+    "districtName": "Gajapati",
+    "kendraAddress": "Khata No 30/375, Plot No 332/1131, WardNo 15 Shop No 4 Hospital Road Friends Colony Po/Ps- Paralakhe",
+    "createdDate": "null",
+    "updatedDate": "null",
+    "status": 1,
+    "latitude": "18.7717887369122",
+    "longitude": "84.0960160292975",
+    "serialNo": null,
+    "applicationId": null
    }
   ]
  },

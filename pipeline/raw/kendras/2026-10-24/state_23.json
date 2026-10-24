@@ -13092,6 +13092,42 @@
     "longitude": "75.785009480851",
     "serialNo": null,
     "applicationId": null
+   },
+   {
+    "id": 21759,
+    "contactNumber": "8839778078",
+    "storeCode": "PMBJK24742",
+    "pinCode": 453555,
+    "stateId": 23,
+    "districtId": 410,
+    "stateName": "Madhya Pradesh",
+    "districtName": "Indore",
+    "kendraAddress": "Shop No Plot No 391 Gram Bhawrasla Sanwer Road Bhawrasla Tehsil",
+    "createdDate": "null",
+    "updatedDate": "null",
+    "status": 1,
+    "latitude": "22.76633",
+    "longitude": "75.84735",
+    "serialNo": null,
+    "applicationId": null
+   },
+   {
+    "id": 21761,
+    "contactNumber": "7770866313",
+    "storeCode": "PMBJK24744",
+    "pinCode": 452001,
+    "stateId": 23,
+    "districtId": 410,
+    "stateName": "Madhya Pradesh",
+    "districtName": "Indore",
+    "kendraAddress": "Shop No Plot No Ground Floor 16/A Shradha Shree Colony Extension, Mr 09",
+    "createdDate": "null",
+    "updatedDate": "null",
+    "status": 1,
+    "latitude": "22.76367",
+    "longitude": "75.87057",
+    "serialNo": null,
+    "applicationId": null
    }
   ]
  },
