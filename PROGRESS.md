@@ -247,6 +247,11 @@ See `docs/milestones/M5-safety-checks.md`.
   ids changed). Check switched off again (row `cdsco_fdc` deleted); loader now stamps rows with
   the run's start time (`last_seen` is timestamptz, migration `20261025000000_*`) and checks size
   against the previous run's `rows_loaded`.
+- **Live and verified (2026-10-25, after refresh run 40124008146):** 687 banned entries, 6,905
+  alerts, check switched on again. Live API: A Clo P / Ezofen-P / Telma 40 "not listed";
+  Acemiz-MR "may apply" from its record, "not listed" with its 3 strip ingredients; Faconex Plus
+  (diclofenac + paracetamol injection) and Fena syrup (aceclofenac 50 + paracetamol 125) "may
+  apply"; Enselin 2 (rosiglitazone) "prohibited".
 - **Waiting on the user:** the NPPA "Compendium of Prices 2026" Excel in
   `pipeline/raw/nppa/<date>/` (not found on 2026-10-24).
 - `web/.prettierignore` exists because Prettier only reads the ignore file of the folder it runs
@@ -254,9 +259,9 @@ See `docs/milestones/M5-safety-checks.md`.
 
 ## Exact next steps
 
-1. **Check the banned-check fix is live** (if this session ended before it): CI green, data
-   refresh run, `data_sources` has `cdsco_fdc` again, and on the live site aceclofenac 100 +
-   paracetamol 325 tablets are "not listed" while a rosiglitazone brand is an alert.
+1. **Finish M5** when the NPPA file arrives (step 2). Then write the M5 milestone notes' final
+   results and mark M5 done; the brief's "Done when" (all check tests pass, monthly Action runs)
+   is met for batch and banned checks.
 2. **NPPA:** when the Excel is in `pipeline/raw/nppa/<date>/`, inspect it, show the user a sample,
    then `parse_nppa.py`, the `ceiling_prices` table (redesign the M0 draft), `checkPrice`
    (per-unit MRP vs ceiling, saying clearly that ceiling prices exclude GST), and the card row.
