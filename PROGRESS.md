@@ -242,6 +242,11 @@ See `docs/milestones/M5-safety-checks.md`.
   `describeMedicine` in `web/lib/run-checks.ts`). Measured over all 241,046 brands: 18,278
   flagged before → 62 certain alerts (all withdrawn single drugs) + 4,885 "show your pharmacist".
   Details in `docs/milestones/M5-safety-checks.md`. Web tests 281, pipeline 152.
+- **Reload slip (2026-10-25), fixed:** the first refresh after the fix kept the old 682 entries
+  next to the new 687 (deletion was "last_seen older than today", both loads were the same day,
+  ids changed). Check switched off again (row `cdsco_fdc` deleted); loader now stamps rows with
+  the run's start time (`last_seen` is timestamptz, migration `20261025000000_*`) and checks size
+  against the previous run's `rows_loaded`.
 - **Waiting on the user:** the NPPA "Compendium of Prices 2026" Excel in
   `pipeline/raw/nppa/<date>/` (not found on 2026-10-24).
 - `web/.prettierignore` exists because Prettier only reads the ignore file of the folder it runs

@@ -77,6 +77,17 @@ class Supabase:
         if not resp.ok:
             raise RuntimeError(f"Delete from {table} failed: {resp.status_code} {resp.text}")
 
+    def rows_loaded(self, source: str) -> int | None:
+        """How many rows the previous run of a source loaded (None if it never ran)."""
+        resp = self.session.get(
+            f"{self.base}/data_sources",
+            params={"source": f"eq.{source}", "select": "rows_loaded"},
+            timeout=60,
+        )
+        resp.raise_for_status()
+        found = resp.json()
+        return found[0]["rows_loaded"] if found else None
+
     def count(self, table: str) -> int:
         resp = self.session.head(
             f"{self.base}/{table}", params={"select": "id"}, headers={"Prefer": "count=exact"}
@@ -216,15 +227,18 @@ def row_id(*parts) -> str:
     return hashlib.sha1("|".join(str(p) for p in parts).encode()).hexdigest()[:24]
 
 
-def check_size(db: Supabase, table: str, new: int) -> None:
-    """Validate step: a sudden jump or drop usually means the source changed format."""
-    live = db.count(table)
-    if live and not 0.8 * live <= new <= 1.2 * live:
-        raise SystemExit(f"Refusing to load: {new} {table} rows vs {live} live (±20%)")
+def check_size(db: Supabase, source: str, new: int) -> None:
+    """Validate step: a sudden jump or drop usually means the source changed format.
+
+    Compared with what the previous run of this source loaded (data_sources.rows_loaded), not
+    with the table's row count, which can include leftovers a failed or interrupted run left.
+    """
+    previous = db.rows_loaded(source)
+    if previous and not 0.8 * previous <= new <= 1.2 * previous:
+        raise SystemExit(f"Refusing to load: {new} {source} rows vs {previous} last time (±20%)")
 
 
-def load_alerts(db: Supabase, alerts: pd.DataFrame) -> int:
-    today = date.today().isoformat()
+def load_alerts(db: Supabase, alerts: pd.DataFrame, run_started: str) -> int:
     rows = {}
     for r in alerts.itertuples(index=False):
         key = row_id(r.kind, r.alert_month, r.batch_no_norm, r.product_name, r.reported_by)
@@ -244,17 +258,17 @@ def load_alerts(db: Supabase, alerts: pd.DataFrame) -> int:
             "reported_by": clean(r.reported_by) or None,
             "remarks": clean(r.remarks) or None,
             "source_url": r.source_url,
-            "last_seen": today,
+            "last_seen": run_started,
         }
-    check_size(db, "nsq_alerts", len(rows))
+    check_size(db, "cdsco_alerts", len(rows))
     db.upsert("nsq_alerts", list(rows.values()), on_conflict="id")
-    # Alerts CDSCO has withdrawn are no longer in today's download.
-    db.delete_where("nsq_alerts", "last_seen", f"lt.{today}")
+    # Alerts CDSCO has withdrawn were not in this run's download. Rows are compared with the
+    # run's start time, not its date: two runs on one day must not keep each other's rows.
+    db.delete_where("nsq_alerts", "last_seen", f"lt.{run_started}")
     return len(rows)
 
 
-def load_banned_fdcs(db: Supabase, banned: pd.DataFrame) -> int:
-    today = date.today().isoformat()
+def load_banned_fdcs(db: Supabase, banned: pd.DataFrame, run_started: str) -> int:
     rows = {}
     for r in banned.itertuples(index=False):
         key = row_id(
@@ -276,11 +290,11 @@ def load_banned_fdcs(db: Supabase, banned: pd.DataFrame) -> int:
             "status_note": clean(r.status_note) or None,
             "source_title": r.source_title,
             "source_url": clean(r.source_url) or FDC_SOURCE_PAGE,
-            "last_seen": today,
+            "last_seen": run_started,
         }
-    check_size(db, "banned_fdcs", len(rows))
+    check_size(db, "cdsco_fdc", len(rows))
     db.upsert("banned_fdcs", list(rows.values()), on_conflict="id")
-    db.delete_where("banned_fdcs", "last_seen", f"lt.{today}")
+    db.delete_where("banned_fdcs", "last_seen", f"lt.{run_started}")
     return len(rows)
 
 
@@ -361,12 +375,14 @@ def main() -> None:
 
     # Safety-check data (M5). Text columns stay text: "" means "not given", never NaN.
     alerts = pd.read_csv(CLEAN_DIR / "cdsco_alerts.csv", dtype=str, keep_default_na=False)
-    n = load_alerts(db, alerts)
+    # One timestamp for the whole run: rows this run did not load are deleted afterwards.
+    run_started = datetime.now(UTC).isoformat()
+    n = load_alerts(db, alerts, run_started)
     record_run(db, "cdsco_alerts", n, ALERTS_SOURCE_PAGE)
     print(f"nsq_alerts: {n}")
 
     banned = pd.read_csv(CLEAN_DIR / "banned_fdcs.csv", dtype=str, keep_default_na=False)
-    n = load_banned_fdcs(db, banned)
+    n = load_banned_fdcs(db, banned, run_started)
     record_run(db, "cdsco_fdc", n, FDC_SOURCE_PAGE)
     print(f"banned_fdcs: {n}")
 

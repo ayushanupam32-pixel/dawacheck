@@ -107,6 +107,12 @@ composition in `pipeline/clean/brands.csv`.
 Lesson for the report: test a safety check against the whole population it will see, not only
 against the cases it should catch.
 
+A second slip during the fix: reloading kept the 682 old (unrestricted) entries next to the 687
+new ones, because the loader deleted rows "older than today" and both loads ran on the same day,
+with new row ids. The check stayed switched off until the loader was fixed: rows are now stamped
+with the run's start time and everything older is removed, and the ±20% safety check compares
+with what the previous run loaded rather than with the table's row count.
+
 ## Key decisions, in plain words
 
 **"Couldn't check" is not "nothing found".** If a list is not loaded, or the batch number is
