@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { AlertTriangle, CheckCircle2, CircleHelp, Loader2, PiggyBank, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
@@ -31,12 +31,11 @@ export function SearchClient({ t, locale }: { t: T; locale: string }) {
   const inputId = useId();
   const hintId = useId();
 
-  async function search(event: React.FormEvent) {
-    event.preventDefault();
-    if (query.trim().length < 3) return;
+  async function runSearch(text: string) {
+    if (text.trim().length < 3) return;
     setState({ step: "searching" });
     try {
-      const res = await fetch(`/api/match?q=${encodeURIComponent(query.trim())}`);
+      const res = await fetch(`/api/match?q=${encodeURIComponent(text.trim())}`);
       if (!res.ok) throw new Error(String(res.status));
       const body = (await res.json()) as SearchResponse;
       setState(
@@ -48,6 +47,24 @@ export function SearchClient({ t, locale }: { t: T; locale: string }) {
       setState({ step: "error" });
     }
   }
+
+  function search(event: React.FormEvent) {
+    event.preventDefault();
+    runSearch(query);
+  }
+
+  // Arriving from the scan's confirm screen (/search?q=TELMA%2040): search straight away.
+  // The page is static (same HTML for every visitor), so the URL can only be read in the
+  // browser after it loads; the timer defers the state change until after this render.
+  useEffect(() => {
+    const fromScan = new URLSearchParams(window.location.search).get("q");
+    if (!fromScan) return;
+    const timer = setTimeout(() => {
+      setQuery(fromScan);
+      runSearch(fromScan);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   async function choose(brand: BrandCandidate) {
     setState({ step: "loading" });

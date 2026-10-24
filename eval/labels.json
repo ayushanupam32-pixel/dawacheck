@@ -1,0 +1,18 @@
+[
+  {
+    "id": "demo",
+    "split": "demo",
+    "front": "../../web/public/demo/front.jpg",
+    "back": "../../web/public/demo/back.jpg",
+    "brand": "DEMOTEL 40",
+    "ingredients": "Telmisartan 40 mg",
+    "mrp": 122.98,
+    "packSize": 15,
+    "batchNo": "DM2504",
+    "mfgDate": "2025-09",
+    "expDate": "2027-08",
+    "foil": false,
+    "lighting": "poor",
+    "notes": "Generated demo image (eval/make_demo_images.py): tilt, shadow, glare band, noise."
+  }
+]

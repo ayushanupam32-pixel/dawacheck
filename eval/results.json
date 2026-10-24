@@ -1,0 +1,81 @@
+[
+  {
+    "id": "demo",
+    "split": "demo",
+    "ms": 550,
+    "full": {
+      "brand": {
+        "correct": 1,
+        "total": 1,
+        "cerSum": 0
+      },
+      "ingredients": {
+        "correct": 1,
+        "total": 1,
+        "cerSum": 0
+      },
+      "mrp": {
+        "correct": 1,
+        "total": 1,
+        "cerSum": 0
+      },
+      "packSize": {
+        "correct": 1,
+        "total": 1,
+        "cerSum": 0
+      },
+      "batchNo": {
+        "correct": 1,
+        "total": 1,
+        "cerSum": 0
+      },
+      "mfgDate": {
+        "correct": 1,
+        "total": 1,
+        "cerSum": 0
+      },
+      "expDate": {
+        "correct": 1,
+        "total": 1,
+        "cerSum": 0
+      }
+    },
+    "base": {
+      "brand": {
+        "correct": 0,
+        "total": 1,
+        "cerSum": 0.8
+      },
+      "ingredients": {
+        "correct": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "mrp": {
+        "correct": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "packSize": {
+        "correct": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "batchNo": {
+        "correct": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "mfgDate": {
+        "correct": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "expDate": {
+        "correct": 1,
+        "total": 1,
+        "cerSum": 0
+      }
+    }
+  }
+]

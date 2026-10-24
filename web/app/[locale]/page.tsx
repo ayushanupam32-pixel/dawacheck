@@ -37,13 +37,13 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const dict = await getDictionary(locale);
   const t = dict.home;
 
-  // What you can do from the home page. Each gets an href when its milestone lands:
-  // typing a name in M1 and finding a Kendra in M2 (done), scanning and uploading in M3.
+  // What you can do from the home page. Scanning and uploading share one page: it offers both the
+  // camera and the gallery.
   const actions: { icon: LucideIcon; title: string; body: string; href?: string }[] = [
+    { icon: Camera, title: t.scanTitle, body: t.scanBody, href: `/${locale}/scan` },
+    { icon: ImageUp, title: t.uploadTitle, body: t.uploadBody, href: `/${locale}/scan` },
     { icon: Keyboard, title: t.typeTitle, body: t.typeBody, href: `/${locale}/search` },
     { icon: MapPin, title: t.kendraTitle, body: t.kendraBody, href: `/${locale}/kendras` },
-    { icon: Camera, title: t.scanTitle, body: t.scanBody },
-    { icon: ImageUp, title: t.uploadTitle, body: t.uploadBody },
   ];
 
   return (

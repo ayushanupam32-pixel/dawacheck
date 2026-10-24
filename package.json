@@ -9,7 +9,8 @@
     "typecheck": "pnpm --filter web typecheck",
     "test": "pnpm --filter web test",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "eval": "pnpm --filter web eval"
   },
   "devDependencies": {
     "prettier": "3.9.10",
