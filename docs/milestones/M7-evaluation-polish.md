@@ -138,7 +138,8 @@ Building them found two things:
 - Final test set is only 3 photos; labels typed by the developer until a person checks them.
 - Not yet measured on a phone; 7 s on a laptop misses the 5 s target.
 - In the browser the OCR misses the short "OMEE" name on the demo strip (the presenter types it).
-- Playwright runs locally only (CI lacks the database's publishable key as a secret).
+- (Fixed 2026-10-26: Playwright now runs in CI, with the read-only publishable key as a
+  GitHub secret.)
 - Hindi/Tamil texts (incl. the SUS Hindi version) not reviewed by a native speaker.
 
 ## Viva questions this milestone answers

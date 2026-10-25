@@ -342,7 +342,7 @@ eval` reports both (with / without guesses). Word-level guesses were tried and r
 - **Playwright** (`pnpm build && pnpm test:e2e`, 19 tests, ~15 s, installed Chrome): both demo
   strips end to end (read → confirm → match → all 5 check rows → disclaimer; the Omee strip gives
   the red CDSCO alert), typed search (Telma 40 → generic + savings), Kendras by PIN (3 results), axe
-  everywhere. Runs locally only: CI has no `SUPABASE_PUBLISHABLE_KEY` secret (would need adding).
+  everywhere. In CI since 2026-10-26 (see below).
 
 ### M7 part 3 (2026-10-25): docs and study kits
 
@@ -400,7 +400,7 @@ shows the test-set reading table).
 
 - `docs/definition-of-done.md`: the brief's 9 items with evidence. Met: 3, 5, 6, 7, 8. Partly:
   1 (five checks; M6 dropped), 2 (no real phone yet; no PWA), 4 (first scheduled refresh due
-  5 Nov 2026), 9 (Playwright not in CI; report/slides are outlines).
+  5 Nov 2026), 9 (report/slides are outlines; Playwright now in CI).
 - **New privacy test** `web/e2e/privacy.spec.ts`: network log of a real photo scan (only two
   small JSON API calls, no image bytes, only other host the OCR CDN) and of a GPS Kendra search
   (no upload, no coordinates in any request). Both fail when a leak is planted.
@@ -408,10 +408,14 @@ shows the test-set reading table).
   from your strip" box (batch, MRP, count, manufactured) and the full five-check result card
   (en/hi/ta; Playwright test with Taxim-O 200 batch 25460922 → red alert). 22 Playwright tests.
 
-## Exact next steps
+### Playwright in CI (2026-10-26)
+
+- GitHub secret `SUPABASE_PUBLISHABLE_KEY` added (from `web/.env.local`; read-only key, RLS).
+- `ci.yml`: the build and a new "End-to-end tests (Playwright)" step get `SUPABASE_URL` and the
+  key; Playwright uses the runner's Chrome; skipped when the secret is unavailable (fork PRs);
+  report uploaded on failure. First run 40225372468: **22 passed (44 s)**. Job timeout 20 min.
 
 1. **Time the live demo on a phone** ("How we read this" shows the seconds) → fill **[PHONE]**.
 2. **SUS study** with 15–20 people (`docs/sus/README.md`), then `sus_score.py` → fill **[SUS]**.
 3. Write the report and slides from the outlines; record the demo.
-4. Optional: Playwright in CI (add `SUPABASE_PUBLISHABLE_KEY` as a GitHub secret); native-speaker
-   review of Hindi/Tamil texts; more phone photos (a new test set would need its own freeze).
+4. Optional: native-speaker review of Hindi/Tamil texts; more phone photos (a new test set would need its own freeze).
