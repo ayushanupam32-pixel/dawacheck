@@ -265,6 +265,12 @@ See `docs/milestones/M5-safety-checks.md`.
   MRP per tablet vs ceiling × 1.05 (5% GST). Synonym added: acetylsalicylic acid = aspirin.
   Accuracy: 30/30 prices exact, 60/60 verdicts. **Yearly task:** when NPPA publishes the April
   revision (late March), download the new orders into `pipeline/raw/nppa/<date>/`.
+- **GST margin by manufacturing date (2026-10-25):** comparing real brand prices showed a flat 5%
+  margin would call correctly priced pre-cut strips (12% GST until 22.09.2025) overpriced; the
+  margin is now 5% for strips made from Oct 2025, else 12%. **M5 verified live:** data refresh
+  run 40175469975 (with brands) loaded 696 ceiling prices; Telma 40 at ₹7.75/tab is "within" if
+  made 2024-06, "above" if 2026-01. The demo strip (made-up MRP ₹122.98/15) shows "above" for
+  Telma 40: expected, the demo price is invented.
 - `web/.prettierignore` exists because Prettier only reads the ignore file of the folder it runs
   in; `web/lib/ai/salt-rules.json` must never be reformatted (a pytest checks it).
 
