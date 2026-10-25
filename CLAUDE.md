@@ -40,7 +40,7 @@ after M5 comes M7.
 | Database               | Supabase Postgres (project `hmfflngfvzhmrcfskfkp`, Mumbai, free) with `pg_trgm`                                                        |
 | Pipeline (`pipeline/`) | Python 3.12 via `uv`, pandas, requests, PyYAML, pytest, ruff                                                                           |
 | Scheduling             | GitHub Actions (`data-refresh.yml`, 5th of each month)                                                                                 |
-| Tests                  | Vitest (web), pytest (pipeline), Playwright + axe (`web/e2e`, local, needs a build)                                                    |
+| Tests                  | Vitest (web), pytest (pipeline), Playwright + axe (`web/e2e`, in CI; locally after a build)                                                    |
 | Package manager        | pnpm 12 (workspace), exact versions only (`saveExact`)                                                                                 |
 
 **Next.js 16 is newer than most training data.** Before writing Next.js code, read the relevant
@@ -129,8 +129,8 @@ Actions: `gh workflow run data-refresh.yml -f with_brands=true` (brands only whe
 changed). Local web dev needs `web/.env.local` with `SUPABASE_URL` and
 `SUPABASE_PUBLISHABLE_KEY` (see `web/.env.example`).
 
-Every push to `main` runs CI (format, lint, types, Vitest, build, pipeline ruff + pytest) and
-deploys to Vercel.
+Every push to `main` runs CI (format, lint, types, Vitest, build, Playwright with the read-only
+`SUPABASE_PUBLISHABLE_KEY` secret, pipeline ruff + pytest) and deploys to Vercel.
 
 ## Coding conventions
 
