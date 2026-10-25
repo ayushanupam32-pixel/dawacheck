@@ -1,7 +1,7 @@
 # DawaCheck progress
 
-Last updated: 2026-10-26 (M7 built and in CI; AI working files untracked; SUS study, phone timing
-and the written report wait for the user).
+Last updated: 2026-10-26 (M7 built and in CI; report drafted in `docs/report.md`; SUS study, phone
+timing and finishing the report wait for the user).
 
 ## Where we are
 
@@ -431,9 +431,25 @@ shows the test-set reading table).
   Claude", "Hindi/Tamil written by Claude"). Advice given: declare AI assistance in the report
   and viva, per the college's policy.
 
+### Report draft (2026-10-26)
+
+- `docs/report.md`: the full report (~11,000 words), written from `docs/report-outline.md`, the
+  milestone notes and `eval/`. Front matter (declaration with a draft AI-use statement,
+  certificate, acknowledgements), sections 1–10, 20 references, photo credits, reproduction
+  steps. Counts checked against the live `data_sources` table (refresh of 25 Oct 2026: 21,560
+  Kendras, 6,882 alerts, 687 banned entries, 696 ceiling prices) and a test run (406 Vitest, 197
+  pytest). Fixed in the draft compared with older notes: deskew searches ±15° (the code), not
+  ±10°; the ingredient feature can also be +0.5; brand guesses (up to 3 front lines) are also sent
+  to `/api/match`; brand-guess ablation after the merge fix is 1/5 with vs 0/5 without.
+- Markers for the user: `[PHONE]`, `[SUS]`, `[FILL]` (name, guide, college, dates),
+  `[CITE]` (out-of-pocket spending source, 2–3 medicine-label OCR papers), `[VERIFY]` (the
+  other apps in section 2, PMBJP dates). Figures 2–7 still to insert (frames from `demo.gif`,
+  a preprocessing figure). The student must rewrite it in their own words.
+
 ## Exact next steps
 
 1. **Time the live demo on a phone** ("How we read this" shows the seconds) → fill **[PHONE]**.
 2. **SUS study** with 15–20 people (`docs/sus/README.md`), then `sus_score.py` → fill **[SUS]**.
-3. Write the report and slides from the outlines; record the demo.
+3. Finish `docs/report.md` (fill the markers, rewrite in your own words, add figures); make the
+   slides from `docs/slides.md`; record the demo.
 4. Optional: native-speaker review of Hindi/Tamil texts; more phone photos (a new test set would need its own freeze).

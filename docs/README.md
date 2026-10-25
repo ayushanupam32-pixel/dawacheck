@@ -1,16 +1,17 @@
 # docs/
 
-| File                                           | What                                                                   |
-| ---------------------------------------------- | ---------------------------------------------------------------------- |
-| [milestones/](milestones)                      | Viva notes per milestone (M0–M7): what was built, decisions, results   |
-| [architecture.mmd](architecture.mmd)           | Architecture diagram source (Mermaid); `architecture.png` is generated |
-| [demo.gif](demo.gif)                           | README demo, generated from the live site                              |
-| [report-outline.md](report-outline.md)         | Project report outline with where each section's material is           |
-| [slides.md](slides.md)                         | 14-slide outline                                                       |
-| [demo-script.md](demo-script.md)               | 3-minute live demo, minute by minute                                   |
-| [viva-qa.md](viva-qa.md)                       | Likely examiner questions with short answers                           |
-| [definition-of-done.md](definition-of-done.md) | The brief's checklist, item by item, with evidence                     |
-| [sus/](sus)                                    | Usability study kit: tasks, questionnaire (en/hi), scoring script      |
+| File                                           | What                                                                      |
+| ---------------------------------------------- | ------------------------------------------------------------------------- |
+| [milestones/](milestones)                      | Viva notes per milestone (M0–M7): what was built, decisions, results      |
+| [architecture.mmd](architecture.mmd)           | Architecture diagram source (Mermaid); `architecture.png` is generated    |
+| [demo.gif](demo.gif)                           | README demo, generated from the live site                                 |
+| [report-outline.md](report-outline.md)         | Project report outline with where each section's material is              |
+| [report.md](report.md)                         | Full report draft from the outline; fill the [PHONE], [SUS], [FILL] marks |
+| [slides.md](slides.md)                         | 14-slide outline                                                          |
+| [demo-script.md](demo-script.md)               | 3-minute live demo, minute by minute                                      |
+| [viva-qa.md](viva-qa.md)                       | Likely examiner questions with short answers                              |
+| [definition-of-done.md](definition-of-done.md) | The brief's checklist, item by item, with evidence                        |
+| [sus/](sus)                                    | Usability study kit: tasks, questionnaire (en/hi), scoring script         |
 
 ## Regenerating the pictures
 
