@@ -1,0 +1,362 @@
+[
+ {
+  "id": 1,
+  "stateCode": 35,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Andaman And Nicobar Islands",
+  "stateNameInLocal": "Andaman And Nicobar Islands",
+  "census2001Code": 35,
+  "census2011Code": 35,
+  "stateOrUt": "U"
+ },
+ {
+  "id": 2,
+  "stateCode": 28,
+  "stateVersion": "2",
+  "stateNameInEnglish": "Andhra Pradesh",
+  "stateNameInLocal": "Andhra Pradesh",
+  "census2001Code": 28,
+  "census2011Code": 28,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 3,
+  "stateCode": 12,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Arunachal Pradesh",
+  "stateNameInLocal": "Arunachal Pradesh",
+  "census2001Code": 12,
+  "census2011Code": 12,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 4,
+  "stateCode": 18,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Assam",
+  "stateNameInLocal": "Assam",
+  "census2001Code": 18,
+  "census2011Code": 18,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 5,
+  "stateCode": 10,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Bihar",
+  "stateNameInLocal": "Bihar",
+  "census2001Code": 10,
+  "census2011Code": 10,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 6,
+  "stateCode": 4,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Chandigarh",
+  "stateNameInLocal": "Chandigarh",
+  "census2001Code": 4,
+  "census2011Code": 4,
+  "stateOrUt": "U"
+ },
+ {
+  "id": 7,
+  "stateCode": 22,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Chhattisgarh",
+  "stateNameInLocal": "Chhattisgarh",
+  "census2001Code": 22,
+  "census2011Code": 22,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 8,
+  "stateCode": 7,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Delhi",
+  "stateNameInLocal": "Delhi",
+  "census2001Code": 7,
+  "census2011Code": 7,
+  "stateOrUt": "U"
+ },
+ {
+  "id": 9,
+  "stateCode": 30,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Goa",
+  "stateNameInLocal": "Goa",
+  "census2001Code": 30,
+  "census2011Code": 30,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 10,
+  "stateCode": 24,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Gujarat",
+  "stateNameInLocal": "Gujarat",
+  "census2001Code": 24,
+  "census2011Code": 24,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 11,
+  "stateCode": 6,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Haryana",
+  "stateNameInLocal": "Haryana",
+  "census2001Code": 6,
+  "census2011Code": 6,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 12,
+  "stateCode": 2,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Himachal Pradesh",
+  "stateNameInLocal": "Himachal Pradesh",
+  "census2001Code": 2,
+  "census2011Code": 2,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 13,
+  "stateCode": 1,
+  "stateVersion": "3",
+  "stateNameInEnglish": "Jammu And Kashmir",
+  "stateNameInLocal": "Jammu And Kashmir",
+  "census2001Code": 1,
+  "census2011Code": 1,
+  "stateOrUt": "U"
+ },
+ {
+  "id": 14,
+  "stateCode": 20,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Jharkhand",
+  "stateNameInLocal": "Jharkhand",
+  "census2001Code": 20,
+  "census2011Code": 20,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 15,
+  "stateCode": 29,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Karnataka",
+  "stateNameInLocal": "Karnataka",
+  "census2001Code": 29,
+  "census2011Code": 29,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 16,
+  "stateCode": 32,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Kerala",
+  "stateNameInLocal": "Kerala",
+  "census2001Code": 32,
+  "census2011Code": 32,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 17,
+  "stateCode": 37,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Ladakh",
+  "stateNameInLocal": "Ladakh",
+  "census2001Code": 0,
+  "census2011Code": 0,
+  "stateOrUt": "U"
+ },
+ {
+  "id": 18,
+  "stateCode": 31,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Lakshadweep",
+  "stateNameInLocal": "Lakshadweep",
+  "census2001Code": 31,
+  "census2011Code": 31,
+  "stateOrUt": "U"
+ },
+ {
+  "id": 19,
+  "stateCode": 23,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Madhya Pradesh",
+  "stateNameInLocal": "Madhya Pradesh",
+  "census2001Code": 23,
+  "census2011Code": 23,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 20,
+  "stateCode": 27,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Maharashtra",
+  "stateNameInLocal": "Maharashtra",
+  "census2001Code": 27,
+  "census2011Code": 27,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 21,
+  "stateCode": 14,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Manipur",
+  "stateNameInLocal": "Manipur",
+  "census2001Code": 14,
+  "census2011Code": 14,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 22,
+  "stateCode": 17,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Meghalaya",
+  "stateNameInLocal": "Meghalaya",
+  "census2001Code": 17,
+  "census2011Code": 17,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 23,
+  "stateCode": 15,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Mizoram",
+  "stateNameInLocal": "Mizoram",
+  "census2001Code": 15,
+  "census2011Code": 15,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 24,
+  "stateCode": 13,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Nagaland",
+  "stateNameInLocal": "Nagaland",
+  "census2001Code": 13,
+  "census2011Code": 13,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 25,
+  "stateCode": 21,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Odisha",
+  "stateNameInLocal": "Odisha",
+  "census2001Code": 21,
+  "census2011Code": 21,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 26,
+  "stateCode": 34,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Puducherry",
+  "stateNameInLocal": "Puducherry",
+  "census2001Code": 34,
+  "census2011Code": 34,
+  "stateOrUt": "U"
+ },
+ {
+  "id": 27,
+  "stateCode": 3,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Punjab",
+  "stateNameInLocal": "Punjab",
+  "census2001Code": 3,
+  "census2011Code": 3,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 28,
+  "stateCode": 8,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Rajasthan",
+  "stateNameInLocal": "Rajasthan",
+  "census2001Code": 8,
+  "census2011Code": 8,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 29,
+  "stateCode": 11,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Sikkim",
+  "stateNameInLocal": "Sikkim",
+  "census2001Code": 11,
+  "census2011Code": 11,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 30,
+  "stateCode": 33,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Tamil Nadu",
+  "stateNameInLocal": "Tamil Nadu",
+  "census2001Code": 33,
+  "census2011Code": 33,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 31,
+  "stateCode": 36,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Telangana",
+  "stateNameInLocal": "Telangana",
+  "census2001Code": 0,
+  "census2011Code": 0,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 32,
+  "stateCode": 38,
+  "stateVersion": "1",
+  "stateNameInEnglish": "The Dadra And Nagar Haveli And Daman And Diu",
+  "stateNameInLocal": "The Dadra And Nagar Haveli And Daman And Diu",
+  "census2001Code": 0,
+  "census2011Code": 0,
+  "stateOrUt": "U"
+ },
+ {
+  "id": 33,
+  "stateCode": 16,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Tripura",
+  "stateNameInLocal": "Tripura",
+  "census2001Code": 16,
+  "census2011Code": 16,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 34,
+  "stateCode": 5,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Uttarakhand",
+  "stateNameInLocal": "Uttarakhand",
+  "census2001Code": 5,
+  "census2011Code": 5,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 35,
+  "stateCode": 9,
+  "stateVersion": "1",
+  "stateNameInEnglish": "Uttar Pradesh",
+  "stateNameInLocal": "Uttar Pradesh",
+  "census2001Code": 9,
+  "census2011Code": 9,
+  "stateOrUt": "S"
+ },
+ {
+  "id": 36,
+  "stateCode": 19,
+  "stateVersion": "1",
+  "stateNameInEnglish": "West Bengal",
+  "stateNameInLocal": "West Bengal",
+  "census2001Code": 19,
+  "census2011Code": 19,
+  "stateOrUt": "S"
+ }
+]
