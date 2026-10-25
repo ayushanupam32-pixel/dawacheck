@@ -298,6 +298,37 @@ def load_banned_fdcs(db: Supabase, banned: pd.DataFrame, run_started: str) -> in
     return len(rows)
 
 
+NPPA_URLS = {
+    "nlem2022-767.pdf": "https://nppa.gov.in/storage/uploads/tender/0fd8be342c35d5a46a13b281cadc5e4f.pdf",
+    "nlem2015-138.pdf": "https://nppa.gov.in/storage/uploads/tender/0d883ca9b600c8a13cec452376176fc4.pdf",
+}
+
+
+def load_ceiling_prices(db: Supabase, prices: pd.DataFrame, run_started: str) -> int:
+    """Only rows whose composition was read (a key that can match a medicine) are loaded."""
+    rows = {}
+    for r in prices[prices.parse_status == "ok"].itertuples(index=False):
+        key = row_id(r.composition_key, r.medicine, r.dosage, r.unit, r.order)
+        rows[key] = {
+            "id": key,
+            "composition_key": r.composition_key,
+            "medicine": r.medicine,
+            "dosage": r.dosage,
+            "unit": r.unit,
+            "unit_kind": r.unit_kind,
+            "ceiling_price": float(r.ceiling_price),
+            "order_no": r.order,
+            "effective_from": r.effective_from,
+            "list": r.list,
+            "source_url": NPPA_URLS.get(r.source_file, "https://nppa.gov.in/en/view_more?id=4"),
+            "last_seen": run_started,
+        }
+    check_size(db, "nppa", len(rows))
+    db.upsert("ceiling_prices", list(rows.values()), on_conflict="id")
+    db.delete_where("ceiling_prices", "last_seen", f"lt.{run_started}")
+    return len(rows)
+
+
 def record_run(db: Supabase, source: str, rows_loaded: int, url: str) -> None:
     db.upsert(
         "data_sources",
@@ -380,6 +411,11 @@ def main() -> None:
     n = load_alerts(db, alerts, run_started)
     record_run(db, "cdsco_alerts", n, ALERTS_SOURCE_PAGE)
     print(f"nsq_alerts: {n}")
+
+    prices = pd.read_csv(CLEAN_DIR / "ceiling_prices.csv", dtype=str, keep_default_na=False)
+    n = load_ceiling_prices(db, prices, run_started)
+    record_run(db, "nppa", n, "https://nppa.gov.in/en/view_more?id=4")
+    print(f"ceiling_prices: {n}")
 
     banned = pd.read_csv(CLEAN_DIR / "banned_fdcs.csv", dtype=str, keep_default_na=False)
     n = load_banned_fdcs(db, banned, run_started)

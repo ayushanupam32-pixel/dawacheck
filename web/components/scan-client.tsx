@@ -346,6 +346,9 @@ function Confirm({
         : (f.batchNo?.confidence ?? 0),
     names: [values.brand.trim()].filter(Boolean),
     manufacturer: f.manufacturer?.value ?? null,
+    // For the fair-price check: the MRP and the count as confirmed ("₹122.98", "15").
+    mrp: Number(values.mrp.replace(/[^\d.]/g, "")) || null,
+    packSize: Number(values.packSize.replace(/[^\d]/g, "")) || null,
   };
 
   const [match, setMatch] = useState<

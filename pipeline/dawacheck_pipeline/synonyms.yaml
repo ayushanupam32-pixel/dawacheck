@@ -8,6 +8,7 @@
 # Left side: any spelling seen in a source (lowercase). Right side: canonical name.
 synonyms:
   acetaminophen: paracetamol
+  acetylsalicylic acid: aspirin # NPPA and one Jan Aushadhi product use the chemical name
   amoxycillin: amoxicillin
   frusemide: furosemide
   torasemide: torsemide

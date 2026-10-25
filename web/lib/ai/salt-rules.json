@@ -2,6 +2,7 @@
  "_generated_by": "pipeline/dawacheck_pipeline/export_rules.py from synonyms.yaml",
  "synonyms": {
   "acetaminophen": "paracetamol",
+  "acetylsalicylic acid": "aspirin",
   "amoxycillin": "amoxicillin",
   "frusemide": "furosemide",
   "torasemide": "torsemide",

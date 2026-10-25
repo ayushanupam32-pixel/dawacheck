@@ -56,6 +56,10 @@ jobs:
         run: uv run python -m dawacheck_pipeline.fetch_cdsco_fdc
       - name: Parse prohibited FDCs
         run: uv run python -m dawacheck_pipeline.parse_cdsco_fdc
+      # NPPA's ceiling prices change once a year (April); the orders are saved by hand in
+      # pipeline/raw/nppa/<date>/ (NPPA's site refuses scripts). Parsed from the latest folder.
+      - name: Parse NPPA ceiling prices
+        run: uv run python -m dawacheck_pipeline.parse_nppa
       - name: Load into Supabase (validates first; fails without changing live data)
         run: uv run python -m dawacheck_pipeline.load_supabase ${{ inputs.with_brands && '--with-brands' || '' }}
       - name: Build static Kendra files for the website

@@ -7,14 +7,9 @@ dropped on 2026-10-25; the card has five rows.)
 
 **Done when:** all check test cases pass; the monthly GitHub Action runs successfully.
 
-**Status (2026-10-24): in progress.** Built and tested: batch safety, banned combination, the
-result card, the pipeline for both sources. Waiting:
-
-- **Fair price:** the NPPA "Compendium of Prices 2026" Excel export has not reached
-  `pipeline/raw/nppa/` yet. The card says "Not available yet".
-- **Loading the data:** only the GitHub Action has the database's secret key, so the alerts and
-  banned lists are loaded by `data-refresh.yml` after this work is committed. Until then the card
-  says "Couldn't check: this government list is not loaded yet" (never "nothing found").
+**Status (2026-10-25): done.** All four data checks are built, tested and live: cheaper generic
+(M1), batch safety (CDSCO alerts), fair price (NPPA ceiling prices), banned combination (CDSCO
+lists), plus the nearest-Kendra link. The brief's accuracy targets are met (see "Accuracy").
 
 ## Sources (inspected first; decisions agreed with the user)
 
@@ -25,7 +20,10 @@ result card, the pipeline for both sources. Waiting:
 | Fair price         | NPPA "Compendium of Prices 2026" (dashboard; the user exports the Excel)       | Excel (pending)                                         |
 
 No robots.txt on either CDSCO site; 2 seconds between requests. NPPA's web pages refuse scripts
-(403), so we do not scrape them: the user downloads the file, like the Kaggle brand dataset.
+(403) and its price dashboard uses rotating security tokens and request encryption, so neither is
+scripted. The ceiling prices come instead from NPPA's official yearly orders, plain PDF files
+listed on its "Circulars / Orders" page and served to any visitor; they are downloaded once a year
+(April revision) into `pipeline/raw/nppa/<date>/`.
 
 ## What was built
 
@@ -35,9 +33,10 @@ No robots.txt on either CDSCO site; 2 seconds between requests. NPPA's web pages
 | Parse alerts          | `pipeline/dawacheck_pipeline/parse_cdsco_alerts.py`                                |
 | Fetch FDC lists       | `pipeline/dawacheck_pipeline/fetch_cdsco_fdc.py`                                   |
 | Parse FDC lists       | `pipeline/dawacheck_pipeline/parse_cdsco_fdc.py` (pdfplumber)                      |
+| Parse NPPA orders     | `pipeline/dawacheck_pipeline/parse_nppa.py` (ceiling prices, 1.4.2026)             |
 | Load                  | `pipeline/dawacheck_pipeline/load_supabase.py` (`load_alerts`, `load_banned_fdcs`) |
 | Tables                | `supabase/migrations/20261024040000_safety_check_tables.sql`                       |
-| Checks (pure, tested) | `web/lib/checks/batch.ts`, `banned.ts`, `types.ts`                                 |
+| Checks (pure, tested) | `web/lib/checks/batch.ts`, `banned.ts`, `price.ts`, `types.ts`                     |
 | Checks with database  | `web/lib/run-checks.ts`, `POST /api/checks`                                        |
 | Result card           | `web/components/result-card.tsx` (en / hi / ta)                                    |
 | Monthly refresh       | `.github/workflows/data-refresh.yml` (4 new steps)                                 |
@@ -60,6 +59,18 @@ different companies reuse numbers. Results:
   medicine".
 - **unknown**: no batch number, a batch number the reader was unsure of (below the confirm
   screen's 60% "Please check" level and not corrected by the user), or no alerts loaded.
+
+**Fair price.** NPPA fixes a ceiling price per unit (one tablet, one ml) for each scheduled
+formulation, **excluding GST**. The check finds the ceiling by the medicine's exact composition
+key (like the generic), works out the MRP per tablet from the strip (MRP ÷ how many), and compares
+it with the ceiling **plus 5% GST** (the GST on most medicines since 22.09.2025; some lifesaving
+ones are 0%). Above that, the MRP is above the ceiling whatever the GST: "show this to your
+pharmacist", with NPPA's helpline (1800 111 255). Otherwise: "within the ceiling", "not
+price-controlled" (no ceiling for this medicine), or "can't compare" (MRP or count missing, or a
+price per ml/g, since we do not read a bottle's volume). A combination from a cut-short brand
+record gets no verdict: its ceiling could belong to a smaller combination. When a medicine has
+several ceilings (pack sizes, two lists), the newer list and the highest price are used, so a
+price is never called too high by mistake.
 
 **Banned combination.** An entry applies only if everything it names matches the medicine:
 
@@ -122,6 +133,9 @@ From `eval/m5-checks.md`:
 - **Batch alerts vs CDSCO's own monthly PDFs** (target ≥ 98%): **170 / 172** batches of the
   April–June 2025 CDSCO-lab PDFs are in our data (98.8%). The 2 misses are missing from CDSCO's
   online table itself. The online table holds more alerts than the PDFs (they are partial lists).
+- **Fair price, 30 hand-verified scheduled medicines** (target 100%): **30 / 30** ceiling prices
+  read exactly from the official order, **60 / 60** within/above verdicts
+  (`pipeline/tests/test_nppa_30.py`, `web/tests/price-cases.test.ts`).
 
 ## Key decisions, in plain words
 

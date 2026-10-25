@@ -22,7 +22,9 @@ import { fill } from "@/components/generic-result";
 import { Button } from "@/components/ui/button";
 import type { CheckStatus } from "@/lib/checks/types";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
+import type { PriceResult } from "@/lib/checks/price";
 import type { ChecksResponse } from "@/lib/run-checks";
+import { formatRupees } from "@/lib/savings";
 
 type T = Dictionary["checks"];
 
@@ -30,6 +32,9 @@ export type ResultCardInput = {
   brandId: number;
   /** Ingredients confirmed from the strip, with strengths (the banned check compares them). */
   stripIngredients: { salt: string; value: number; unit: string }[];
+  /** MRP printed on the strip (₹) and the number of tablets/capsules, for the fair price. */
+  mrp: number | null;
+  packSize: number | null;
   batchNo: string;
   batchConfidence: number;
   names: string[];
@@ -188,8 +193,27 @@ export function ResultCard({
           )}
         </Row>
 
-        <Row t={t} title={t.priceTitle} status="na">
-          <p>{t.priceNotYet}</p>
+        <Row t={t} title={t.priceTitle} status={data.price.status}>
+          <PriceText t={t} locale={locale} price={data.price} />
+          {data.price.ceiling && (
+            <p className="text-sm text-muted-foreground">
+              {t.source}:{" "}
+              <a
+                href={data.price.ceiling.source_url}
+                target="_blank"
+                rel="noreferrer"
+                className="underline"
+              >
+                NPPA
+              </a>{" "}
+              {fill(t.priceSource, {
+                order: data.price.ceiling.order_no,
+                date: new Date(data.price.ceiling.effective_from).toLocaleDateString(
+                  `${locale}-IN`,
+                ),
+              })}
+            </p>
+          )}
         </Row>
 
         <Row t={t} title={t.bannedTitle} status={data.banned.status}>
@@ -241,6 +265,29 @@ export function ResultCard({
       <p className="rounded-lg bg-muted/60 p-3 text-sm">{disclaimer}</p>
     </section>
   );
+}
+
+/** The fair-price row in words. Prices exclude GST, so the GST is always said. */
+function PriceText({ t, locale, price }: { t: T; locale: string; price: PriceResult }) {
+  const rupees = (x: number | null) => (x === null ? "" : formatRupees(x, `${locale}-IN`));
+  const c = price.ceiling;
+  const values = {
+    perUnit: rupees(price.perUnit),
+    ceiling: rupees(c?.ceiling_price ?? null),
+    max: rupees(price.maxWithGst),
+    unit: c?.unit.replace(/^1\s*/, "").toLowerCase() ?? "",
+  };
+  const text = {
+    within: t.priceWithin,
+    above: t.priceAbove,
+    not_scheduled: t.priceNotScheduled,
+    need_mrp: t.priceNeedMrp,
+    other_unit: t.priceOtherUnit,
+    unsure_composition: t.priceUnsure,
+    no_composition: t.bannedNoComposition,
+    no_data: t.noData,
+  }[price.reason];
+  return <p className={price.reason === "above" ? "font-medium" : ""}>{fill(text, values)}</p>;
 }
 
 function Row({

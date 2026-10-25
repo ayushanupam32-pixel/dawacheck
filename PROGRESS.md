@@ -4,21 +4,20 @@ Last updated: 2026-10-24 (M4 commit, pushed to `main`).
 
 ## Where we are
 
-**M0–M4 are done and pushed to `main`.** M4 (matching a scanned strip to a medicine) adds two
-database migrations, already applied to Supabase. Next: M5 (safety checks).
+**M0–M5 are done and live. M6 was dropped by the user. Next: M7 (evaluation and polish).**
 
 - Live site: https://dawacheck-psi.vercel.app (deploys automatically on every push to `main`)
 
-| Milestone                                                   | Status      | Commits                                                          | Notes                                                                |
-| ----------------------------------------------------------- | ----------- | ---------------------------------------------------------------- | -------------------------------------------------------------------- |
-| M0 Setup                                                    | done        | `052cbcd`                                                        | Next.js + pnpm workspace, CI, Vercel, 3 languages, large-text toggle |
-| M1 Generic lookup                                           | done        | `eff1cd6`, `bc365fe`, `8726de1`, `1c4fee9`, `c1b090f`, `ca3d59c` | type a brand → exact Jan Aushadhi generic + savings                  |
-| M2 Nearest Kendra                                           | done        | `da80334`, `c9ffe2b` (data refresh)                              | computed on the phone from static files                              |
-| M3 Reading strips                                           | done        | `2b6b700`, `317324e`, `db927f1`                                  | in-browser OCR, confirm screen, evaluation                           |
-| M4 Matching OCR → medicine                                  | done        |                                                                  | re-ranker + choice model + safety rules; top-1 89% dev / 86% test    |
-| M5 Safety checks (NSQ, NPPA, banned FDC, 6-row result card) | not started |                                                                  |                                                                      |
-| M6 Family cabinet + PWA                                     | dropped     |                                                                  |                                                                      |
-| M7 Evaluation + polish                                      | not started |                                                                  |                                                                      |
+| Milestone                                             | Status      | Commits                                                          | Notes                                                                |
+| ----------------------------------------------------- | ----------- | ---------------------------------------------------------------- | -------------------------------------------------------------------- |
+| M0 Setup                                              | done        | `052cbcd`                                                        | Next.js + pnpm workspace, CI, Vercel, 3 languages, large-text toggle |
+| M1 Generic lookup                                     | done        | `eff1cd6`, `bc365fe`, `8726de1`, `1c4fee9`, `c1b090f`, `ca3d59c` | type a brand → exact Jan Aushadhi generic + savings                  |
+| M2 Nearest Kendra                                     | done        | `da80334`, `c9ffe2b` (data refresh)                              | computed on the phone from static files                              |
+| M3 Reading strips                                     | done        | `2b6b700`, `317324e`, `db927f1`                                  | in-browser OCR, confirm screen, evaluation                           |
+| M4 Matching OCR → medicine                            | done        |                                                                  | re-ranker + choice model + safety rules; top-1 89% dev / 86% test    |
+| M5 Safety checks (NSQ, NPPA, banned FDC, result card) | done        |                                                                  |                                                                      |
+| M6 Family cabinet + PWA                               | dropped     |                                                                  |                                                                      |
+| M7 Evaluation + polish                                | not started |                                                                  |                                                                      |
 
 Viva notes for each finished milestone: `docs/milestones/M0-setup.md` … `M4-matching.md`.
 
@@ -257,23 +256,27 @@ See `docs/milestones/M5-safety-checks.md`.
   NSQ vs CDSCO PDFs 170/172 (98.8%). Placeholder batch numbers ("Not applicable", "Not given")
   now count as no batch (6,921 usable alerts). The NPPA dashboard was inspected: it uses rotating
   CSRF tokens and request encryption, so it is NOT scripted; the user exports the Excel by hand.
-- **Waiting on the user:** the NPPA "Compendium of Prices 2026" Excel in
-  `pipeline/raw/nppa/<date>/` (not there as of 2026-10-25).
+- **Fair price done (2026-10-25):** the user had no Excel and asked me to download from a valid
+  source. Source: NPPA's yearly orders S.O. 1575(E) (767, NLEM 2022) and S.O. 1581(E) (138, NLEM
+  2015), 25.03.2026, in force 1.4.2026, Gazette PDFs from nppa.gov.in "Circulars / Orders",
+  saved in `pipeline/raw/nppa/2026-03-27/` with SOURCE.md. `parse_nppa.py` (rows rewritten in Jan
+  Aushadhi name style, same keys as brands; one row per form for aspirin's shared price), table
+  `ceiling_prices` (migration `20261025010000_*`), loader, refresh step. `web/lib/checks/price.ts`:
+  MRP per tablet vs ceiling × 1.05 (5% GST). Synonym added: acetylsalicylic acid = aspirin.
+  Accuracy: 30/30 prices exact, 60/60 verdicts. **Yearly task:** when NPPA publishes the April
+  revision (late March), download the new orders into `pipeline/raw/nppa/<date>/`.
 - `web/.prettierignore` exists because Prettier only reads the ignore file of the folder it runs
   in; `web/lib/ai/salt-rules.json` must never be reformatted (a pytest checks it).
 
 ## Exact next steps
 
-1. **Finish M5** when the NPPA file arrives (step 2). Then write the M5 milestone notes' final
-   results and mark M5 done; the brief's "Done when" (all check tests pass, monthly Action runs)
-   is met for batch and banned checks. Also still open in M5 (or do them in M7): the brief's
-   accuracy checks: NSQ rows vs 3 monthly PDFs checked by hand (≥ 98%), the banned check on 20
-   banned + 20 legal medicines (100%), the fair-price check on 30 medicines (100%). If the NPPA
-   Excel can't be exported, fall back to the downloadable 2022 compendium PDF, labelled as
-   August 2022 prices.
-2. **NPPA:** when the Excel is in `pipeline/raw/nppa/<date>/`, inspect it, show the user a sample,
-   then `parse_nppa.py`, the `ceiling_prices` table (redesign the M0 draft), `checkPrice`
-   (per-unit MRP vs ceiling, saying clearly that ceiling prices exclude GST), and the card row.
+1. **Start M7 (evaluation and polish)** — M6 is dropped. From the brief: final test-set
+   evaluation (`pnpm eval -- --final`, `pnpm eval:match -- --final`), ablations, About page with
+   the results table and data sources (credit CC BY-SA brand data), accessibility pass
+   (Lighthouse ≥ 90), SUS study with 15–20 users (the user runs it), docs (README GIF,
+   architecture diagram, report, slides, viva Q&A). Also the brief's Playwright end-to-end test
+   (sample photos → confirm → result card).
+2. **Spot-check `eval/labels.json`** (human) before final numbers go into the report.
 3. **Speed:** move preprocessing and OCR into a Web Worker; try a smaller first-pass image; skip
    the inverted variant when the ink variant already found the key fields; measure on a phone.
 4. **Brand reading:** use the matcher to confirm brand guesses before the confirm screen.

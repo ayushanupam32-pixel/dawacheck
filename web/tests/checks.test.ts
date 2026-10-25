@@ -3,6 +3,7 @@ import { parseCompositionKey } from "@/lib/ai/normalize";
 import { checkBanned, combinationKey, type Medicine } from "@/lib/checks/banned";
 import { checkBatch, type BatchInput } from "@/lib/checks/batch";
 import type { AlertRow, BannedRow } from "@/lib/checks/types";
+import { checkPrice, pickCeiling, type CeilingRow } from "@/lib/checks/price";
 import { chooseSalts, describeMedicine, parseChecksInput } from "@/lib/run-checks";
 
 // Rows as loaded from the real CDSCO data (pipeline/clean/cdsco_alerts.csv, banned_fdcs.csv).
@@ -412,7 +413,106 @@ describe("parseChecksInput", () => {
       batchConfidence: 1,
       names: ["Telma"],
       manufacturer: null,
+      mrp: null,
+      packSize: null,
+    });
+    // MRP and count: positive numbers only.
+    expect(parseChecksInput({ mrp: "103.8", packSize: 15 })).toMatchObject({
+      mrp: 103.8,
+      packSize: 15,
+    });
+    expect(parseChecksInput({ mrp: -5, packSize: "x" })).toMatchObject({
+      mrp: null,
+      packSize: null,
     });
     expect(parseChecksInput("x")).toBeNull();
+  });
+});
+
+// Real rows of NPPA order S.O. 1575(E), in force from 1.4.2026.
+const ceiling = (over: Partial<CeilingRow>): CeilingRow => ({
+  composition_key: "telmisartan:40:mg#tablet#ir",
+  medicine: "Telmisartan",
+  dosage: "Tablet 40mg",
+  unit: "1 Tablet",
+  unit_kind: "unit",
+  ceiling_price: 6.92,
+  order_no: "S.O. 1575(E)",
+  effective_from: "2026-04-01",
+  list: "NLEM 2022",
+  source_url: "https://nppa.gov.in/",
+  ...over,
+});
+const TELMISARTAN_40 = ceiling({});
+const price = (over: Partial<Parameters<typeof checkPrice>[0]>) => ({
+  compositionKey: "telmisartan:40:mg#tablet#ir",
+  saltsComplete: true,
+  mrp: null,
+  packSize: null,
+  ...over,
+});
+
+describe("checkPrice", () => {
+  it("is within the ceiling when MRP per tablet <= ceiling + 5% GST", () => {
+    // 15 tablets for 103.80 = 6.92 a tablet, exactly the ceiling.
+    const r = checkPrice(price({ mrp: 103.8, packSize: 15 }), [TELMISARTAN_40]);
+    expect(r).toMatchObject({ status: "ok", reason: "within", perUnit: 6.92, maxWithGst: 7.27 });
+    // 7.26 a tablet: above the ceiling, but within ceiling + 5% GST.
+    expect(checkPrice(price({ mrp: 108.9, packSize: 15 }), [TELMISARTAN_40]).reason).toBe("within");
+  });
+
+  it("is above the ceiling when MRP per tablet > ceiling + 5% GST", () => {
+    const r = checkPrice(price({ mrp: 150, packSize: 15 }), [TELMISARTAN_40]);
+    expect(r).toMatchObject({ status: "warn", reason: "above", perUnit: 10 });
+  });
+
+  it("says when a medicine is not price-controlled", () => {
+    expect(
+      checkPrice(price({ compositionKey: "aceclofenac:100:mg|paracetamol:325:mg#tablet#ir" }), [
+        TELMISARTAN_40,
+      ]),
+    ).toMatchObject({ status: "na", reason: "not_scheduled" });
+  });
+
+  it("needs the MRP and the count, and per-tablet prices only", () => {
+    expect(checkPrice(price({ mrp: 103.8 }), [TELMISARTAN_40])).toMatchObject({
+      status: "unknown",
+      reason: "need_mrp",
+      maxWithGst: 7.27,
+    });
+    const syrup = ceiling({ composition_key: "x:1:mg/ml#syrup#ir", unit: "1 ML", unit_kind: "ml" });
+    expect(
+      checkPrice(price({ compositionKey: "x:1:mg/ml#syrup#ir", mrp: 50, packSize: 60 }), [syrup])
+        .reason,
+    ).toBe("other_unit");
+  });
+
+  it("does not guess the ceiling of a combination whose ingredient list may be cut short", () => {
+    const amoxiclav = ceiling({
+      composition_key: "amoxicillin:500:mg|clavulanic acid:125:mg#tablet#ir",
+    });
+    expect(
+      checkPrice(
+        price({
+          compositionKey: amoxiclav.composition_key,
+          saltsComplete: false,
+          mrp: 200,
+          packSize: 10,
+        }),
+        [amoxiclav],
+      ),
+    ).toMatchObject({ status: "unknown", reason: "unsure_composition" });
+  });
+
+  it("prefers the newer list, and the highest price among several", () => {
+    const old = ceiling({ list: "NLEM 2015", ceiling_price: 9 });
+    const a = ceiling({ ceiling_price: 6.5 });
+    expect(pickCeiling([old, a, TELMISARTAN_40])?.ceiling_price).toBe(6.92);
+    expect(pickCeiling([old])?.ceiling_price).toBe(9);
+  });
+
+  it("needs a composition and loaded prices", () => {
+    expect(checkPrice(price({ compositionKey: null }), []).reason).toBe("no_composition");
+    expect(checkPrice(price({}), [], false).reason).toBe("no_data");
   });
 });

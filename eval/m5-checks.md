@@ -69,3 +69,23 @@ alerts with a real batch number.
 Method: `pdfplumber` tables of the three PDFs (batch column), normalized like the strip reader,
 compared with `pipeline/clean/cdsco_alerts.csv` for the same month; misses checked by hand in the
 PDF text and in the raw online-table files.
+
+## Fair-price check: 30 hand-verified scheduled medicines
+
+Target: correct verdict on 30 (100%). **Result: 30 / 30 ceiling prices read exactly, 60 / 60
+verdicts correct.**
+
+- **Source:** NPPA order S.O. 1575(E), 25.03.2026 (ceiling prices of 767 scheduled formulations
+  under NLEM 2022, in force from 1.4.2026), plus S.O. 1581(E) (138 formulations, NLEM 2015).
+  Official Gazette PDFs from nppa.gov.in, saved in `pipeline/raw/nppa/2026-03-27/` (SOURCE.md).
+- **Prices read correctly:** for 30 common tablets and capsules (amlodipine, atorvastatin,
+  azithromycin, cefixime, cetirizine, clopidogrel, metformin, telmisartan, levothyroxine, ...),
+  the ceiling price was read by hand from the order's English table and compared with what the
+  parser produced from the same PDF: right composition key and exactly the official price for all
+  30 (`pipeline/tests/test_nppa_30.py`).
+- **Verdicts:** for each, a 10-tablet strip priced at ceiling + 4% (within the 5% GST margin)
+  must be "within", and at ceiling + 10% "above": 60 / 60 (`web/tests/price-cases.test.ts`).
+
+Coverage: 430 of 439 tablet/capsule ceiling prices parse (the 9 refused have unusual names, e.g.
+"Co-trimoxazole [Sulphamethoxazole (A) + Trimethoprim (B)]"). 38,481 active brands (16.5%) have a
+ceiling price, about the share of the market that is price-controlled.

@@ -195,7 +195,6 @@
     "batchUncertain": "The batch number was hard to read. Check it above against your strip, then check again.",
     "checkedThrough": "Alerts checked up to {month}.",
     "priceTitle": "Fair price",
-    "priceNotYet": "Not available yet: the government ceiling-price list is still being added to DawaCheck.",
     "bannedTitle": "Banned combination",
     "bannedAlert": "This combination of ingredients is prohibited by the Government of India ({notification}). Show this to your pharmacist.",
     "bannedReview": "This combination appears in the government's lists of prohibited combinations, with a status a pharmacist should check:",
@@ -215,6 +214,13 @@
     "updated": "Updated",
     "noData": "Couldn't check: this government list is not loaded into DawaCheck yet.",
     "statusAvailable": "Available",
-    "bannedMaybe": "may apply: we could not confirm all its details (the full list of ingredients, the form, release type or strength). Compare with your strip"
+    "bannedMaybe": "may apply: we could not confirm all its details (the full list of ingredients, the form, release type or strength). Compare with your strip",
+    "priceWithin": "The MRP, {perUnit} per {unit}, is within the government ceiling price: {ceiling} + GST (at most {max}).",
+    "priceAbove": "The MRP, {perUnit} per {unit}, is above the government ceiling price of {ceiling} + GST (at most {max}). Show this to your pharmacist. You can also call NPPA's free helpline, 1800 111 255.",
+    "priceNotScheduled": "The government does not fix a ceiling price for this medicine (it is not a scheduled formulation).",
+    "priceNeedMrp": "Government ceiling price: {ceiling} per {unit} + GST (at most {max}). Type the MRP and how many are in the strip above to compare.",
+    "priceOtherUnit": "Government ceiling price: {ceiling} per {unit} + GST (at most {max}). Compare it with the price per {unit} of your pack.",
+    "priceUnsure": "We could not confirm this medicine's full list of ingredients, so we cannot tell which ceiling price applies.",
+    "priceSource": "order {order}, in force from {date}. Ceiling prices exclude GST; most medicines carry 5% GST."
   }
 }

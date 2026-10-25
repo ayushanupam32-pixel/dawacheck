@@ -68,7 +68,8 @@ dawacheck/
 │   │                             match-weights.json (written by `pnpm eval:match --fit`)
 │   ├── lib/geo/                  geohash, nearest Kendras (Haversine)
 │   ├── lib/i18n/                 locale detection, dictionary loading
-│   ├── lib/{match,find-match,savings,supabase}.ts
+│   ├── lib/checks/               M5 checks, pure: batch, banned, price (+ types)
+│   ├── lib/{match,find-match,run-checks,savings,supabase}.ts
 │   ├── messages/                 en.json, hi.json, ta.json (same keys; a test enforces it)
 │   ├── public/data/              GENERATED Kendra/PIN files (pipeline/build_static.py)
 │   ├── public/demo/              generated DEMO strip images for Demo mode
