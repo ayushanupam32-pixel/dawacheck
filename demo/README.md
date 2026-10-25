@@ -83,7 +83,9 @@ No generic is offered for either (Cheaper generic: Not available).
 
 ## Features that need no strip
 
-- **Type a name:** home → "Type the medicine name" → `Telma 40` → pick the pack → generic + saving.
+- **Type a name:** home → "Type the medicine name" → `Taxim-O 200` → pick it → all five checks
+  and the generic. Type batch `25460922` in "Details from your strip": batch safety turns red (the
+  real CDSCO alert); add MRP `119.31`, `10`, `05/2025` and the price shows above the ceiling.
 - **"Not sure" instead of a guess:** on the confirm screen type `Valium` and clear the
   ingredients → it offers Valium 2, 5 and 10 mg instead of guessing.
 - **Nearest Jan Aushadhi Kendra:** home → "Find a Jan Aushadhi Kendra" → PIN `110001` (or "Use my

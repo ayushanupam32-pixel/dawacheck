@@ -3,11 +3,13 @@
 import { useEffect, useId, useState } from "react";
 import { Loader2, Search } from "lucide-react";
 import { BrandButton, BrandResult, Notice } from "@/components/generic-result";
+import { ResultCard } from "@/components/result-card";
 import { Button } from "@/components/ui/button";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { BrandCandidate, SearchResponse } from "@/lib/match";
 
 type T = Dictionary["search"];
+type TChecks = Dictionary["checks"];
 
 type State =
   | { step: "idle" }
@@ -17,7 +19,17 @@ type State =
   | { step: "result"; brand: BrandCandidate }
   | { step: "error" };
 
-export function SearchClient({ t, locale }: { t: T; locale: string }) {
+export function SearchClient({
+  t,
+  tChecks,
+  disclaimer,
+  locale,
+}: {
+  t: T;
+  tChecks: TChecks;
+  disclaimer: string;
+  locale: string;
+}) {
   const [query, setQuery] = useState("");
   const [state, setState] = useState<State>({ step: "idle" });
   const inputId = useId();
@@ -114,10 +126,104 @@ export function SearchClient({ t, locale }: { t: T; locale: string }) {
           </section>
         )}
 
-        {state.step === "result" && <BrandResult t={t} locale={locale} brandId={state.brand.id} />}
+        {state.step === "result" && (
+          <>
+            <TypedChecks
+              key={state.brand.id}
+              t={t}
+              tChecks={tChecks}
+              disclaimer={disclaimer}
+              locale={locale}
+              brand={state.brand}
+            />
+            <BrandResult t={t} locale={locale} brandId={state.brand.id} />
+          </>
+        )}
       </div>
 
       <p className="text-sm text-muted-foreground">{t.brandCredit}</p>
     </div>
+  );
+}
+
+/**
+ * The five checks for a medicine found by typing its name (the brief: all checks work from a
+ * photo, from a typed name and in Demo mode). With no photo there is no batch number, MRP or
+ * date to read, so the user may type them; each check that needs one says so until it's typed.
+ * What is typed is used for this check only and never stored.
+ */
+function TypedChecks({
+  t,
+  tChecks,
+  disclaimer,
+  locale,
+  brand,
+}: {
+  t: T;
+  tChecks: TChecks;
+  disclaimer: string;
+  locale: string;
+  brand: BrandCandidate;
+}) {
+  const [batch, setBatch] = useState("");
+  const [mrp, setMrp] = useState("");
+  const [count, setCount] = useState("");
+  const [mfg, setMfg] = useState("");
+  const ids = { batch: useId(), mrp: useId(), count: useId(), mfg: useId() };
+  const field =
+    "min-h-12 w-full rounded-lg border border-input bg-background px-3 text-lg focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none";
+  const mfgDate = /^(\d{2})\/(\d{4})$/.test(mfg.trim())
+    ? mfg.trim().replace(/^(\d{2})\/(\d{4})$/, "$2-$1")
+    : null;
+
+  const inputs: [keyof typeof ids, string, string, (v: string) => void, string?][] = [
+    ["batch", t.batchLabel, batch, setBatch],
+    ["mrp", t.checkMrpLabel, mrp, setMrp, "decimal"],
+    ["count", t.checkCountLabel, count, setCount, "numeric"],
+    ["mfg", t.mfgLabel, mfg, setMfg],
+  ];
+  return (
+    <section className="flex flex-col gap-4">
+      <div className="flex flex-col gap-3 rounded-xl border border-border p-4">
+        <h2 className="text-xl font-semibold">{t.stripTitle}</h2>
+        <p className="text-base">{t.stripHint}</p>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {inputs.map(([key, label, value, set, mode]) => (
+            <div key={key} className="flex flex-col gap-1">
+              <label htmlFor={ids[key]} className="text-base font-semibold">
+                {label}
+              </label>
+              <input
+                id={ids[key]}
+                value={value}
+                inputMode={mode as React.HTMLAttributes<HTMLInputElement>["inputMode"]}
+                placeholder={key === "mfg" ? "MM/YYYY" : undefined}
+                autoComplete="off"
+                onChange={(e) => set(e.target.value)}
+                className={field}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+      <ResultCard
+        t={tChecks}
+        locale={locale}
+        disclaimer={disclaimer}
+        input={{
+          brandId: brand.id,
+          // No photo: the checks use the brand's own record of its ingredients.
+          stripIngredients: [],
+          batchNo: batch.trim(),
+          // Typed by the user from the strip, so not an OCR guess.
+          batchConfidence: batch.trim() ? 1 : 0,
+          names: [brand.name],
+          manufacturer: brand.manufacturer,
+          mrp: Number(mrp.replace(/[^\d.]/g, "")) || null,
+          packSize: Number(count.replace(/[^\d]/g, "")) || null,
+          mfgDate,
+        }}
+      />
+    </section>
   );
 }

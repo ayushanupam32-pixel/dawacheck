@@ -396,6 +396,18 @@ shows the test-set reading table).
   Cetzine 10 isn't in the 2022 dataset. Not fixed; say it in the viva as a limitation.
 - Re-run the verifier before the viva (alerts and prices are live data).
 
+### Definition of done (2026-10-26)
+
+- `docs/definition-of-done.md`: the brief's 9 items with evidence. Met: 3, 5, 6, 7, 8. Partly:
+  1 (five checks; M6 dropped), 2 (no real phone yet; no PWA), 4 (first scheduled refresh due
+  5 Nov 2026), 9 (Playwright not in CI; report/slides are outlines).
+- **New privacy test** `web/e2e/privacy.spec.ts`: network log of a real photo scan (only two
+  small JSON API calls, no image bytes, only other host the OCR CDN) and of a GPS Kendra search
+  (no upload, no coordinates in any request). Both fail when a leak is planted.
+- **Gap fixed:** the typed-name search showed only the generic. It now has an optional "Details
+  from your strip" box (batch, MRP, count, manufactured) and the full five-check result card
+  (en/hi/ta; Playwright test with Taxim-O 200 batch 25460922 → red alert). 22 Playwright tests.
+
 ## Exact next steps
 
 1. **Time the live demo on a phone** ("How we read this" shows the seconds) → fill **[PHONE]**.

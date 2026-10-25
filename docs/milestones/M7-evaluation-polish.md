@@ -77,7 +77,7 @@ top of the page; it now moves to the new screen's heading.
 | Speed per strip (≤ 5 s p95 on phone) | 7.1 s median, 10.8 s p95 on a laptop (was 9.9 / 16.8); phone: [PHONE]                                             |
 | Lighthouse accessibility (≥ 90)      | 100 on every page tested                                                                                          |
 | axe WCAG 2.1 AA                      | 0 violations, 5 pages × 3 languages + 4 interactive screens                                                       |
-| Playwright end to end                | 19 tests pass (both demos, search, Kendras, accessibility)                                                        |
+| Playwright end to end                | 22 tests pass (both demos, search + checks, Kendras, privacy, accessibility)                                      |
 | Brand guesses (ablation)             | no change on dev photos: 1/5 right, 0 wrong, with or without                                                      |
 | SUS (≥ 70)                           | [SUS]                                                                                                             |
 | Final test set (3 photos, run once)  | reading: 0 fields right, wrong brand 1/3, wrong ingredients 2/2; matching with confirmed names 1/2 right, 0 wrong |
@@ -128,7 +128,7 @@ Building them found two things:
 
 ## How to test it
 
-- `pnpm build && pnpm test:e2e` (needs `web/.env.local`): 19 tests, ~15 s.
+- `pnpm build && pnpm test:e2e` (needs `web/.env.local`): 22 tests, ~15 s.
 - Live: Scan → "Demo: blood-pressure strip" → Find; "Demo: strip with a quality alert" → type
   "Omee", tick "It matches my strip" → Find → red alert. About page: refresh dates + results.
 - `python3 docs/sus/sus_score.py docs/sus/responses.csv` once responses exist.

@@ -30,7 +30,12 @@ export default async function SearchPage({ params }: PageProps<"/[locale]/search
 
       <main>
         {/* Only the search texts are sent to the browser, not the whole dictionary. */}
-        <SearchClient t={dict.search} locale={locale} />
+        <SearchClient
+          t={dict.search}
+          tChecks={dict.checks}
+          disclaimer={dict.common.disclaimer}
+          locale={locale}
+        />
       </main>
 
       <footer className="mt-auto flex gap-3 rounded-xl border border-border bg-muted/40 p-4 text-base leading-relaxed">

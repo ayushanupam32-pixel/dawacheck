@@ -65,7 +65,13 @@
     "updated": "Last updated",
     "searchAgain": "Search again",
     "error": "Something went wrong. Please try again.",
-    "brandCredit": "Brand names and ingredients: A-Z Medicine Dataset of India (Kaggle, CC BY-SA 4.0), November 2022."
+    "brandCredit": "Brand names and ingredients: A-Z Medicine Dataset of India (Kaggle, CC BY-SA 4.0), November 2022.",
+    "stripTitle": "Details from your strip (optional)",
+    "stripHint": "Type the batch number to check it against government quality alerts, and the MRP and how many are in the strip to check the price. Used for this check only, never stored.",
+    "batchLabel": "Batch number",
+    "mfgLabel": "Manufactured (MM/YYYY)",
+    "checkMrpLabel": "MRP (₹)",
+    "checkCountLabel": "How many in the strip"
   },
   "kendras": {
     "title": "Nearest Jan Aushadhi Kendra",

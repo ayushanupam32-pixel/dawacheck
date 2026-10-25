@@ -65,7 +65,13 @@
     "updated": "आख़िरी अपडेट",
     "searchAgain": "फिर से खोजें",
     "error": "कुछ गड़बड़ हो गई। कृपया फिर से कोशिश करें।",
-    "brandCredit": "ब्रांड नाम और घटक: A-Z Medicine Dataset of India (Kaggle, CC BY-SA 4.0), नवंबर 2022।"
+    "brandCredit": "ब्रांड नाम और घटक: A-Z Medicine Dataset of India (Kaggle, CC BY-SA 4.0), नवंबर 2022।",
+    "stripTitle": "आपकी पट्टी की जानकारी (वैकल्पिक)",
+    "stripHint": "सरकारी गुणवत्ता चेतावनियों से मिलाने के लिए बैच नंबर लिखें, और कीमत जाँचने के लिए MRP और पट्टी में कितनी हैं। यह सिर्फ़ इसी जाँच के लिए है, कभी सहेजा नहीं जाता।",
+    "batchLabel": "बैच नंबर",
+    "mfgLabel": "बनाने की तारीख़ (MM/YYYY)",
+    "checkMrpLabel": "MRP (₹)",
+    "checkCountLabel": "पट्टी में कितनी हैं"
   },
   "kendras": {
     "title": "नज़दीकी जन औषधि केंद्र",
