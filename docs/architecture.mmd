@@ -1,0 +1,34 @@
+%% DawaCheck architecture. architecture.png is generated from this file (see docs/README.md).
+flowchart TB
+  subgraph phone["① User's phone (browser): photos and location never leave it"]
+    direction LR
+    cam["Camera / gallery<br/>front, back, stamp"] --> prep["Stage 1 · preprocessing<br/>Web Worker: straighten, contrast,<br/>black-and-white, ink, inverted"]
+    prep --> ocr["Stage 2 · OCR<br/>Tesseract.js, 2 workers,<br/>progressive passes"]
+    ocr --> ext["Stage 3 · extraction<br/>batch, dates, MRP, pack,<br/>salts, brand guesses"]
+    ext --> confirm["Confirm screen<br/>user fixes fields"]
+    card["Result card<br/>5 checks + disclaimer"]
+    geo["Nearest Kendra<br/>Haversine on the phone,<br/>from static Kendra files"]
+  end
+
+  subgraph vercel["② Vercel · Next.js 16 (free Hobby plan)"]
+    direction LR
+    match["POST /api/match<br/>Stage 4: trigram candidates,<br/>re-rank, choice model,<br/>safety rules, or 'not sure'"]
+    checks["POST /api/checks<br/>generic · batch alert ·<br/>ceiling price · banned FDC"]
+    static["Static files<br/>pages in en / hi / ta,<br/>Kendras by geohash cell<br/>(only nearby cells are downloaded)"]
+  end
+
+  subgraph supa["③ Supabase Postgres (free, Mumbai): read-only for the app"]
+    db[("brands 241k · ja_products 1.6k · nsq_alerts 6.9k<br/>banned_fdcs 687 · ceiling_prices 696 · data_sources")]
+  end
+
+  subgraph gha["④ GitHub Actions: 5th of every month"]
+    direction LR
+    gov["Government sources<br/>PMBI · CDSCO · NPPA<br/>+ Kaggle brands · OSM"] --> fetch["fetch<br/>polite, cached"] --> parse["parse +<br/>normalize"] --> validate["validate<br/>stop if > 20% change"] --> load["load database +<br/>rebuild Kendra files<br/>(secret key only here)"]
+  end
+
+  confirm -- "medicine details only:<br/>name, salts, batch, MRP" --> match
+  match -- "matched brand" --> checks
+  checks -- "5 results" --> card
+  match --> db
+  checks --> db
+  load --> db

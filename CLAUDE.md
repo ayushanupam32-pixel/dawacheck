@@ -91,7 +91,8 @@ dawacheck/
 │   └── tests/
 ├── supabase/migrations/          SQL schema (applied through the Supabase connector)
 ├── eval/                         labels.json, photo-sources.json, results.md; photos/ is git-ignored
-├── docs/milestones/              viva notes per milestone (M0–M4)
+├── docs/                         milestones/ (viva notes M0–M7), architecture, demo.gif, report
+│                                 outline, slides, demo script, viva Q&A, sus/ (usability kit)
 └── .github/workflows/            ci.yml, data-refresh.yml
 ```
 

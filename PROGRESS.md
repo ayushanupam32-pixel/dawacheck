@@ -1,25 +1,28 @@
 # DawaCheck progress
 
-Last updated: 2026-10-25 (M7 part 2: About page, accessibility pass, Playwright).
+Last updated: 2026-10-25 (M7 built; final evaluation and SUS study wait for people).
 
 ## Where we are
 
-**M0–M5 are done and live. M6 was dropped by the user. M7 (evaluation and polish) is in progress.**
+**M0–M5 are done and live. M6 was dropped by the user. M7 is built and live; two steps wait for
+people: the label spot-check (then the one-time final evaluation) and the SUS study.**
 
 - Live site: https://dawacheck-psi.vercel.app (deploys automatically on every push to `main`)
 
-| Milestone                                             | Status      | Commits                                                          | Notes                                                                |
-| ----------------------------------------------------- | ----------- | ---------------------------------------------------------------- | -------------------------------------------------------------------- |
-| M0 Setup                                              | done        | `052cbcd`                                                        | Next.js + pnpm workspace, CI, Vercel, 3 languages, large-text toggle |
-| M1 Generic lookup                                     | done        | `eff1cd6`, `bc365fe`, `8726de1`, `1c4fee9`, `c1b090f`, `ca3d59c` | type a brand → exact Jan Aushadhi generic + savings                  |
-| M2 Nearest Kendra                                     | done        | `da80334`, `c9ffe2b` (data refresh)                              | computed on the phone from static files                              |
-| M3 Reading strips                                     | done        | `2b6b700`, `317324e`, `db927f1`                                  | in-browser OCR, confirm screen, evaluation                           |
-| M4 Matching OCR → medicine                            | done        |                                                                  | re-ranker + choice model + safety rules; top-1 89% dev / 86% test    |
-| M5 Safety checks (NSQ, NPPA, banned FDC, result card) | done        |                                                                  |                                                                      |
-| M6 Family cabinet + PWA                               | dropped     |                                                                  |                                                                      |
-| M7 Evaluation + polish                                | in progress |                                                                  |                                                                      |
+| Milestone                                             | Status  | Commits                                                          | Notes                                                                |
+| ----------------------------------------------------- | ------- | ---------------------------------------------------------------- | -------------------------------------------------------------------- |
+| M0 Setup                                              | done    | `052cbcd`                                                        | Next.js + pnpm workspace, CI, Vercel, 3 languages, large-text toggle |
+| M1 Generic lookup                                     | done    | `eff1cd6`, `bc365fe`, `8726de1`, `1c4fee9`, `c1b090f`, `ca3d59c` | type a brand → exact Jan Aushadhi generic + savings                  |
+| M2 Nearest Kendra                                     | done    | `da80334`, `c9ffe2b` (data refresh)                              | computed on the phone from static files                              |
+| M3 Reading strips                                     | done    | `2b6b700`, `317324e`, `db927f1`                                  | in-browser OCR, confirm screen, evaluation                           |
+| M4 Matching OCR → medicine                            | done    |                                                                  | re-ranker + choice model + safety rules; top-1 89% dev / 86% test    |
+| M5 Safety checks (NSQ, NPPA, banned FDC, result card) | done    |                                                                  |                                                                      |
+| M6 Family cabinet + PWA                               | dropped |                                                                  |                                                                      |
+| M7 Evaluation + polish                                | built   |                                                                  |                                                                      |
 
-Viva notes for each finished milestone: `docs/milestones/M0-setup.md` … `M4-matching.md`.
+Viva notes for each milestone: `docs/milestones/M0-setup.md` … `M7-evaluation-polish.md`.
+Other deliverables in `docs/` (see `docs/README.md`): architecture diagram, demo GIF, report
+outline, slides, demo script, viva Q&A, SUS kit.
 
 ## What exists
 
@@ -341,22 +344,33 @@ eval` reports both (with / without guesses). Word-level guesses were tried and r
   the red CDSCO alert), typed search (Telma 40 → generic + savings), Kendras by PIN (3 results), axe
   everywhere. Runs locally only: CI has no `SUPABASE_PUBLISHABLE_KEY` secret (would need adding).
 
+### M7 part 3 (2026-10-25): docs and study kits
+
+- **README** rewritten (pitch, demo GIF, features, architecture, results with baselines, sources
+  and licences, privacy, disclaimer, setup, limitations, future work).
+- `docs/architecture.mmd` + `.png` (rendered with mermaid-cli and the installed Chrome),
+  `docs/demo.gif` (live site, `web/scripts/demo-screens.ts` + `eval/make_demo_gif.py`).
+- `docs/report-outline.md`, `slides.md` (14), `demo-script.md` (3 min; the cabinet step replaced
+  by the "not sure" step), `viva-qa.md` (18 questions), `docs/milestones/M7-evaluation-polish.md`.
+- `docs/sus/`: facilitator guide with 5 tasks, SUS questionnaire (English + our Hindi
+  translation, not validated), response template, `sus_score.py` (doctests).
+- `eval/SPOT-CHECK.md`: how the user checks the labels (test photos first) before the final run.
+- Privacy wording made exact (About page en/hi/ta + README): the Kendra files reveal the phone's
+  ~150 km square, never the point.
+- Pipeline tests are now 197 (were 152 at M5).
+- Note: the Mac's system `python3` is 3.9 and has a tokenizer bug with long lines of Hindi/Tamil
+  text; run such scripts with `uv run --no-project --python 3.12 python …`.
+
 ## Exact next steps
 
-0. **Time the live demo on a phone** ("How we read this" shows the seconds).
-1. **Continue M7** — M6 is dropped. Done: About page, accessibility pass, Playwright (see above).
-   Left: final test-set evaluation (`pnpm eval -- --final`, `pnpm eval:match -- --final`, once,
-   after the label spot-check), SUS study with 15–20 users (the user runs it), docs (README GIF,
-   architecture diagram, report, slides, demo script, viva Q&A). Optional: Playwright in CI (needs
-   the publishable key as a GitHub secret).
-2. **Spot-check `eval/labels.json`** (human) before final numbers go into the report.
-3. **Speed:** done on a laptop (7.1 s median); measure on a mid-range Android phone.
-4. **Brand reading:** guesses are in, but the OCR rarely reads names on real photos; more phone
-   photos will show whether it helps.
-5. **More photos:** the user takes ~15–20 strip photos with their own phone (front, back, stamp
-   close-up), copies them into `eval/photos/`, labels them at `/en/eval/label` (including the
-   new "match brand": the exact brand name in the database, or empty if not in it).
-6. **Spot-check `eval/labels.json`** (human) before any numbers go into the report.
-7. Then M7 (M6 was dropped by the user on 2026-10-25): evaluation, About page, accessibility, final
-   `pnpm eval -- --final` and `pnpm eval:match -- --final`), and the deliverables (README GIF,
-   architecture diagram, report, slides, viva Q&A).
+1. **The user spot-checks the labels** (`eval/SPOT-CHECK.md`, the 3 test photos first) and
+   tells Claude when done.
+2. **Final evaluation, once:** `pnpm eval -- --final` and `pnpm eval:match -- --final`; then fill
+   the **[FINAL]** places in README, `docs/report-outline.md`, `slides.md`, `viva-qa.md`, M7 notes
+   (the About page updates itself from `web/lib/eval-summary.json`; commit it).
+3. **Time the live demo on a phone** ("How we read this" shows the seconds): [FINAL] speed.
+4. **SUS study** with 15–20 people (`docs/sus/README.md`), then `sus_score.py` → fill **[SUS]**.
+5. Write the report and slides from the outlines; record the demo.
+6. Optional: more phone photos and a bigger frozen test set (before step 2, if there is time);
+   Playwright in CI (add `SUPABASE_PUBLISHABLE_KEY` as a GitHub secret); native-speaker review of
+   Hindi/Tamil texts.

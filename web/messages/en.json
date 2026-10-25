@@ -282,7 +282,7 @@
     "noResults": "Results are not available yet.",
     "privacyTitle": "Your privacy",
     "privacyPhotos": "Your photos are read on your phone and never uploaded.",
-    "privacyLocation": "Your location is used only on your phone, to sort Kendras by distance. It is never sent to DawaCheck. If you tap “Show on map”, map pictures for that area come from OpenStreetMap.",
+    "privacyLocation": "Your location is used only on your phone, to sort Kendras by distance; it is never sent to DawaCheck. The phone downloads the Kendra list for its area (squares about 150 km wide), so at most that rough area can be seen. If you tap “Show on map”, map pictures for that area come from OpenStreetMap.",
     "privacySent": "When you tap “Find a cheaper generic”, the medicine details you confirmed (name, ingredients, batch number, MRP) go to DawaCheck's server to search the lists. They are not stored and not written to logs.",
     "privacyNone": "No accounts, no cookies, no ads, no analytics. The large-text setting is saved only in your browser.",
     "privacyCode": "The code is open, so anyone can check this:",
