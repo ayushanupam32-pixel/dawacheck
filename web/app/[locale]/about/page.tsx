@@ -297,16 +297,19 @@ function ReaderResults({
           </tr>
         </thead>
         <tbody>
-          {reader.fields.map((f) => (
-            <tr key={f.field}>
-              <th scope="row" className={`${td} font-normal`}>
-                {tScan[f.field]}
-              </th>
-              <td className={td}>{of(f.correct, f.total)}</td>
-              <td className={td}>{of(f.wrong, f.total)}</td>
-              <td className={td}>{of(f.baseCorrect, f.total)}</td>
-            </tr>
-          ))}
+          {/* A field no test photo shows (total 0) has nothing to score: leave it out. */}
+          {reader.fields
+            .filter((f) => f.total > 0)
+            .map((f) => (
+              <tr key={f.field}>
+                <th scope="row" className={`${td} font-normal`}>
+                  {tScan[f.field]}
+                </th>
+                <td className={td}>{of(f.correct, f.total)}</td>
+                <td className={td}>{of(f.wrong, f.total)}</td>
+                <td className={td}>{of(f.baseCorrect, f.total)}</td>
+              </tr>
+            ))}
         </tbody>
       </ScrollTable>
       <p className="text-base text-muted-foreground">{t.readNote}</p>
