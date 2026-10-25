@@ -737,6 +737,91 @@
           }
         }
       ]
+    },
+    {
+      "name": "Labelled photos, TEST (frozen)",
+      "rows": [
+        {
+          "label": "Exact name only (no fuzzy matching)",
+          "cases": 3,
+          "inDataset": 2,
+          "top1": 0,
+          "top3": 0,
+          "answered": 0,
+          "abstained": 1,
+          "abstainedInDataset": 1,
+          "wrongOfAnswered": 0,
+          "wrongGenericOfAnswered": 0,
+          "notInDatasetAnswered": 0,
+          "wrongCases": [],
+          "misses": {
+            "notFound": 2,
+            "rankedLower": 0,
+            "unsureSibling": 0,
+            "unsureOther": 0
+          }
+        },
+        {
+          "label": "Trigram search only (no re-ranking, no abstention)",
+          "cases": 3,
+          "inDataset": 2,
+          "top1": 0,
+          "top3": 0.5,
+          "answered": 1,
+          "abstained": 0,
+          "abstainedInDataset": 0,
+          "wrongOfAnswered": 1,
+          "wrongGenericOfAnswered": 1,
+          "notInDatasetAnswered": 1,
+          "wrongCases": ["augmentin875", "diazepam10", "sortis40"],
+          "misses": {
+            "notFound": 0,
+            "rankedLower": 2,
+            "unsureSibling": 0,
+            "unsureOther": 0
+          }
+        },
+        {
+          "label": "Re-ranking, no abstention",
+          "cases": 3,
+          "inDataset": 2,
+          "top1": 0.5,
+          "top3": 0.5,
+          "answered": 1,
+          "abstained": 0,
+          "abstainedInDataset": 0,
+          "wrongOfAnswered": 0.6666666666666666,
+          "wrongGenericOfAnswered": 0.6666666666666666,
+          "notInDatasetAnswered": 1,
+          "wrongCases": ["augmentin875", "sortis40"],
+          "misses": {
+            "notFound": 0,
+            "rankedLower": 1,
+            "unsureSibling": 0,
+            "unsureOther": 0
+          }
+        },
+        {
+          "label": "DawaCheck (re-ranking + abstention)",
+          "cases": 3,
+          "inDataset": 2,
+          "top1": 0.5,
+          "top3": 0.5,
+          "answered": 0.3333333333333333,
+          "abstained": 0.6666666666666667,
+          "abstainedInDataset": 0.5,
+          "wrongOfAnswered": 0,
+          "wrongGenericOfAnswered": 0,
+          "notInDatasetAnswered": 0,
+          "wrongCases": [],
+          "misses": {
+            "notFound": 0,
+            "rankedLower": 1,
+            "unsureSibling": 0,
+            "unsureOther": 0
+          }
+        }
+      ]
     }
   ],
   "calibration": [
@@ -888,6 +973,19 @@
       ]
     },
     {
+      "id": "augmentin875",
+      "read": "Augmentin",
+      "expected": "Augmentin 1000 Duo Tablet",
+      "got": "abstain (strength_unknown)",
+      "confidence": 0.21794556968697487,
+      "ok": false,
+      "options": [
+        "Augmentin 375 Tablet",
+        "Augmentin 250mg/50mg Injection",
+        "Augmentin 500mg/100mg Injection"
+      ]
+    },
+    {
       "id": "cialis20",
       "read": "Cialis",
       "expected": "Cialis 20mg Tablet",
@@ -904,6 +1002,24 @@
       "confidence": 0,
       "ok": true,
       "options": []
+    },
+    {
+      "id": "diazepam10",
+      "read": "Valium",
+      "expected": "Valium 10mg Tablet",
+      "got": "Valium 10mg Tablet",
+      "confidence": 0.8595820311398998,
+      "ok": true,
+      "options": ["Valium 10mg Tablet", "Valium 5 Tablet", "Valium 2mg Tablet"]
+    },
+    {
+      "id": "sortis40",
+      "read": "Sortis",
+      "expected": "(abstain: not in dataset)",
+      "got": "abstain (contradiction)",
+      "confidence": 0.015552478326229802,
+      "ok": true,
+      "options": ["Sortin 5mg Tablet", "Sortin 10mg Tablet", "Sortin 20mg Tablet"]
     },
     {
       "id": "androcur50",

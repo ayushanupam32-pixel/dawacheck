@@ -1,7 +1,7 @@
 # Slides outline (14 slides, ~12 minutes + 3-minute live demo)
 
-One idea per slide, big text, one picture each. **[FINAL]** / **[SUS]**: numbers to fill in
-after the final evaluation and the usability study.
+One idea per slide, big text, one picture each. **[PHONE]** / **[SUS]**: numbers to fill in
+after timing a phone and after the usability study.
 
 1. **DawaCheck** — "Photograph your medicine strip; check it against public government data."
    Name, roll number, guide, college. Picture: app on a phone (frame from `docs/demo.gif`).
@@ -22,7 +22,8 @@ after the final evaluation and the usability study.
 
 6. **Reading a strip (AI part 1)** — One strip shown 4 ways: original, black-and-white (adaptive
    threshold), ink (foil glare removed), straightened stamp. Tesseract in the browser,
-   progressive passes. "Plain OCR read the batch 1/3; DawaCheck 3/3" (dev) / **[FINAL]**.
+   progressive passes. "Plain OCR read the batch 1/3; DawaCheck 3/3" (dev photos). Be honest about the test set:
+   3 hard photos (French and German packs), 0 fields read right — the OCR limit.
 
 7. **Finding the medicine (AI part 2)** — Trigram candidates → evidence features → choice model
    (softmax over candidates + "none") → safety rules → answer or "not sure". Valium 2/5/10 example:
@@ -42,11 +43,12 @@ after the final evaluation and the usability study.
 
 11. **Results summary** — Table of brief targets vs achieved: matching top-1 ≥ 85% ✓ (85.9%),
     top-3 ≥ 95% ✗ (90.2%), wrong answers ≤ 2% ~ (1.0% dev, 3.3% test), Lighthouse ≥ 90 ✓ (100),
-    SUS ≥ 70 **[SUS]**, speed ≤ 5 s **[FINAL]** (7.1 s laptop), ₹0 ✓.
+    SUS ≥ 70 **[SUS]**, speed ≤ 5 s **[PHONE]** (7.1 s laptop), ₹0 ✓.
 
 12. **Usability study** — **[SUS]** n, mean SUS with 95% CI, task completion, two quotes.
 
-13. **Limitations** — Small photo set (16), weak brand reading on real photos, simulated matching
+13. **Limitations** — Test set: 0/3 photos read well, 0 wrong medicines; front-only photos
+    over-trusted (defect found by the test run); small photo set (16), weak brand reading on real photos, simulated matching
     data, 2022 brand snapshot, English OCR only, phone speed. Say them before you're asked.
 
 14. **Future work and thanks** — Phone photo set, on-device speed, Hindi OCR, offline PWA,

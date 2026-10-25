@@ -1,0 +1,342 @@
+[
+  {
+    "id": "augmentin875",
+    "split": "test",
+    "ms": 3757,
+    "ocr": ["binary:24", "ink:44", "enhanced:27", "inverted:23"],
+    "read": {
+      "brand": "Amoxicilline/acide Clavulanique - A |",
+      "ingredients": "Cee 8000 mg\nNee 2 %",
+      "mrp": "",
+      "packSize": "",
+      "batchNo": "",
+      "mfgDate": "",
+      "expDate": ""
+    },
+    "match": {
+      "got": "abstain (no_candidates)",
+      "outcome": "abstained",
+      "guesses": ["Dono me |", "Dono mer |", "Amoxicilline/acide Clavulanique - A |"]
+    },
+    "matchSingle": {
+      "got": "abstain (no_candidates)",
+      "outcome": "abstained"
+    },
+    "full": {
+      "brand": {
+        "correct": 0,
+        "wrong": 1,
+        "total": 1,
+        "cerSum": 1
+      },
+      "ingredients": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "mrp": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "packSize": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "batchNo": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "mfgDate": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "expDate": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 1
+      }
+    },
+    "base": {
+      "brand": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "ingredients": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "mrp": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "packSize": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "batchNo": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "mfgDate": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "expDate": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 1
+      }
+    }
+  },
+  {
+    "id": "diazepam10",
+    "split": "test",
+    "ms": 3424,
+    "ocr": ["binary:24", "ink:23", "enhanced:24", "inverted:23"],
+    "read": {
+      "brand": "",
+      "ingredients": "Oe Fd So RE Be 7000 mg\nWn J 0 %",
+      "mrp": "",
+      "packSize": "",
+      "batchNo": "",
+      "mfgDate": "",
+      "expDate": ""
+    },
+    "match": {
+      "got": "abstain (no_candidates)",
+      "outcome": "abstained",
+      "guesses": ["NE Ream, go A RE \\ te wt", "yiazepa™"]
+    },
+    "matchSingle": {
+      "got": "abstain (no_brand)",
+      "outcome": "abstained"
+    },
+    "full": {
+      "brand": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "ingredients": {
+        "correct": 0,
+        "wrong": 1,
+        "total": 1,
+        "cerSum": 1
+      },
+      "mrp": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "packSize": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "batchNo": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "mfgDate": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "expDate": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      }
+    },
+    "base": {
+      "brand": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "ingredients": {
+        "correct": 0,
+        "wrong": 1,
+        "total": 1,
+        "cerSum": 1
+      },
+      "mrp": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "packSize": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "batchNo": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "mfgDate": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "expDate": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      }
+    }
+  },
+  {
+    "id": "sortis40",
+    "split": "test",
+    "ms": 3035,
+    "ocr": ["binary:25", "ink:23", "enhanced:35", "inverted:25"],
+    "read": {
+      "brand": "",
+      "ingredients": "Potanovane 40 mg",
+      "mrp": "",
+      "packSize": "",
+      "batchNo": "",
+      "mfgDate": "",
+      "expDate": ""
+    },
+    "match": {
+      "got": "abstain (contradiction)",
+      "outcome": "abstained",
+      "guesses": [
+        "E o  potenovane LOMA",
+        "= SORTIS \\ taolely -",
+        "Eo Ce g g atorvastatinumi So © poe"
+      ]
+    },
+    "matchSingle": {
+      "got": "abstain (no_brand)",
+      "outcome": "abstained"
+    },
+    "full": {
+      "brand": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "ingredients": {
+        "correct": 0,
+        "wrong": 1,
+        "total": 1,
+        "cerSum": 0.55
+      },
+      "mrp": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "packSize": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "batchNo": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "mfgDate": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "expDate": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      }
+    },
+    "base": {
+      "brand": {
+        "correct": 0,
+        "wrong": 1,
+        "total": 1,
+        "cerSum": 1
+      },
+      "ingredients": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "mrp": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "packSize": {
+        "correct": 1,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 0
+      },
+      "batchNo": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "mfgDate": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      },
+      "expDate": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 0,
+        "cerSum": 0
+      }
+    }
+  }
+]

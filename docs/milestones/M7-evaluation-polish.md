@@ -6,7 +6,9 @@
 **Status (2026-10-25):** everything that can be built is built, tested and live. Two things wait
 for people, by design: **(1)** a person checks the labels (`eval/SPOT-CHECK.md`), then the final
 test-set evaluation runs once; **(2)** the usability study with 15–20 users (`docs/sus/`). The
-report, slides and README have marked places (**[FINAL]**, **[SUS]**) for those numbers.
+report, slides and README have marked places (**[SUS]**, and **[PHONE]** for phone timing) for
+those numbers. **Update:** the user checked the labels (no corrections) and the final evaluation
+ran once on 2026-10-25; see "Final test-set run" below.
 
 The order was agreed with the user: improvements that change the reader or matcher first (the
 final evaluation may run only once), then the About page, accessibility and Playwright, then docs.
@@ -70,15 +72,34 @@ top of the page; it now moves to the new screen's heading.
 
 ## Results
 
-| Measure (brief target)               | Result                                                                |
-| ------------------------------------ | --------------------------------------------------------------------- |
-| Speed per strip (≤ 5 s p95 on phone) | 7.1 s median, 10.8 s p95 on a laptop (was 9.9 / 16.8); phone: [FINAL] |
-| Lighthouse accessibility (≥ 90)      | 100 on every page tested                                              |
-| axe WCAG 2.1 AA                      | 0 violations, 5 pages × 3 languages + 4 interactive screens           |
-| Playwright end to end                | 19 tests pass (both demos, search, Kendras, accessibility)            |
-| Brand guesses (ablation)             | no change on dev photos: 1/5 right, 0 wrong, with or without          |
-| SUS (≥ 70)                           | [SUS]                                                                 |
-| Final test set                       | [FINAL]                                                               |
+| Measure (brief target)               | Result                                                                                                            |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| Speed per strip (≤ 5 s p95 on phone) | 7.1 s median, 10.8 s p95 on a laptop (was 9.9 / 16.8); phone: [PHONE]                                             |
+| Lighthouse accessibility (≥ 90)      | 100 on every page tested                                                                                          |
+| axe WCAG 2.1 AA                      | 0 violations, 5 pages × 3 languages + 4 interactive screens                                                       |
+| Playwright end to end                | 19 tests pass (both demos, search, Kendras, accessibility)                                                        |
+| Brand guesses (ablation)             | no change on dev photos: 1/5 right, 0 wrong, with or without                                                      |
+| SUS (≥ 70)                           | [SUS]                                                                                                             |
+| Final test set (3 photos, run once)  | reading: 0 fields right, wrong brand 1/3, wrong ingredients 2/2; matching with confirmed names 1/2 right, 0 wrong |
+
+## Final test-set run (2026-10-25)
+
+Labels checked by the user (no corrections), then `pnpm eval -- --final` and
+`pnpm eval:match -- --final`, once. Results in `eval/results-final.md` and the "TEST (frozen)"
+section of `eval/match-results.md`; the About page shows them (`readerFinal`).
+
+- **Reading:** no field right on any of the 3 photos; wrong values shown: brand 1/3 (a French
+  salt line), ingredients 2/2 (garbage like "Cee 8000 mg"); plain OCR read 1 of 2 pack sizes.
+  OCR confidence was 23–44%: two are foreign packs (French Augmentin, German Sortis) photographed
+  at an angle.
+- **Matching** (names as a user would confirm them): Valium 10mg matched at 86% (right), Augmentin
+  abstained (sold in several strengths, none read), Sortis correctly not in the list: 1/2 right,
+  0 wrong. Baselines that always answer: 67–100% of answers wrong.
+- **Fully automatic:** 0 right, 0 wrong (all abstained).
+- **Defect found:** for a photo without a back side, `mergeReadings` uses a placeholder back
+  reading with confidence 100, so `(front + back) / 200` doubles a weak front's score (24% → 62%)
+  and garbage passes `MIN_SHOW`. The dev set hid this. The test numbers stand as measured; a fix
+  must be checked on dev photos only.
 
 ## How to test it
 

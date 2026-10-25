@@ -1,7 +1,9 @@
 # Project report outline: DawaCheck
 
 Section order from the brief. Each section lists what to write and where the material already is.
-**[FINAL]** = fill in after the final test-set evaluation; **[SUS]** = after the usability study.
+**[PHONE]** = fill in after timing the app on a mid-range Android phone; **[SUS]** = after the
+usability study. The final test-set evaluation ran on 2026-10-25 (`eval/results-final.md`,
+`eval/match-results.md` "TEST (frozen)").
 Never put a number in the report that is not in `eval/` or `docs/sus/`.
 
 Suggested length: 35–45 pages with figures. Screenshots: `docs/demo.gif` frames (regenerate with
@@ -18,8 +20,9 @@ Suggested length: 35–45 pages with figures. Screenshots: `docs/demo.gif` frame
 - Method: in-browser preprocessing + Tesseract OCR, rule-based extraction, trigram retrieval +
   re-ranking with a conditional-logit choice model and abstention; monthly public-data pipeline.
 - Results: matching top-1 85.9% with 3.3% wrong answers on 207 unseen simulated strips (vs 26.3%
-  wrong without abstention); batch, dates read 3/3–3/4 on dev photos with 0 wrong; **[FINAL]**
-  test-set reading; **[SUS]** usability; Lighthouse accessibility 100; ₹0 running cost.
+  wrong without abstention); batch, dates read 3/3–3/4 on dev photos with 0 wrong, but on the
+  3 frozen test photos (two foreign packs, OCR confidence 23–44%) no field was read correctly and
+  matching gave 1 right, 0 wrong; **[SUS]** usability; Lighthouse accessibility 100; ₹0 running cost.
 - Privacy: photos and location never leave the phone.
 
 ## 1. Introduction and problem statement
@@ -117,18 +120,23 @@ banned (yes / maybe / no), Kendra (geohash + Haversine).
 7.1 **Data**: labelled photos (16 web photos: 13 dev, 3 frozen test; sources in
 `eval/photo-sources.json`), simulated matching cases (800: 593 dev, 207 test), how labels were made
 and checked (empty form, spot-check by a person: `eval/SPOT-CHECK.md`).
-7.2 **Reading** (`eval/results.md`, **[FINAL]** `eval/results-final.md`): per-field accuracy and
-wrong rate, CER; foil vs matte.
+7.2 **Reading** (`eval/results.md`, `eval/results-final.md`): per-field accuracy and wrong rate,
+CER; foil vs matte. Test set: 0 fields right; wrong brand 1/3, wrong ingredients 2/2; plain OCR
+1/2 pack sizes. Discuss honestly: photo difficulty (foreign packs, OCR confidence 23–44%), the
+front-only defect it exposed (missing back counted as 100% confident), and that the test set is
+too small (3) to generalise. Do not re-tune on it.
 7.3 **Ablation: preprocessing** — full pipeline vs raw Tesseract (the brief's first baseline).
 7.4 **Matching** (`eval/match-results.md`): exact-name baseline, trigram only, re-ranking without
 abstention, DawaCheck; top-1, top-3, wrong of answered, wrong generic, abstention; on simulated
 dev/test and labelled photos. Calibration table.
 7.5 **Ablation: brand guesses** — with vs without (no change on dev photos; say why).
-7.6 **Photo → medicine, fully automatic** vs with the user's correction.
+7.6 **Photo → medicine, fully automatic** vs with the user's correction. Test set: automatic
+0 right / 0 wrong (all abstained); with confirmed names 1/2 right (Valium 10mg), 0 wrong, vs
+67–100% wrong answers for the always-answer baselines.
 7.7 **Checks accuracy** (`eval/m5-checks.md`): banned 40/40, NSQ vs CDSCO PDFs 170/172, prices
 30/30, verdicts 60/60; generic hand check 16/20, 0 wrong.
 7.8 **Speed**: 9.9 → 7.1 s median on a laptop (2 workers); 1200 px experiment and why rejected;
-**[FINAL]** phone measurement.
+**[PHONE]** phone measurement.
 7.9 **Usability**: **[SUS]** mean, SD, 95% CI, n; task completion; quotes (no names).
 7.10 **Accessibility**: Lighthouse 100; axe 0 violations; keyboard pass and the focus fix.
 7.11 Brief targets table: met / not met, honestly (top-3 90% vs 95%; abstention 28% vs ≤ 20%;

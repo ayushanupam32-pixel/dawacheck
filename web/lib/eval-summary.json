@@ -106,6 +106,41 @@
             "abstainedInDataset": 0.4
           }
         ]
+      },
+      {
+        "set": "photosTest",
+        "cases": 3,
+        "inDataset": 2,
+        "rows": [
+          {
+            "method": "exact",
+            "top1": 0,
+            "top3": 0,
+            "wrongOfAnswered": 0,
+            "abstainedInDataset": 1
+          },
+          {
+            "method": "trigram",
+            "top1": 0,
+            "top3": 0.5,
+            "wrongOfAnswered": 1,
+            "abstainedInDataset": 0
+          },
+          {
+            "method": "rerank",
+            "top1": 0.5,
+            "top3": 0.5,
+            "wrongOfAnswered": 0.6666666666666666,
+            "abstainedInDataset": 0
+          },
+          {
+            "method": "dawacheck",
+            "top1": 0.5,
+            "top3": 0.5,
+            "wrongOfAnswered": 0,
+            "abstainedInDataset": 0.5
+          }
+        ]
       }
     ]
   },
@@ -173,5 +208,70 @@
     ],
     "medianMs": 7258,
     "p95Ms": 10909
+  },
+  "readerFinal": {
+    "generated": "2026-10-25",
+    "split": "test",
+    "strips": 3,
+    "fields": [
+      {
+        "field": "brand",
+        "total": 3,
+        "correct": 0,
+        "wrong": 1,
+        "baseCorrect": 0,
+        "baseWrong": 1
+      },
+      {
+        "field": "ingredients",
+        "total": 2,
+        "correct": 0,
+        "wrong": 2,
+        "baseCorrect": 0,
+        "baseWrong": 1
+      },
+      {
+        "field": "mrp",
+        "total": 0,
+        "correct": 0,
+        "wrong": 0,
+        "baseCorrect": 0,
+        "baseWrong": 0
+      },
+      {
+        "field": "packSize",
+        "total": 2,
+        "correct": 0,
+        "wrong": 0,
+        "baseCorrect": 1,
+        "baseWrong": 0
+      },
+      {
+        "field": "batchNo",
+        "total": 1,
+        "correct": 0,
+        "wrong": 0,
+        "baseCorrect": 0,
+        "baseWrong": 0
+      },
+      {
+        "field": "mfgDate",
+        "total": 0,
+        "correct": 0,
+        "wrong": 0,
+        "baseCorrect": 0,
+        "baseWrong": 0
+      },
+      {
+        "field": "expDate",
+        "total": 1,
+        "correct": 0,
+        "wrong": 0,
+        "baseCorrect": 0,
+        "baseWrong": 0
+      }
+    ],
+    "medianMs": 3424,
+    "p95Ms": 3757
   }
 }

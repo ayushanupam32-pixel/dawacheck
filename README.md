@@ -50,8 +50,8 @@ Source: [docs/architecture.mmd](docs/architecture.mmd).
 ## Results
 
 Measured by the evaluation harness (`pnpm eval`, `pnpm eval:match`), which runs the same code
-as the app. **These are development-set numbers.** The frozen test set (3 photos) is evaluated
-once, after the labels are checked by a person; the About page updates itself when it is.
+as the app. The tables below are **development-set** numbers (what we tuned on). The frozen test
+set was evaluated **once**, after a person checked the labels; its results follow each table.
 
 **Finding the right medicine** (207 simulated strips from real brands with OCR-like errors,
 never used for tuning; 1 in 4 is not in the brand list, so "not sure" is right):
@@ -78,9 +78,11 @@ of in-list strips. Wrong _generic_ given: 0%. Simulated strips are easier than r
 | Ingredients | 1/9             | 4/9             | 0/9             |
 | Brand       | 1/13            | 4/13            | 0/13            |
 
+**Frozen test set** (3 photos, labels checked by a person, run once on 2026-10-25): no field was read correctly; wrong values shown: brand 1/3, ingredients 2/2; plain OCR read 1 of 2 pack sizes, DawaCheck none. Two of the three are foreign packs (French Augmentin, German Sortis) and OCR confidence was only 23–44%, so almost nothing was readable. The run also exposed a defect: with no back photo, the merge step counts the missing back as a fully confident reading, which doubled weak front readings and let garbage ingredients ("Cee 8000 mg") past the bar for showing free text. The test result stands as measured.
+
 Reading time on a laptop: 7.3 s median, 10.9 s p95 (was 9.9 s / 16.8 s before the 2-worker
 reader). On real photos the user's name correction matters: with names as confirmed, 3/5
-in-list photos matched and 0 were wrong; fully automatic, 1/5 and 0 wrong.
+in-list photos matched and 0 were wrong; fully automatic, 1/5 and 0 wrong. On the test photos, with the names a user would confirm: 1 of 2 in-list strips matched (Valium 10mg, 86%), 0 wrong; Augmentin said "not sure" (several strengths, none read) and Sortis correctly said it is not in the list. The always-answer baselines got 67–100% of their answers wrong. Fully automatic: 0 right, 0 wrong (all three abstained).
 
 **Checks:** banned-list rules 40/40 cases; NSQ alerts vs CDSCO's own PDFs 170/172 (98.8%);
 ceiling prices 30/30 exact, price verdicts 60/60. Generic lookup hand check: 16/20 right, 0 wrong
@@ -149,11 +151,15 @@ docs/       Architecture, milestone notes (M0–M7), report, slides, demo script
 
 ## Limitations
 
+- **Front-only photos are over-trusted** (found by the final test run): a missing back photo
+  counts as a fully confident reading, so weak front text can be shown as ingredients. To be
+  fixed and checked on development photos only.
 - **Small photo set:** 16 web photos (13 dev, 3 test); the brief asks for ~200. Real-phone photos
   are still to be added, so the reading numbers are rough.
 - **Brand and ingredient reading is weak** on busy real photos (OCR quality is the bottleneck);
   the confirm screen and "not sure" keep it safe, but the user often types the name.
-- **Speed:** 7 s on a laptop; the brief's target is 5 s on a mid-range phone (not yet measured).
+- **Speed:** 7 s on a laptop (3–4 s on the simpler test photos); the brief's target is 5 s on a
+  mid-range phone (not yet measured).
 - **Brand data is a 2022 snapshot** (prices and new brands may be missing); the app asks for the
   MRP on the strip.
 - **English OCR only**; Hindi text on strips is not read. Hindi and Tamil interface texts still

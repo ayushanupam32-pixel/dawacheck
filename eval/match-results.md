@@ -1,6 +1,6 @@
 # Matching evaluation (M4)
 
-Written by `pnpm eval:match` on 2026-10-25.
+Written by `pnpm eval:match --final` on 2026-10-25.
 
 **Answered** = the app shows a medicine without asking. **Wrong** = an answered medicine that
 is not the one on the strip (for "not in dataset" cases, any answer is wrong).
@@ -49,6 +49,19 @@ DawaCheck on in-dataset strips it did not answer correctly: right brand not foun
 
 DawaCheck on in-dataset strips it did not answer correctly: right brand not found by the search 0; found but ranked below another 1; ranked first but not sure enough, because a same-name brand with another strength is also possible 0, for other reasons 1.
 
+## Labelled photos, TEST (frozen)
+
+3 cases, 2 in the dataset.
+
+| Method                                             | Top-1 | Top-3 | Answered | Wrong (of answered) | Wrong generic | Abstained, in dataset | Not-in-dataset answered |
+| -------------------------------------------------- | ----- | ----- | -------- | ------------------- | ------------- | --------------------- | ----------------------- |
+| Exact name only (no fuzzy matching)                | 0.0%  | 0.0%  | 0.0%     | 0.0%                | 0.0%          | 100.0%                | 0.0%                    |
+| Trigram search only (no re-ranking, no abstention) | 0.0%  | 50.0% | 100.0%   | 100.0%              | 100.0%        | 0.0%                  | 100.0%                  |
+| Re-ranking, no abstention                          | 50.0% | 50.0% | 100.0%   | 66.7%               | 66.7%         | 0.0%                  | 100.0%                  |
+| DawaCheck (re-ranking + abstention)                | 50.0% | 50.0% | 33.3%    | 0.0%                | 0.0%          | 50.0%                 | 0.0%                    |
+
+DawaCheck on in-dataset strips it did not answer correctly: right brand not found by the search 0; found but ranked below another 1; ranked first but not sure enough, because a same-name brand with another strength is also possible 0, for other reasons 0.
+
 ## Calibration (simulated test)
 
 | Confidence | Cases | Top choice right |
@@ -75,6 +88,9 @@ DawaCheck on in-dataset strips it did not answer correctly: right brand not foun
 | azithromycin250-sandoz | Sandoz Azithromycin   | (abstain: not in dataset)    | abstain (unsure)           | 20.8%      | yes    | DavaIndia Azithromycin 250mg Tablet; Genericart Azithromycin 250mg Tablet; DavaIndia Azithromycin 500mg Tablet |
 | anterone50             | Anterone 50           | (abstain: not in dataset)    | abstain (contradiction)    | 0.0%       | yes    | StayHappi Medroxyprogesterone acetate 10mg Tablet                                                              |
 | citalopram20           | Citalopram Heumann    | (abstain: not in dataset)    | abstain (unsure)           | 3.3%       | yes    | Citalopam 20mg Tablet; DavaIndia Escitalopram Oxalate 20mg Tablet; StayHappi Escitalopram Oxalate 20mg Tablet  |
+| augmentin875           | Augmentin             | Augmentin 1000 Duo Tablet    | abstain (strength_unknown) | 21.8%      | **no** | Augmentin 375 Tablet; Augmentin 250mg/50mg Injection; Augmentin 500mg/100mg Injection                          |
 | cialis20               | Cialis                | Cialis 20mg Tablet           | abstain (strength_unknown) | 32.3%      | **no** | Cialis 10mg Tablet; Cialis 20mg Tablet                                                                         |
 | dexedrine5             | Dexedrine             | (abstain: not in dataset)    | abstain (no_candidates)    | 0.0%       | yes    |                                                                                                                |
+| diazepam10             | Valium                | Valium 10mg Tablet           | Valium 10mg Tablet         | 86.0%      | yes    | Valium 10mg Tablet; Valium 5 Tablet; Valium 2mg Tablet                                                         |
+| sortis40               | Sortis                | (abstain: not in dataset)    | abstain (contradiction)    | 1.6%       | yes    | Sortin 5mg Tablet; Sortin 10mg Tablet; Sortin 20mg Tablet                                                      |
 | androcur50             | Androcur              | (abstain: not in dataset)    | abstain (no_candidates)    | 0.0%       | yes    |                                                                                                                |

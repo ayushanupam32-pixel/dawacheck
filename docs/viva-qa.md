@@ -13,7 +13,8 @@ Answer in your own words; these are the points to hit. Each milestone note
    Scale, straighten (projection profile), contrast stretch, adaptive black-and-white (Bradley,
    integral image), inverted, and the "ink" image (max − min of RGB) that removes silver-foil
    glare. Ablation: plain Tesseract on the untouched photo read the batch 1/3, DawaCheck 3/3 on
-   dev photos ([FINAL] on test). The baseline is deliberately the original file, so the gain isn't
+   dev photos. On the 3 frozen test photos neither read anything right (foreign packs, OCR
+   confidence 23–44%). The baseline is deliberately the original file, so the gain isn't
    exaggerated.
 
 3. **How does it know which medicine it is?**
@@ -74,7 +75,7 @@ Answer in your own words; these are the points to hit. Each milestone note
 
 13. **Is it fast enough?**
     7.1 s median on a laptop after running two OCR workers in parallel (from 9.9 s, same accuracy);
-    the target is 5 s on a phone, [FINAL] measured on a phone. Smaller images would be faster but
+    the target is 5 s on a phone, [PHONE] measured on a phone. Smaller images would be faster but
     lost dates in our test, so we kept accuracy.
 
 14. **How is it accessible?**
@@ -100,3 +101,11 @@ Answer in your own words; these are the points to hit. Each milestone note
     An upright "DEMO" on a demo strip was read as the name and matched a real "Demo 20mg Capsule"
     (same salt, same strength) at 98%. Name + composition agreeing is strong evidence, yet wrong:
     the confirm screen and the shown confidence exist for exactly this.
+
+19. **Your test-set reading results are 0 right. Doesn't that mean it doesn't work?**
+    It means Tesseract can't read those photos: two are foreign packs and the OCR's own confidence
+    was 23–44%. What matters for safety held: 0 wrong medicines, and with the names a user
+    confirms, Valium 10 matched and the others said "not sure". The test also caught a real defect
+    (a missing back photo was counted as a confident reading, letting garbage ingredients show),
+    which the dev photos had hidden. That's what a frozen test set is for; we report it rather than
+    re-tune on it. With 3 photos, it is also far too small to generalise.

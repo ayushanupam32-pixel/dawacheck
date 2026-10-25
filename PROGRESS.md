@@ -1,11 +1,11 @@
 # DawaCheck progress
 
-Last updated: 2026-10-25 (M7 built; final evaluation and SUS study wait for people).
+Last updated: 2026-10-25 (final test-set evaluation done; SUS study and phone timing wait for the user).
 
 ## Where we are
 
-**M0–M5 are done and live. M6 was dropped by the user. M7 is built and live; two steps wait for
-people: the label spot-check (then the one-time final evaluation) and the SUS study.**
+**M0–M5 are done and live. M6 was dropped by the user. M7 is built and live; the final test-set
+evaluation ran once (2026-10-25). Waiting for the user: the SUS study and timing on a phone.**
 
 - Live site: https://dawacheck-psi.vercel.app (deploys automatically on every push to `main`)
 
@@ -361,16 +361,29 @@ eval` reports both (with / without guesses). Word-level guesses were tried and r
 - Note: the Mac's system `python3` is 3.9 and has a tokenizer bug with long lines of Hindi/Tamil
   text; run such scripts with `uv run --no-project --python 3.12 python …`.
 
+### Final test-set evaluation (2026-10-25, run once; do NOT run `--final` again)
+
+The user checked the labels (no corrections). `eval/results-final.md`, `eval/match-results.md`
+("TEST (frozen)"), `web/lib/eval-summary.json` (`readerFinal`, `photosTest`; the About page now
+shows the test-set reading table).
+
+- Reading, 3 photos: **0 fields right**; wrong brand 1/3, wrong ingredients 2/2; plain OCR 1/2
+  pack sizes. OCR confidence 23–44% (French Augmentin, German Sortis, angled photos).
+- Matching with confirmed names: 1/2 right (Valium 10mg 86%), 0 wrong; Augmentin abstained
+  (strength unknown), Sortis correctly not in the list. Baselines: 67–100% wrong answers.
+- Fully automatic: 0 right, 0 wrong.
+- **Defect found:** `mergeReadings` gives a missing back photo a placeholder reading with
+  confidence 100, so `(front + back) / 200` doubles a weak front's score and garbage ingredients
+  pass `MIN_SHOW`. Not fixed yet; any fix is evaluated on dev photos only (test numbers stand).
+- README, report outline, slides, viva Q&A (new Q19) and M7 notes updated; phone-speed
+  placeholders are now **[PHONE]**.
+
 ## Exact next steps
 
-1. **The user spot-checks the labels** (`eval/SPOT-CHECK.md`, the 3 test photos first) and
-   tells Claude when done.
-2. **Final evaluation, once:** `pnpm eval -- --final` and `pnpm eval:match -- --final`; then fill
-   the **[FINAL]** places in README, `docs/report-outline.md`, `slides.md`, `viva-qa.md`, M7 notes
-   (the About page updates itself from `web/lib/eval-summary.json`; commit it).
-3. **Time the live demo on a phone** ("How we read this" shows the seconds): [FINAL] speed.
-4. **SUS study** with 15–20 people (`docs/sus/README.md`), then `sus_score.py` → fill **[SUS]**.
-5. Write the report and slides from the outlines; record the demo.
-6. Optional: more phone photos and a bigger frozen test set (before step 2, if there is time);
-   Playwright in CI (add `SUPABASE_PUBLISHABLE_KEY` as a GitHub secret); native-speaker review of
-   Hindi/Tamil texts.
+1. **Fix the front-only confidence defect** (above) and check it with `pnpm eval` on dev photos
+   only; never re-run `--final`.
+2. **Time the live demo on a phone** ("How we read this" shows the seconds) → fill **[PHONE]**.
+3. **SUS study** with 15–20 people (`docs/sus/README.md`), then `sus_score.py` → fill **[SUS]**.
+4. Write the report and slides from the outlines; record the demo.
+5. Optional: Playwright in CI (add `SUPABASE_PUBLISHABLE_KEY` as a GitHub secret); native-speaker
+   review of Hindi/Tamil texts; more phone photos (a new test set would need its own freeze).
