@@ -1,6 +1,6 @@
 # DawaCheck progress
 
-Last updated: 2026-10-25 (M7 started: speed, brand guesses, real-brand demo strips; not committed yet).
+Last updated: 2026-10-25 (M7 part 1 committed `f656e60` and verified live).
 
 ## Where we are
 
@@ -275,6 +275,11 @@ See `docs/milestones/M5-safety-checks.md`.
 
 ## M7 progress (2026-10-25)
 
+**Committed `f656e60`, CI green, live and verified:** both demos clicked through on
+https://dawacheck-psi.vercel.app (Telmikind: match 81%, generic, batch not in alerts, fair price;
+Omee: type "Omee", tick the batch, Find → match 94% and the red CDSCO alert). Laptop read time on
+the live site 1.3–1.5 s per demo strip.
+
 Agreed order with the user: improvements that change the reader/matcher first (the final test-set
 eval runs only once), then About page + accessibility + Playwright, then final eval and docs.
 
@@ -313,8 +318,7 @@ eval` reports both (with / without guesses). Word-level guesses were tried and r
 
 ## Exact next steps
 
-0. **Commit the M7 work above** (not committed yet), push, check the live demo on a phone (time
-   it: "How we read this" shows the seconds).
+0. **Time the live demo on a phone** ("How we read this" shows the seconds).
 1. **Continue M7** — M6 is dropped. From the brief: final test-set
    evaluation (`pnpm eval -- --final`, `pnpm eval:match -- --final`), ablations, About page with
    the results table and data sources (credit CC BY-SA brand data), accessibility pass
