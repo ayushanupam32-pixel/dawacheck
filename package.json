@@ -8,6 +8,7 @@
     "lint": "pnpm --filter web lint",
     "typecheck": "pnpm --filter web typecheck",
     "test": "pnpm --filter web test",
+    "test:e2e": "pnpm --filter web test:e2e",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "eval": "pnpm --filter web eval",

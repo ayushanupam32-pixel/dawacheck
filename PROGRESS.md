@@ -1,6 +1,6 @@
 # DawaCheck progress
 
-Last updated: 2026-10-25 (M7 part 1 committed `f656e60` and verified live).
+Last updated: 2026-10-25 (M7 part 2: About page, accessibility pass, Playwright).
 
 ## Where we are
 
@@ -316,15 +316,39 @@ eval` reports both (with / without guesses). Word-level guesses were tried and r
   retyping the same value still counted as unsure. Texts in en/hi/ta.
 - Web tests: 399, including the new `tests/reader.test.ts`, brand guesses and combineDecisions.
 
+### M7 part 2 (2026-10-25): About page, accessibility, Playwright
+
+- **About page** `/[locale]/about` (linked from the home page): the 6 sources + OpenStreetMap,
+  each with its publisher, what we use it for, licence and **last refresh date + row count from
+  `data_sources`** (cached for an hour with `"use cache"`; if the database can't be reached the
+  page says the date isn't available). Results: matching on the simulated **test** set (4 methods:
+  exact name, trigram, re-ranking, DawaCheck; top-1, wrong answers, top-3) and field reading on the
+  dev photos vs plain OCR, plus speed. Privacy (incl. OSM tiles only after "Show on map", what the
+  server receives) and medical safety. All texts in en/hi/ta (Hindi/Tamil by Claude: review).
+- **Numbers are generated, not typed:** `pnpm eval` writes `reader` (dev photos only, demo strips
+  excluded) or `readerFinal` (with --final) and `pnpm eval:match` writes `matching` into
+  `web/lib/eval-summary.json`. After the final runs, the page shows the test-set numbers by itself.
+  `eval:match` now also keeps the demo strips out of the photo metrics (listed per photo only).
+- **Accessibility:** Lighthouse 13.5.0 accessibility **100** on /en, /en/scan, /en/search,
+  /en/kendras, /en/about, /hi/about, /ta (production build, mobile). Playwright + axe (WCAG 2.1
+  A/AA) find **0 violations** on all 5 pages × 3 languages and on the confirm screen, result card,
+  search results and Kendra list. Keyboard pass: logical order, visible focus everywhere. **Fixed:**
+  after reading, focus fell back to the page body; it now moves to the new screen's heading
+  (photo steps, confirm screen, error). Tables fit a 375 px phone in en/hi; in Tamil the last
+  column scrolls inside its own labelled box.
+- **Playwright** (`pnpm build && pnpm test:e2e`, 19 tests, ~15 s, installed Chrome): both demo
+  strips end to end (read → confirm → match → all 5 check rows → disclaimer; the Omee strip gives
+  the red CDSCO alert), typed search (Telma 40 → generic + savings), Kendras by PIN (3 results), axe
+  everywhere. Runs locally only: CI has no `SUPABASE_PUBLISHABLE_KEY` secret (would need adding).
+
 ## Exact next steps
 
 0. **Time the live demo on a phone** ("How we read this" shows the seconds).
-1. **Continue M7** — M6 is dropped. From the brief: final test-set
-   evaluation (`pnpm eval -- --final`, `pnpm eval:match -- --final`), ablations, About page with
-   the results table and data sources (credit CC BY-SA brand data), accessibility pass
-   (Lighthouse ≥ 90), SUS study with 15–20 users (the user runs it), docs (README GIF,
-   architecture diagram, report, slides, viva Q&A). Also the brief's Playwright end-to-end test
-   (sample photos → confirm → result card).
+1. **Continue M7** — M6 is dropped. Done: About page, accessibility pass, Playwright (see above).
+   Left: final test-set evaluation (`pnpm eval -- --final`, `pnpm eval:match -- --final`, once,
+   after the label spot-check), SUS study with 15–20 users (the user runs it), docs (README GIF,
+   architecture diagram, report, slides, demo script, viva Q&A). Optional: Playwright in CI (needs
+   the publishable key as a GitHub secret).
 2. **Spot-check `eval/labels.json`** (human) before final numbers go into the report.
 3. **Speed:** done on a laptop (7.1 s median); measure on a mid-range Android phone.
 4. **Brand reading:** guesses are in, but the OCR rarely reads names on real photos; more phone

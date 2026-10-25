@@ -29,6 +29,22 @@ type Step =
 /** Confidence below which a field is marked "Please check" on the confirm screen. */
 const CHECK_BELOW = 0.6;
 
+/**
+ * When the screen changes (the next photo, an error), move keyboard focus to the new screen's
+ * heading: a screen reader reads it out, and Tab continues from there instead of from the top of
+ * the page. Never on the first screen, so loading the page doesn't jump.
+ */
+function useFocusOnChange<E extends HTMLElement>(screen: string) {
+  const ref = useRef<E>(null);
+  const shown = useRef(screen);
+  useEffect(() => {
+    if (shown.current === screen) return;
+    shown.current = screen;
+    ref.current?.focus();
+  }, [screen]);
+  return ref;
+}
+
 /** Picks a photo from the camera (capture) or the gallery, and shows a preview. */
 function PhotoPicker({
   t,
@@ -105,6 +121,7 @@ export function ScanClient({
   locale: string;
 }) {
   const [step, setStep] = useState<Step>({ name: "front" });
+  const screenHeading = useFocusOnChange<HTMLHeadingElement>(step.name);
   const [front, setFront] = useState<Blob | null>(null);
   const [back, setBack] = useState<Blob | null>(null);
   const [stamp, setStamp] = useState<Blob | null>(null);
@@ -184,7 +201,9 @@ export function ScanClient({
     }[step.name];
     return (
       <div className="flex flex-col gap-4">
-        <h2 className="text-xl font-semibold">{page.title}</h2>
+        <h2 ref={screenHeading} tabIndex={-1} className="text-xl font-semibold outline-none">
+          {page.title}
+        </h2>
         <p className="text-base">{page.hint}</p>
         <PhotoPicker t={t} photo={page.photo} onPhoto={page.setPhoto} />
         <div className="flex flex-wrap gap-2">
@@ -252,7 +271,13 @@ export function ScanClient({
   if (step.name === "error") {
     return (
       <div className="flex flex-col gap-3">
-        <p className="rounded-xl border-2 border-status-warn p-4 text-base">{t.error}</p>
+        <h2
+          ref={screenHeading}
+          tabIndex={-1}
+          className="rounded-xl border-2 border-status-warn p-4 text-base font-normal outline-none"
+        >
+          {t.error}
+        </h2>
         <div className="flex flex-wrap gap-2">
           <Button onClick={startOver}>
             <RotateCcw aria-hidden="true" />
@@ -305,6 +330,9 @@ function Confirm({
   onStartOver: () => void;
 }) {
   const f: ExtractedFields = reading.fields;
+  // The confirm screen replaces the "Reading…" message: take keyboard focus to its heading.
+  const confirmHeading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => confirmHeading.current?.focus(), []);
   // Every value is editable. Corrections are used for this scan only and never stored.
   const [values, setValues] = useState<Record<string, string>>({
     brand: f.brand?.value ?? "",
@@ -401,7 +429,9 @@ function Confirm({
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <h2 className="text-xl font-semibold">{t.confirmTitle}</h2>
+        <h2 ref={confirmHeading} tabIndex={-1} className="text-xl font-semibold outline-none">
+          {t.confirmTitle}
+        </h2>
         <p className="text-base">{t.confirmIntro}</p>
       </div>
 

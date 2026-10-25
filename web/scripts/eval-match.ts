@@ -37,6 +37,8 @@ import {
 import type { Label } from "../lib/ai/score";
 import { findCandidates } from "../lib/find-match";
 import type { BrandCandidate } from "../lib/match";
+import { MATCH_METHODS, MATCH_SETS } from "../lib/eval-summary";
+import { writeSummary } from "./eval-summary-file";
 
 const WEB_DIR = resolve(__dirname, "..");
 const EVAL_DIR = resolve(WEB_DIR, "..", "eval");
@@ -167,7 +169,8 @@ function simulateReading(brand: PoolBrand): MatchInput {
 type Case = {
   id: string;
   kind: "simulated" | "photo";
-  split: "dev" | "test";
+  /** demo = the generated Demo-mode strips: listed per photo, but kept out of the metrics. */
+  split: "dev" | "test" | "demo";
   input: MatchInput;
   /** The right brand, or null = abstaining is the right answer. */
   truth: { name: string; compositionKey: string | null } | null;
@@ -242,7 +245,7 @@ function photoCases(): Case[] {
     .map((l) => ({
       id: l.id,
       kind: "photo" as const,
-      split: l.split === "test" ? ("test" as const) : ("dev" as const),
+      split: l.split,
       // What the user would confirm on the confirm screen: the labelled values.
       input: {
         brand: l.brand || null,
@@ -569,6 +572,23 @@ async function main() {
     ),
     "",
   ].join("\n");
+
+  // For the About page. Sets and methods are in the fixed order built above (sets, baselines()).
+  writeSummary("matching", {
+    generated: new Date().toISOString().slice(0, 10),
+    sets: results.map(({ rows }, i) => ({
+      set: MATCH_SETS[i],
+      cases: rows[0].cases,
+      inDataset: rows[0].inDataset,
+      rows: rows.map((r, j) => ({
+        method: MATCH_METHODS[j],
+        top1: r.top1,
+        top3: r.top3,
+        wrongOfAnswered: r.wrongOfAnswered,
+        abstainedInDataset: r.abstainedInDataset,
+      })),
+    })),
+  });
 
   writeFileSync(join(EVAL_DIR, "match-results.md"), md);
   writeFileSync(

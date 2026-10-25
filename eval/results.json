@@ -2,7 +2,7 @@
   {
     "id": "demo-telmikind",
     "split": "demo",
-    "ms": 614,
+    "ms": 616,
     "ocr": ["binary:81", "binary:89"],
     "read": {
       "brand": "TELMIKIND 40",
@@ -114,7 +114,7 @@
   {
     "id": "demo-omee",
     "split": "demo",
-    "ms": 1326,
+    "ms": 1351,
     "ocr": [
       "binary:70",
       "ink:0",
@@ -237,7 +237,7 @@
   {
     "id": "favipill800",
     "split": "dev",
-    "ms": 10177,
+    "ms": 10108,
     "ocr": [
       "binary:25",
       "ink:42",
@@ -364,7 +364,7 @@
   {
     "id": "fincover1",
     "split": "dev",
-    "ms": 9405,
+    "ms": 9545,
     "ocr": [
       "binary:26",
       "ink:29",
@@ -487,7 +487,7 @@
   {
     "id": "suhagra100",
     "split": "dev",
-    "ms": 2291,
+    "ms": 2352,
     "ocr": ["binary:21", "ink:39", "enhanced:30", "inverted:20"],
     "read": {
       "brand": "| Suhagra-100",
@@ -599,7 +599,7 @@
   {
     "id": "neorelax-mr",
     "split": "dev",
-    "ms": 7831,
+    "ms": 7937,
     "ocr": [
       "binary:28",
       "ink:38",
@@ -726,7 +726,7 @@
   {
     "id": "crocin-cold-flu",
     "split": "dev",
-    "ms": 7131,
+    "ms": 7258,
     "ocr": [
       "binary:22",
       "ink:40",
@@ -853,7 +853,7 @@
   {
     "id": "metformin500-zanza",
     "split": "dev",
-    "ms": 1663,
+    "ms": 1648,
     "ocr": ["binary:33", "ink:19", "enhanced:32", "inverted:33"],
     "read": {
       "brand": "rmin",
@@ -965,7 +965,7 @@
   {
     "id": "warfarin2-label",
     "split": "dev",
-    "ms": 2118,
+    "ms": 2137,
     "ocr": ["binary:56", "ink:69", "enhanced:57", "inverted:54"],
     "read": {
       "brand": "—— WARFARIN",
@@ -1077,7 +1077,7 @@
   {
     "id": "azithromycin250-sandoz",
     "split": "dev",
-    "ms": 7721,
+    "ms": 7972,
     "ocr": ["binary:21", "ink:22", "enhanced:27", "inverted:21"],
     "read": {
       "brand": "",
@@ -1189,7 +1189,7 @@
   {
     "id": "anterone50",
     "split": "dev",
-    "ms": 1797,
+    "ms": 1806,
     "ocr": ["binary:39", "ink:31", "enhanced:60", "inverted:36"],
     "read": {
       "brand": "cyproterone acetate 50 mg EE one 50",
@@ -1301,7 +1301,7 @@
   {
     "id": "citalopram20",
     "split": "dev",
-    "ms": 9513,
+    "ms": 9732,
     "ocr": ["binary:23", "ink:90", "enhanced:40", "inverted:24"],
     "read": {
       "brand": "HEUMANN Jf",
@@ -1413,7 +1413,7 @@
   {
     "id": "cialis20",
     "split": "dev",
-    "ms": 3221,
+    "ms": 3309,
     "ocr": ["binary:22", "ink:35", "enhanced:27", "inverted:22"],
     "read": {
       "brand": "",
@@ -1525,7 +1525,7 @@
   {
     "id": "dexedrine5",
     "split": "dev",
-    "ms": 2885,
+    "ms": 2937,
     "ocr": ["binary:25", "ink:23", "enhanced:31", "inverted:25"],
     "read": {
       "brand": "",
@@ -1641,7 +1641,7 @@
   {
     "id": "androcur50",
     "split": "dev",
-    "ms": 10788,
+    "ms": 10909,
     "ocr": ["binary:24", "ink:22", "enhanced:21", "inverted:25"],
     "read": {
       "brand": "",

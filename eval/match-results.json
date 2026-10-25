@@ -642,12 +642,12 @@
       "rows": [
         {
           "label": "Exact name only (no fuzzy matching)",
-          "cases": 14,
+          "cases": 13,
           "inDataset": 5,
           "top1": 0.6,
           "top3": 0.6,
-          "answered": 0.21428571428571427,
-          "abstained": 0.7857142857142857,
+          "answered": 0.23076923076923078,
+          "abstained": 0.7692307692307692,
           "abstainedInDataset": 0.4,
           "wrongOfAnswered": 0,
           "wrongGenericOfAnswered": 0,
@@ -662,16 +662,16 @@
         },
         {
           "label": "Trigram search only (no re-ranking, no abstention)",
-          "cases": 14,
+          "cases": 13,
           "inDataset": 5,
           "top1": 0.8,
           "top3": 1,
-          "answered": 0.7857142857142857,
-          "abstained": 0.2142857142857143,
+          "answered": 0.8461538461538461,
+          "abstained": 0.15384615384615385,
           "abstainedInDataset": 0,
           "wrongOfAnswered": 0.6363636363636364,
           "wrongGenericOfAnswered": 0.6363636363636364,
-          "notInDatasetAnswered": 0.6666666666666666,
+          "notInDatasetAnswered": 0.75,
           "wrongCases": [
             "favipill800",
             "metformin500-zanza",
@@ -690,16 +690,16 @@
         },
         {
           "label": "Re-ranking, no abstention",
-          "cases": 14,
+          "cases": 13,
           "inDataset": 5,
           "top1": 0.8,
           "top3": 1,
-          "answered": 0.7857142857142857,
-          "abstained": 0.2142857142857143,
+          "answered": 0.8461538461538461,
+          "abstained": 0.15384615384615385,
           "abstainedInDataset": 0,
           "wrongOfAnswered": 0.6363636363636364,
           "wrongGenericOfAnswered": 0.6363636363636364,
-          "notInDatasetAnswered": 0.6666666666666666,
+          "notInDatasetAnswered": 0.75,
           "wrongCases": [
             "favipill800",
             "metformin500-zanza",
@@ -718,12 +718,12 @@
         },
         {
           "label": "DawaCheck (re-ranking + abstention)",
-          "cases": 14,
+          "cases": 13,
           "inDataset": 5,
           "top1": 0.8,
           "top3": 1,
-          "answered": 0.21428571428571427,
-          "abstained": 0.7857142857142857,
+          "answered": 0.23076923076923078,
+          "abstained": 0.7692307692307692,
           "abstainedInDataset": 0.4,
           "wrongOfAnswered": 0,
           "wrongGenericOfAnswered": 0,
@@ -747,13 +747,13 @@
     },
     {
       "range": "0.25–0.50",
-      "n": 23,
-      "right": 0.5217391304347826
+      "n": 24,
+      "right": 0.5416666666666666
     },
     {
       "range": "0.50–0.75",
-      "n": 36,
-      "right": 0.9166666666666666
+      "n": 35,
+      "right": 0.9142857142857143
     },
     {
       "range": "0.75–0.90",
@@ -768,13 +768,22 @@
   ],
   "photos": [
     {
-      "id": "demo",
-      "read": "DEMOTEL 40",
-      "expected": "(abstain: not in dataset)",
-      "got": "abstain (no_candidates)",
-      "confidence": 0,
+      "id": "demo-telmikind",
+      "read": "TELMIKIND 40",
+      "expected": "Telmikind 40 Tablet",
+      "got": "Telmikind 40 Tablet",
+      "confidence": 0.7888383608018542,
       "ok": true,
-      "options": []
+      "options": ["Telmikind 40 Tablet", "Telmikind-H Tablet", "Telmikind-AM Tablet"]
+    },
+    {
+      "id": "demo-omee",
+      "read": "OMEE",
+      "expected": "Omee Capsule",
+      "got": "Omee Capsule",
+      "confidence": 0.7672393103731326,
+      "ok": true,
+      "options": ["Omee Capsule", "Omees 20mg Capsule", "Omee-D Capsule"]
     },
     {
       "id": "favipill800",

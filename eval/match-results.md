@@ -1,6 +1,6 @@
 # Matching evaluation (M4)
 
-Written by `pnpm eval:match` on 2026-10-24.
+Written by `pnpm eval:match` on 2026-10-25.
 
 **Answered** = the app shows a medicine without asking. **Wrong** = an answered medicine that
 is not the one on the strip (for "not in dataset" cases, any answer is wrong).
@@ -38,14 +38,14 @@ DawaCheck on in-dataset strips it did not answer correctly: right brand not foun
 
 ## Labelled photos, dev (values as confirmed by the user)
 
-14 cases, 5 in the dataset.
+13 cases, 5 in the dataset.
 
 | Method                                             | Top-1 | Top-3  | Answered | Wrong (of answered) | Wrong generic | Abstained, in dataset | Not-in-dataset answered |
 | -------------------------------------------------- | ----- | ------ | -------- | ------------------- | ------------- | --------------------- | ----------------------- |
-| Exact name only (no fuzzy matching)                | 60.0% | 60.0%  | 21.4%    | 0.0%                | 0.0%          | 40.0%                 | 0.0%                    |
-| Trigram search only (no re-ranking, no abstention) | 80.0% | 100.0% | 78.6%    | 63.6%               | 63.6%         | 0.0%                  | 66.7%                   |
-| Re-ranking, no abstention                          | 80.0% | 100.0% | 78.6%    | 63.6%               | 63.6%         | 0.0%                  | 66.7%                   |
-| DawaCheck (re-ranking + abstention)                | 80.0% | 100.0% | 21.4%    | 0.0%                | 0.0%          | 40.0%                 | 0.0%                    |
+| Exact name only (no fuzzy matching)                | 60.0% | 60.0%  | 23.1%    | 0.0%                | 0.0%          | 40.0%                 | 0.0%                    |
+| Trigram search only (no re-ranking, no abstention) | 80.0% | 100.0% | 84.6%    | 63.6%               | 63.6%         | 0.0%                  | 75.0%                   |
+| Re-ranking, no abstention                          | 80.0% | 100.0% | 84.6%    | 63.6%               | 63.6%         | 0.0%                  | 75.0%                   |
+| DawaCheck (re-ranking + abstention)                | 80.0% | 100.0% | 23.1%    | 0.0%                | 0.0%          | 40.0%                 | 0.0%                    |
 
 DawaCheck on in-dataset strips it did not answer correctly: right brand not found by the search 0; found but ranked below another 1; ranked first but not sure enough, because a same-name brand with another strength is also possible 0, for other reasons 1.
 
@@ -54,8 +54,8 @@ DawaCheck on in-dataset strips it did not answer correctly: right brand not foun
 | Confidence | Cases | Top choice right |
 | ---------- | ----- | ---------------- |
 | 0.00–0.25  | 37    | 16.2%            |
-| 0.25–0.50  | 23    | 52.2%            |
-| 0.50–0.75  | 36    | 91.7%            |
+| 0.25–0.50  | 24    | 54.2%            |
+| 0.50–0.75  | 35    | 91.4%            |
 | 0.75–0.90  | 41    | 90.2%            |
 | 0.90–1.00  | 53    | 98.1%            |
 
@@ -63,7 +63,8 @@ DawaCheck on in-dataset strips it did not answer correctly: right brand not foun
 
 | Photo                  | Name confirmed        | Expected                     | DawaCheck                  | Confidence | OK     | Options offered                                                                                                |
 | ---------------------- | --------------------- | ---------------------------- | -------------------------- | ---------- | ------ | -------------------------------------------------------------------------------------------------------------- |
-| demo                   | DEMOTEL 40            | (abstain: not in dataset)    | abstain (no_candidates)    | 0.0%       | yes    |                                                                                                                |
+| demo-telmikind         | TELMIKIND 40          | Telmikind 40 Tablet          | Telmikind 40 Tablet        | 78.9%      | yes    | Telmikind 40 Tablet; Telmikind-H Tablet; Telmikind-AM Tablet                                                   |
+| demo-omee              | OMEE                  | Omee Capsule                 | Omee Capsule               | 76.7%      | yes    | Omee Capsule; Omees 20mg Capsule; Omee-D Capsule                                                               |
 | favipill800            | Favipill 800          | (abstain: not in dataset)    | abstain (contradiction)    | 2.7%       | yes    | Favipill 400mg Tablet                                                                                          |
 | fincover1              | Fincover              | Fincover 1mg Tablet          | Fincover 1mg Tablet        | 88.2%      | yes    | Fincover 1mg Tablet                                                                                            |
 | suhagra100             | Suhagra-100           | Suhagra 100 Tablet           | Suhagra 100 Tablet         | 71.4%      | yes    | Suhagra 100 Tablet; Suhagra 25 Tablet; Suhagra 50 Tablet                                                       |

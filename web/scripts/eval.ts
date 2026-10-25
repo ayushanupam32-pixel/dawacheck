@@ -26,6 +26,7 @@ import { brandGuesses } from "../lib/ai/merge";
 import { pageToReading, readProgressively } from "../lib/ai/reader";
 import { buildMatchInput, nameIdentity, type Decision } from "../lib/ai/rerank";
 import { matchGuesses } from "../lib/find-match";
+import { writeSummary } from "./eval-summary-file";
 import type { BrandCandidate } from "../lib/match";
 import { createClient } from "@supabase/supabase-js";
 import {
@@ -307,6 +308,32 @@ function writeReport(rows: Row[]) {
     `spaces and punctuation. A field left empty in the label is not scored.`,
     ...matchSection(rows),
   ];
+  // For the About page: real photos only (the generated demo strips are easy and would flatter
+  // the numbers), dev photos while developing, the frozen test photos with --final.
+  const real = rows.filter((r) => r.label.split === (final ? "test" : "dev"));
+  const realTimes = real.map((r) => r.ms).sort((a, b) => a - b);
+  const at = (q: number) =>
+    Math.round(realTimes[Math.min(realTimes.length - 1, Math.floor(q * realTimes.length))] ?? 0);
+  writeSummary(final ? "readerFinal" : "reader", {
+    generated: new Date().toISOString().slice(0, 10),
+    split: final ? "test" : "dev",
+    strips: real.length,
+    fields: SCORED_FIELDS.map((field) => {
+      const f = sum(real, (r) => r.full, field);
+      const b = sum(real, (r) => r.base, field);
+      return {
+        field,
+        total: f.total,
+        correct: f.correct,
+        wrong: f.wrong,
+        baseCorrect: b.correct,
+        baseWrong: b.wrong,
+      };
+    }),
+    medianMs: at(0.5),
+    p95Ms: at(0.95),
+  });
+
   const out = join(EVAL_DIR, final ? "results-final.md" : "results.md");
   writeFileSync(out, lines.join("\n") + "\n");
   writeFileSync(

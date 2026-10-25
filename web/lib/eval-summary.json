@@ -1,0 +1,177 @@
+{
+  "matching": {
+    "generated": "2026-10-25",
+    "sets": [
+      {
+        "set": "simDev",
+        "cases": 593,
+        "inDataset": 439,
+        "rows": [
+          {
+            "method": "exact",
+            "top1": 0.5444191343963554,
+            "top3": 0.5444191343963554,
+            "wrongOfAnswered": 0.012396694214876033,
+            "abstainedInDataset": 0.4533029612756264
+          },
+          {
+            "method": "trigram",
+            "top1": 0.8200455580865603,
+            "top3": 0.8997722095671982,
+            "wrongOfAnswered": 0.34306569343065696,
+            "abstainedInDataset": 0.05239179954441914
+          },
+          {
+            "method": "rerank",
+            "top1": 0.8906605922551253,
+            "top3": 0.908883826879271,
+            "wrongOfAnswered": 0.2864963503649635,
+            "abstainedInDataset": 0.05239179954441914
+          },
+          {
+            "method": "dawacheck",
+            "top1": 0.8906605922551253,
+            "top3": 0.908883826879271,
+            "wrongOfAnswered": 0.00964630225080386,
+            "abstainedInDataset": 0.2984054669703872
+          }
+        ]
+      },
+      {
+        "set": "simTest",
+        "cases": 207,
+        "inDataset": 163,
+        "rows": [
+          {
+            "method": "exact",
+            "top1": 0.6257668711656442,
+            "top3": 0.6257668711656442,
+            "wrongOfAnswered": 0.02857142857142857,
+            "abstainedInDataset": 0.3619631901840491
+          },
+          {
+            "method": "trigram",
+            "top1": 0.8098159509202454,
+            "top3": 0.9079754601226994,
+            "wrongOfAnswered": 0.30526315789473685,
+            "abstainedInDataset": 0.06134969325153374
+          },
+          {
+            "method": "rerank",
+            "top1": 0.8588957055214724,
+            "top3": 0.901840490797546,
+            "wrongOfAnswered": 0.2631578947368421,
+            "abstainedInDataset": 0.06134969325153374
+          },
+          {
+            "method": "dawacheck",
+            "top1": 0.8588957055214724,
+            "top3": 0.901840490797546,
+            "wrongOfAnswered": 0.03305785123966942,
+            "abstainedInDataset": 0.2822085889570552
+          }
+        ]
+      },
+      {
+        "set": "photosDev",
+        "cases": 13,
+        "inDataset": 5,
+        "rows": [
+          {
+            "method": "exact",
+            "top1": 0.6,
+            "top3": 0.6,
+            "wrongOfAnswered": 0,
+            "abstainedInDataset": 0.4
+          },
+          {
+            "method": "trigram",
+            "top1": 0.8,
+            "top3": 1,
+            "wrongOfAnswered": 0.6363636363636364,
+            "abstainedInDataset": 0
+          },
+          {
+            "method": "rerank",
+            "top1": 0.8,
+            "top3": 1,
+            "wrongOfAnswered": 0.6363636363636364,
+            "abstainedInDataset": 0
+          },
+          {
+            "method": "dawacheck",
+            "top1": 0.8,
+            "top3": 1,
+            "wrongOfAnswered": 0,
+            "abstainedInDataset": 0.4
+          }
+        ]
+      }
+    ]
+  },
+  "reader": {
+    "generated": "2026-10-25",
+    "split": "dev",
+    "strips": 13,
+    "fields": [
+      {
+        "field": "brand",
+        "total": 13,
+        "correct": 1,
+        "wrong": 4,
+        "baseCorrect": 0,
+        "baseWrong": 3
+      },
+      {
+        "field": "ingredients",
+        "total": 9,
+        "correct": 1,
+        "wrong": 4,
+        "baseCorrect": 0,
+        "baseWrong": 2
+      },
+      {
+        "field": "mrp",
+        "total": 4,
+        "correct": 1,
+        "wrong": 0,
+        "baseCorrect": 0,
+        "baseWrong": 1
+      },
+      {
+        "field": "packSize",
+        "total": 10,
+        "correct": 3,
+        "wrong": 0,
+        "baseCorrect": 1,
+        "baseWrong": 0
+      },
+      {
+        "field": "batchNo",
+        "total": 3,
+        "correct": 3,
+        "wrong": 0,
+        "baseCorrect": 1,
+        "baseWrong": 0
+      },
+      {
+        "field": "mfgDate",
+        "total": 4,
+        "correct": 3,
+        "wrong": 0,
+        "baseCorrect": 1,
+        "baseWrong": 0
+      },
+      {
+        "field": "expDate",
+        "total": 4,
+        "correct": 3,
+        "wrong": 0,
+        "baseCorrect": 1,
+        "baseWrong": 0
+      }
+    ],
+    "medianMs": 7258,
+    "p95Ms": 10909
+  }
+}

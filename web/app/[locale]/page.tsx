@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { LucideIcon } from "lucide-react";
 import {
   Ban,
+  BookOpen,
   Camera,
   ImageUp,
   IndianRupee,
@@ -120,6 +121,13 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           <Lock aria-hidden="true" className="size-5 shrink-0 text-primary" />
           {t.privacy}
         </p>
+        <Link
+          href={`/${locale}/about`}
+          className="inline-flex min-h-12 w-fit items-center gap-3 text-base font-medium text-primary underline underline-offset-4"
+        >
+          <BookOpen aria-hidden="true" className="size-5 shrink-0" />
+          {t.aboutLink}
+        </Link>
       </main>
 
       <footer className="mt-auto flex gap-3 rounded-xl border border-border bg-muted/40 p-4 text-base leading-relaxed">

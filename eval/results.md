@@ -27,7 +27,7 @@ wrong) was left empty: the user is asked to type it. A wrong value is worse than
 
 ## Speed (this computer, not a phone)
 
-Median 3221 ms, p95 10788 ms per strip (front + back). Phone timing is measured
+Median 3309 ms, p95 10909 ms per strip (front + back). Phone timing is measured
 separately in the app ("How we read this" shows the time).
 
 CER = edits needed / length of the true value (0 = perfect). Exact match ignores case,
