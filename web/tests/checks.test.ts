@@ -3,7 +3,7 @@ import { parseCompositionKey } from "@/lib/ai/normalize";
 import { checkBanned, combinationKey, type Medicine } from "@/lib/checks/banned";
 import { checkBatch, type BatchInput } from "@/lib/checks/batch";
 import type { AlertRow, BannedRow } from "@/lib/checks/types";
-import { checkPrice, pickCeiling, type CeilingRow } from "@/lib/checks/price";
+import { checkPrice, maxGst, pickCeiling, type CeilingRow } from "@/lib/checks/price";
 import { chooseSalts, describeMedicine, parseChecksInput } from "@/lib/run-checks";
 
 // Rows as loaded from the real CDSCO data (pipeline/clean/cdsco_alerts.csv, banned_fdcs.csv).
@@ -415,6 +415,7 @@ describe("parseChecksInput", () => {
       manufacturer: null,
       mrp: null,
       packSize: null,
+      mfgDate: null,
     });
     // MRP and count: positive numbers only.
     expect(parseChecksInput({ mrp: "103.8", packSize: 15 })).toMatchObject({
@@ -424,6 +425,7 @@ describe("parseChecksInput", () => {
     expect(parseChecksInput({ mrp: -5, packSize: "x" })).toMatchObject({
       mrp: null,
       packSize: null,
+      mfgDate: null,
     });
     expect(parseChecksInput("x")).toBeNull();
   });
@@ -449,6 +451,7 @@ const price = (over: Partial<Parameters<typeof checkPrice>[0]>) => ({
   saltsComplete: true,
   mrp: null,
   packSize: null,
+  mfgDate: "2026-01", // made after the GST cut: 5% margin
   ...over,
 });
 
@@ -459,6 +462,17 @@ describe("checkPrice", () => {
     expect(r).toMatchObject({ status: "ok", reason: "within", perUnit: 6.92, maxWithGst: 7.27 });
     // 7.26 a tablet: above the ceiling, but within ceiling + 5% GST.
     expect(checkPrice(price({ mrp: 108.9, packSize: 15 }), [TELMISARTAN_40]).reason).toBe("within");
+  });
+
+  it("allows 12% GST for strips made before the 22.09.2025 cut, or of unknown date", () => {
+    // 7.75 a tablet = ceiling + 12%: correct for a strip made in 2024, too high for one in 2026.
+    expect(
+      checkPrice(price({ mrp: 116.25, packSize: 15, mfgDate: "2024-06" }), [TELMISARTAN_40]),
+    ).toMatchObject({ reason: "within", maxWithGst: 7.75 });
+    expect(
+      checkPrice(price({ mrp: 116.25, packSize: 15, mfgDate: null }), [TELMISARTAN_40]).reason,
+    ).toBe("within");
+    expect(checkPrice(price({ mrp: 116.25, packSize: 15 }), [TELMISARTAN_40]).reason).toBe("above");
   });
 
   it("is above the ceiling when MRP per tablet > ceiling + 5% GST", () => {
@@ -514,5 +528,13 @@ describe("checkPrice", () => {
   it("needs a composition and loaded prices", () => {
     expect(checkPrice(price({ compositionKey: null }), []).reason).toBe("no_composition");
     expect(checkPrice(price({}), [], false).reason).toBe("no_data");
+  });
+});
+
+describe("maxGst", () => {
+  it("is 5% for strips made from October 2025, 12% before or when unknown", () => {
+    expect(maxGst("2025-10")).toBe(0.05);
+    expect(maxGst("2025-09")).toBe(0.12); // the cut was on 22.09.2025: either rate possible
+    expect(maxGst(null)).toBe(0.12);
   });
 });

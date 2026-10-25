@@ -23,6 +23,8 @@ export type ChecksInput = {
   /** MRP on the strip (₹) and how many tablets/capsules it covers, as confirmed. */
   mrp: number | null;
   packSize: number | null;
+  /** Manufacturing month on the strip, "YYYY-MM" (decides the GST margin). */
+  mfgDate: string | null;
 };
 
 export type ChecksResponse = {
@@ -170,6 +172,7 @@ export async function runChecks(db: SupabaseClient, input: ChecksInput): Promise
         saltsComplete: medicine.saltsComplete,
         mrp: input.mrp,
         packSize: input.packSize,
+        mfgDate: input.mfgDate,
       },
       ((ceilings.data ?? []) as CeilingRow[]).map((r) => ({
         ...r,
@@ -217,6 +220,7 @@ export function parseChecksInput(body: unknown): ChecksInput | null {
     manufacturer: text(b.manufacturer, 120) || null,
     mrp: positive(b.mrp, 100000),
     packSize: positive(b.packSize, 1000),
+    mfgDate: typeof b.mfgDate === "string" && /^\d{4}-\d{2}$/.test(b.mfgDate) ? b.mfgDate : null,
   };
 }
 

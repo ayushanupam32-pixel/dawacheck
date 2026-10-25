@@ -83,8 +83,9 @@ verdicts correct.**
   the ceiling price was read by hand from the order's English table and compared with what the
   parser produced from the same PDF: right composition key and exactly the official price for all
   30 (`pipeline/tests/test_nppa_30.py`).
-- **Verdicts:** for each, a 10-tablet strip priced at ceiling + 4% (within the 5% GST margin)
-  must be "within", and at ceiling + 10% "above": 60 / 60 (`web/tests/price-cases.test.ts`).
+- **Verdicts:** for each, a 10-tablet strip made in January 2026 (after the GST cut to 5%) priced
+  at ceiling + 4% must be "within", and at ceiling + 10% "above": 60 / 60
+  (`web/tests/price-cases.test.ts`). A strip made before 22.09.2025 is allowed ceiling + 12% GST.
 
 Coverage: 430 of 439 tablet/capsule ceiling prices parse (the 9 refused have unusual names, e.g.
 "Co-trimoxazole [Sulphamethoxazole (A) + Trimethoprim (B)]"). 38,481 active brands (16.5%) have a

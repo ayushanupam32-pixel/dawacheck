@@ -3,9 +3,10 @@
 //
 // Ceiling prices read by hand from NPPA order S.O. 1575(E), 25.03.2026, in force from 1.4.2026
 // (pipeline/tests/test_nppa_30.py checks the parser gives exactly these). Ceiling prices exclude
-// GST; at most 5% GST may be added. For each medicine, a 10-tablet strip:
+// GST; for a strip made after the 22.09.2025 GST cut, at most 5% may be added. For each medicine,
+// a 10-tablet strip made in January 2026:
 // - priced at ceiling + 4% (allowed, inside the GST margin): "within";
-// - priced at ceiling + 10% (more than any GST allows): "above".
+// - priced at ceiling + 10% (more than the 5% GST allows): "above".
 
 import { describe, expect, it } from "vitest";
 import { checkPrice, type CeilingRow } from "@/lib/checks/price";
@@ -64,6 +65,7 @@ const strip = (key: string, price: number, factor: number) =>
       saltsComplete: true,
       mrp: Math.round(price * factor * 10 * 100) / 100,
       packSize: 10,
+      mfgDate: "2026-01", // made after the GST cut: at most 5% GST
     },
     [row(key, price)],
   );

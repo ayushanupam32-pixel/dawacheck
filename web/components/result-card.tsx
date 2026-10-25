@@ -35,6 +35,8 @@ export type ResultCardInput = {
   /** MRP printed on the strip (₹) and the number of tablets/capsules, for the fair price. */
   mrp: number | null;
   packSize: number | null;
+  /** Manufacturing month ("YYYY-MM"), for the GST margin. */
+  mfgDate: string | null;
   batchNo: string;
   batchConfidence: number;
   names: string[];
@@ -275,6 +277,7 @@ function PriceText({ t, locale, price }: { t: T; locale: string; price: PriceRes
     perUnit: rupees(price.perUnit),
     ceiling: rupees(c?.ceiling_price ?? null),
     max: rupees(price.maxWithGst),
+    gst: `${Math.round(price.gst * 100)}%`,
     unit: c?.unit.replace(/^1\s*/, "").toLowerCase() ?? "",
   };
   const text = {

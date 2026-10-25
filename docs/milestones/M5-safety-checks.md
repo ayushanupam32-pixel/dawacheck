@@ -63,14 +63,19 @@ different companies reuse numbers. Results:
 **Fair price.** NPPA fixes a ceiling price per unit (one tablet, one ml) for each scheduled
 formulation, **excluding GST**. The check finds the ceiling by the medicine's exact composition
 key (like the generic), works out the MRP per tablet from the strip (MRP ÷ how many), and compares
-it with the ceiling **plus 5% GST** (the GST on most medicines since 22.09.2025; some lifesaving
-ones are 0%). Above that, the MRP is above the ceiling whatever the GST: "show this to your
-pharmacist", with NPPA's helpline (1800 111 255). Otherwise: "within the ceiling", "not
-price-controlled" (no ceiling for this medicine), or "can't compare" (MRP or count missing, or a
-price per ml/g, since we do not read a bottle's volume). A combination from a cut-short brand
-record gets no verdict: its ceiling could belong to a smaller combination. When a medicine has
-several ceilings (pack sizes, two lists), the newer list and the highest price are used, so a
-price is never called too high by mistake.
+it with the ceiling **plus GST**. GST on most medicines was 12% until 22.09.2025 and is 5% since,
+and a strip made before the cut legitimately carries the 12% price until it expires. So the GST
+margin follows the strip's manufacturing date: 5% if made from October 2025, otherwise (or if the
+date was not read) 12%. Above that, the MRP is above the ceiling: "show this to your pharmacist",
+with NPPA's helpline (1800 111 255). Otherwise: "within the ceiling", "not price-controlled" (no
+ceiling for this medicine), or "can't compare" (MRP or count missing, or a price per ml/g, since we
+do not read a bottle's volume). A combination from a cut-short brand record gets no verdict: its
+ceiling could belong to a smaller combination. When a medicine has several ceilings (pack sizes,
+two lists), the newer list and the highest price are used, so a price is never called too high
+by mistake.
+
+Why the date matters (found by testing on real prices): with a flat 5% margin, a correctly priced
+strip made in 2024 (ceiling + 12% GST) would have been called overpriced.
 
 **Banned combination.** An entry applies only if everything it names matches the medicine:
 

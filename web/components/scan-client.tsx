@@ -349,6 +349,11 @@ function Confirm({
     // For the fair-price check: the MRP and the count as confirmed ("₹122.98", "15").
     mrp: Number(values.mrp.replace(/[^\d.]/g, "")) || null,
     packSize: Number(values.packSize.replace(/[^\d]/g, "")) || null,
+    // "09/2025" on the confirm screen -> "2025-09": it decides the GST margin (12% before the
+    // 22.09.2025 cut, 5% after).
+    mfgDate: /^(\d{2})\/(\d{4})$/.test(values.mfgDate.trim())
+      ? values.mfgDate.trim().replace(/^(\d{2})\/(\d{4})$/, "$2-$1")
+      : null,
   };
 
   const [match, setMatch] = useState<
