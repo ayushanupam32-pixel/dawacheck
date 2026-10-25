@@ -1,8 +1,8 @@
 # DawaCheck
 
-Photograph a medicine strip and get six checks from public Indian government data: a cheaper
-Jan Aushadhi generic, batch safety alerts, fair price, banned combinations, duplicate
-ingredients in your family's medicines, and the nearest Jan Aushadhi Kendra.
+Photograph a medicine strip and get five checks from public Indian government data: a cheaper
+Jan Aushadhi generic, batch safety alerts, fair price, banned combinations, and the nearest Jan
+Aushadhi Kendra.
 
 > DawaCheck gives information from public government data. It is not medical advice. Always
 > consult your doctor or pharmacist before changing any medicine.
@@ -52,7 +52,7 @@ Other commands, all run from the repo root:
 ## Privacy
 
 Photos are read on the device and never uploaded. Your location never leaves the device.
-The family medicine cabinet is stored only in your browser. No analytics.
+No analytics.
 
 ## Cost
 

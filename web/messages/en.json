@@ -18,7 +18,6 @@
       "batch": "Batch safety alerts",
       "price": "Fair price (NPPA ceiling price)",
       "banned": "Banned combinations",
-      "duplicates": "Same ingredient in two family medicines",
       "kendra": "Nearest Jan Aushadhi Kendra"
     },
     "privacy": "Your photos and location stay on your phone.",
@@ -209,8 +208,6 @@
     "legal_under_examination": "Under examination by an expert committee",
     "legal_revoked_with_conditions": "Ban revoked; allowed with conditions",
     "legal_restricted": "Restricted: allowed only under conditions",
-    "cabinetTitle": "Duplicate medicines in your family",
-    "cabinetNotYet": "Coming soon: add medicines to a family cabinet to spot the same ingredient taken twice.",
     "kendraTitle": "Nearest Jan Aushadhi Kendra",
     "kendraLink": "Find the 3 nearest Kendras",
     "checkAgain": "Check again",

@@ -5,3 +5,4 @@ next-env.d.ts
 AGENTS.md
 public/data
 lib/ai/salt-rules.json
+tests/fixtures/banned-fdcs.json

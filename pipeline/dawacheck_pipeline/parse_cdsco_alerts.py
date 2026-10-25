@@ -22,7 +22,21 @@ from dawacheck_pipeline.normalize import clean_text
 from dawacheck_pipeline.paths import CLEAN_DIR, latest_raw_dir
 
 SOURCE_URL = "https://cdsco.gov.in/opencms/opencms/en/Notifications/nsq-drugs/"
-MISSING = {"", "na", "n/a", "nil", "-", "--", "not available", "not mentioned", "null"}
+# Placeholders CDSCO writes where there is no value. "Not applicable" appears as a batch number on
+# 22 alerts (devices, cosmetics); kept, it would look like a batch called NOTAPPLICABLE.
+MISSING = {
+    "",
+    "na",
+    "n/a",
+    "nil",
+    "-",
+    "--",
+    "not available",
+    "not mentioned",
+    "not applicable",
+    "not given",
+    "null",
+}
 
 COLUMNS = [
     "kind",  # "nsq" (failed a quality test) or "spurious" (fake)

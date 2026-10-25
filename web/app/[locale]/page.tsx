@@ -13,7 +13,6 @@ import {
   PiggyBank,
   Pill,
   ShieldAlert,
-  Users,
 } from "lucide-react";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { LargeTextToggle } from "@/components/large-text-toggle";
@@ -27,7 +26,6 @@ const checkIcons: Record<CheckKey, LucideIcon> = {
   batch: ShieldAlert,
   price: IndianRupee,
   banned: Ban,
-  duplicates: Users,
   kendra: MapPin,
 };
 

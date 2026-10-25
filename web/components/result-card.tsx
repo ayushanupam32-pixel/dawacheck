@@ -1,6 +1,7 @@
 "use client";
 
-// The result card (M5): six checks for one strip, each a row with an icon AND words for its
+// The result card (M5): five checks for one strip (the family-cabinet check of the brief's
+// M6 was dropped by the user), each a row with an icon AND words for its
 // status (never colour alone). The checks run on the server (/api/checks); this file only shows
 // them. Wording follows the medical-safety rules: "show this to your pharmacist", never
 // "stop taking" or "unsafe for you"; "not found in the lists we checked", never "safe".
@@ -225,10 +226,6 @@ export function ResultCard({
           {data.banned.status !== "unknown" && (
             <Source t={t} url={data.sources.fdc.url} note={updated(data.sources.fdc.updatedOn)} />
           )}
-        </Row>
-
-        <Row t={t} title={t.cabinetTitle} status="na">
-          <p>{t.cabinetNotYet}</p>
         </Row>
 
         <Row t={t} title={t.kendraTitle} status="na" hideStatus>

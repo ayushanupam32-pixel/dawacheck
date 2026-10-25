@@ -3,10 +3,12 @@ At the start of every session, read PROGRESS.md first.
 # DawaCheck
 
 A B.Tech CSE (AI & ML) class project by Ayush (GitHub `ayushanupam32-pixel`). A user photographs
-the front and back of an Indian medicine strip; the phone reads it and runs six checks from public
+the front and back of an Indian medicine strip; the phone reads it and runs five checks from public
 government data: cheaper Jan Aushadhi generic, batch safety (CDSCO alerts), fair price (NPPA),
-banned combinations, duplicate ingredients in the family cabinet, and the nearest Jan Aushadhi
-Kendra. The full brief is in `~/Downloads/DawaCheck Build Prompt.docx` (milestones M0–M7).
+banned combinations, and the nearest Jan Aushadhi Kendra. The full brief is in
+`~/Downloads/DawaCheck Build Prompt.docx` (milestones M0–M7). **The user dropped M6** (family
+cabinet, duplicate-ingredient check, expiry alerts, PWA install) on 2026-10-25: do not build it;
+after M5 comes M7.
 
 - Live: https://dawacheck-psi.vercel.app (`dawacheck.vercel.app` belongs to someone else)
 - Repo: https://github.com/ayushanupam32-pixel/dawacheck (public)
@@ -17,7 +19,7 @@ Kendra. The full brief is in `~/Downloads/DawaCheck Build Prompt.docx` (mileston
 - **Works with no AI API.** OCR runs in the browser (Tesseract.js). Any cloud vision fallback
   must sit behind `ENABLE_VISION_FALLBACK=false`.
 - **Privacy.** Photos and location never leave the device. Kendra distances are computed in the
-  browser from static files. The family cabinet stays in IndexedDB. No analytics.
+  browser from static files. No analytics.
 - **Medical safety.** Never say "stop taking", "switch" or "unsafe for you"; say "show this to your
   pharmacist or doctor". Every result shows the disclaimer. When unsure, abstain. A wrong generic
   is worse than no answer: generics are matched only on an identical composition key.

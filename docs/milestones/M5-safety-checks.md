@@ -1,8 +1,9 @@
 # M5 — Safety checks
 
-**Goal:** after a scan, a result card with six checks: cheaper generic, batch safety (CDSCO
-alerts), fair price (NPPA ceiling price), banned combination (CDSCO lists), duplicates in the
-family cabinet, nearest Jan Aushadhi Kendra.
+**Goal:** after a scan, a result card with the checks: cheaper generic, batch safety (CDSCO
+alerts), fair price (NPPA ceiling price), banned combination (CDSCO lists), nearest Jan Aushadhi
+Kendra. (The brief's sixth check, duplicates in a family cabinet, belonged to M6, which the user
+dropped on 2026-10-25; the card has five rows.)
 
 **Done when:** all check test cases pass; the monthly GitHub Action runs successfully.
 
@@ -14,7 +15,6 @@ result card, the pipeline for both sources. Waiting:
 - **Loading the data:** only the GitHub Action has the database's secret key, so the alerts and
   banned lists are loaded by `data-refresh.yml` after this work is committed. Until then the card
   says "Couldn't check: this government list is not loaded yet" (never "nothing found").
-- Duplicates in the family cabinet arrive with M6.
 
 ## Sources (inspected first; decisions agreed with the user)
 
@@ -113,6 +113,16 @@ with new row ids. The check stayed switched off until the loader was fixed: rows
 with the run's start time and everything older is removed, and the ±20% safety check compares
 with what the previous run loaded rather than with the table's row count.
 
+## Accuracy (the brief's targets)
+
+From `eval/m5-checks.md`:
+
+- **Banned combination, 20 banned + 20 legal medicines** (target 100%): **40 / 40** correct
+  (`web/tests/banned-cases.test.ts`, runs in CI).
+- **Batch alerts vs CDSCO's own monthly PDFs** (target ≥ 98%): **170 / 172** batches of the
+  April–June 2025 CDSCO-lab PDFs are in our data (98.8%). The 2 misses are missing from CDSCO's
+  online table itself. The online table holds more alerts than the PDFs (they are partial lists).
+
 ## Key decisions, in plain words
 
 **"Couldn't check" is not "nothing found".** If a list is not loaded, or the batch number is
@@ -148,7 +158,7 @@ brand's when the strip lists fewer (the reader missed one).
 
 1. `pnpm test` (checks: `web/tests/checks.test.ts`), `cd pipeline && uv run pytest -q`.
 2. `pnpm dev` → /en/scan → Try a demo strip → change the name to `Telma 40` → Find. The card
-   shows six rows. Before the data is loaded, batch and banned say "Couldn't check".
+   shows five rows. Before the data is loaded, batch and banned say "Couldn't check".
 3. After the data refresh: type batch `60098` and name `Alzomac 0.5`, ingredient
    `Alprazolam 0.5 mg`: the batch row shows the September 2026 NSQ alert.
 

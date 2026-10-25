@@ -63,6 +63,8 @@ def test_parse_month(raw: str, expected: str) -> None:
 def test_placeholders_become_empty() -> None:
     assert text("NA") == ""
     assert text(" n/a ") == ""
+    assert text("Not applicable") == ""
+    assert text("Not Given") == ""
     assert text(None) == ""
     assert text("Alzomac-0.5 Tablets") == "Alzomac-0.5 Tablets"
 

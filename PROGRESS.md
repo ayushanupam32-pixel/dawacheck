@@ -17,7 +17,7 @@ database migrations, already applied to Supabase. Next: M5 (safety checks).
 | M3 Reading strips                                           | done        | `2b6b700`, `317324e`, `db927f1`                                  | in-browser OCR, confirm screen, evaluation                           |
 | M4 Matching OCR → medicine                                  | done        |                                                                  | re-ranker + choice model + safety rules; top-1 89% dev / 86% test    |
 | M5 Safety checks (NSQ, NPPA, banned FDC, 6-row result card) | not started |                                                                  |                                                                      |
-| M6 Family cabinet + PWA                                     | not started |                                                                  |                                                                      |
+| M6 Family cabinet + PWA                                     | dropped     |                                                                  |                                                                      |
 | M7 Evaluation + polish                                      | not started |                                                                  |                                                                      |
 
 Viva notes for each finished milestone: `docs/milestones/M0-setup.md` … `M4-matching.md`.
@@ -103,8 +103,8 @@ corrections): 1/5 matched, 0 wrong: the M3 reader rarely reads the brand name.
 - **"How we read this" panel** shows which image variant produced each field, but not the OCR
   bounding boxes the brief asks for.
 - **Hindi and Tamil translations** were written by Claude and need review by a native speaker.
-- **Tesseract model is downloaded from the CDN** at first use. Self-hosting it (for offline use /
-  PWA) is planned for M6.
+- **Tesseract model is downloaded from the CDN** at first use (M6, which would have self-hosted
+  it for offline use, was dropped).
 
 ## Known bugs and limits
 
@@ -252,8 +252,13 @@ See `docs/milestones/M5-safety-checks.md`.
   Acemiz-MR "may apply" from its record, "not listed" with its 3 strip ingredients; Faconex Plus
   (diclofenac + paracetamol injection) and Fena syrup (aceclofenac 50 + paracetamol 125) "may
   apply"; Enselin 2 (rosiglitazone) "prohibited".
+- **2026-10-25:** M6 dropped by the user: family-cabinet row removed from the result card and
+  the home page (five checks now). Accuracy checks done (`eval/m5-checks.md`): banned 40/40,
+  NSQ vs CDSCO PDFs 170/172 (98.8%). Placeholder batch numbers ("Not applicable", "Not given")
+  now count as no batch (6,921 usable alerts). The NPPA dashboard was inspected: it uses rotating
+  CSRF tokens and request encryption, so it is NOT scripted; the user exports the Excel by hand.
 - **Waiting on the user:** the NPPA "Compendium of Prices 2026" Excel in
-  `pipeline/raw/nppa/<date>/` (not found on 2026-10-24).
+  `pipeline/raw/nppa/<date>/` (not there as of 2026-10-25).
 - `web/.prettierignore` exists because Prettier only reads the ignore file of the folder it runs
   in; `web/lib/ai/salt-rules.json` must never be reformatted (a pytest checks it).
 
@@ -276,6 +281,6 @@ See `docs/milestones/M5-safety-checks.md`.
    close-up), copies them into `eval/photos/`, labels them at `/en/eval/label` (including the
    new "match brand": the exact brand name in the database, or empty if not in it).
 6. **Spot-check `eval/labels.json`** (human) before any numbers go into the report.
-7. Then M6 (cabinet + PWA), M7 (evaluation, About page, accessibility, final
+7. Then M7 (M6 was dropped by the user on 2026-10-25): evaluation, About page, accessibility, final
    `pnpm eval -- --final` and `pnpm eval:match -- --final`), and the deliverables (README GIF,
    architecture diagram, report, slides, viva Q&A).
