@@ -106,6 +106,26 @@ section of `eval/match-results.md`; the About page shows them (`readerFinal`).
   pre-filled, but its automatic match still succeeds through the brand guesses (their first real
   win). All 19 Playwright tests pass.
 
+## Demo strips (after the final run)
+
+`demo/` holds 18 generated strips (front, back, zoomed stamp) by feature: 10 everyday medicines,
+4 expensive ones (two above the NPPA ceiling), 2 real CDSCO alert batches, 2 banned medicines.
+Values come from real records (`demo/strips.json`). `web/scripts/verify-demo-strips.ts` puts
+each through the website's upload flow and checks the match and every result row: **18/18**.
+
+Building them found two things:
+
+- **A real extraction bug, fixed:** a salt printed over two lines ("Amlodipine Besilate IP" /
+  "eq. to Amlodipine 5 mg", the usual Indian format) was read as the salt "To Amlodipine", so
+  the matcher found nothing and abstained. The salt line is now joined with an "eq. to /
+  equivalent to" line, and "to / eq / equivalent / anhydrous" are dropped from salt names (5 new
+  unit tests). No change on the dev photos (none has that layout readable); the test set is not
+  re-run.
+- **A matcher weakness, noted (not fixed):** "CETZINE 10" matched another company's "Cetzin
+  10mg" at 93%, because GSK's Cetzine 10 is not in the 2022 dataset and the names look alike.
+  The confirm screen shows the maker, but the matcher has no way to know a brand is missing.
+  "Azithral 500" also abstains because of a look-alike sibling ("Azithral 5D"): correct caution.
+
 ## How to test it
 
 - `pnpm build && pnpm test:e2e` (needs `web/.env.local`): 19 tests, ~15 s.

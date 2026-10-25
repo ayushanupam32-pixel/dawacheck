@@ -91,6 +91,9 @@ dawacheck/
 │   └── tests/
 ├── supabase/migrations/          SQL schema (applied through the Supabase connector)
 ├── eval/                         labels.json, photo-sources.json, results.md; photos/ is git-ignored
+├── demo/                         18 demo strips (front/back/stamp) by feature; strips.json is the
+│                                 source of truth; make_strips.py draws them; VERIFIED.md from
+│                                 web/scripts/verify-demo-strips.ts
 ├── docs/                         milestones/ (viva notes M0–M7), architecture, demo.gif, report
 │                                 outline, slides, demo script, viva Q&A, sus/ (usability kit)
 └── .github/workflows/            ci.yml, data-refresh.yml

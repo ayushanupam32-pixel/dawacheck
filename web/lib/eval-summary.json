@@ -206,8 +206,8 @@
         "baseWrong": 0
       }
     ],
-    "medianMs": 7141,
-    "p95Ms": 10766
+    "medianMs": 7372,
+    "p95Ms": 10852
   },
   "readerFinal": {
     "generated": "2026-10-25",

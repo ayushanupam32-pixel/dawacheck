@@ -381,6 +381,21 @@ shows the test-set reading table).
 - README, report outline, slides, viva Q&A (new Q19) and M7 notes updated; phone-speed
   placeholders are now **[PHONE]**.
 
+### Demo strips (2026-10-25)
+
+- `demo/`: 18 strips, each `front.jpg`, `back.jpg`, `stamp.jpg`, by feature: `1-everyday` (10),
+  `2-expensive` (4: Montair 10 and Storvas 10 above the ceiling; Rosuvas 10, Galvus 50 big
+  savings), `3-batch-alert` (Omee 25281124, Taxim-O 200 25460922: real CDSCO alerts),
+  `4-banned` (Enselin 2: prohibited, red; Cefolac-AZ: may apply, amber; both dated before their
+  bans). Values from the brand dataset / CDSCO alerts (`demo/strips.json`), DM batches checked
+  absent from alerts. `demo/README.md` = how to use and what to say. **18/18 verified** through
+  the upload flow (`web/scripts/verify-demo-strips.ts` → `demo/VERIFIED.md`).
+- **Bug fixed:** two-line "eq. to" salts were read as "To Amlodipine" (`extractIngredients` now
+  joins them). Dev eval unchanged; 406 unit + 19 Playwright tests pass.
+- **Matcher weakness noted:** "CETZINE 10" → another maker's "Cetzin 10mg" (93%) because GSK
+  Cetzine 10 isn't in the 2022 dataset. Not fixed; say it in the viva as a limitation.
+- Re-run the verifier before the viva (alerts and prices are live data).
+
 ## Exact next steps
 
 1. **Time the live demo on a phone** ("How we read this" shows the seconds) → fill **[PHONE]**.

@@ -265,7 +265,7 @@ const INGREDIENT_RE = new RegExp(
 const NOT_ACTIVE =
   /\b(colou?rs?|excipients?|q\.?\s*s|flavou?r|preservative|base|sugar|approved|lake)\b/i;
 const NAME_NOISE =
-  /\b(each|film|coated|uncoated|sugar|enteric|tablet|tablets|capsule|capsules|hard|soft|gelatin|contains?|ml|of|the|and|with|in|form|as|sustained|extended|prolonged|release|delayed|gastro|resistant|dispersible|chewable|oral|suspension|syrup|tablet\s+contains)\b/gi;
+  /\b(each|film|coated|uncoated|sugar|enteric|tablet|tablets|capsule|capsules|hard|soft|gelatin|contains?|ml|of|the|and|with|in|form|as|sustained|extended|prolonged|release|delayed|gastro|resistant|dispersible|chewable|oral|suspension|syrup|tablet\s+contains|eq|equiv|equivalent|to|anhydrous)\b/gi;
 
 function cleanSaltName(raw: string): string {
   return raw
@@ -278,6 +278,8 @@ function cleanSaltName(raw: string): string {
 }
 
 const STARTS_WITH_STRENGTH = new RegExp(`^\\s*${STRENGTH}`, "i");
+// "eq. to Amlodipine 5 mg", "Equivalent to ...": the second line of a salt written over two lines.
+const STARTS_WITH_EQUIVALENT = /^\s*eq(?:uivalent|uiv|v)?\.?\s*to\b/i;
 
 /**
  * "Each film coated tablet contains: Metformin Hydrochloride IP 500 mg, Glimepiride IP 1 mg"
@@ -291,7 +293,10 @@ export function extractIngredients(text: string): Field<Ingredient[]> {
   const found: Ingredient[] = [];
 
   // "Metformin\n500mg Tablets": a name on one line and its strength at the start of the next.
-  // Join such pairs first, so the name and its strength are read together.
+  // "Amlodipine Besilate IP\neq. to Amlodipine 5 mg": the salt, then its strength as the base
+  // drug (the usual way Indian strips print a salt). Join such pairs first, so the name and its
+  // strength are read together. (Found with the demo strips: read alone, the second line gave
+  // the salt "To Amlodipine", which matches nothing.)
   const lines = block.split(/\n|;/);
   const joined: string[] = [];
   for (const line of lines) {
@@ -300,7 +305,7 @@ export function extractIngredients(text: string): Field<Ingredient[]> {
       previous !== undefined &&
       !/\d/.test(previous) &&
       /[A-Za-z]{4}/.test(previous) &&
-      STARTS_WITH_STRENGTH.test(line)
+      (STARTS_WITH_STRENGTH.test(line) || STARTS_WITH_EQUIVALENT.test(line))
     ) {
       joined[joined.length - 1] = `${previous} ${line}`;
     } else {

@@ -25,7 +25,8 @@ project.
 
 Three ways in: **scan** (front, back and an optional close-up of the batch stamp), **type** a
 brand name, or **Demo mode** (two sample strips, so a demo never depends on the light in the
-room). Accessible (Lighthouse accessibility 100, large-text switch, 48 px tap targets, never
+room). For a full demo, [demo/](demo) has 18 ready-made strips (front, back, stamp) covering
+every feature, each verified on the live site. Accessible (Lighthouse accessibility 100, large-text switch, 48 px tap targets, never
 colour alone) and in three languages.
 
 ## How it works
@@ -148,6 +149,7 @@ web/        Next.js 16 app: app/[locale]/ pages, app/api/ (match, checks), lib/a
 pipeline/   Python data pipeline: fetch, parse, normalize, validate, load; raw/ snapshots
 supabase/   SQL migrations (tables, search function, Row Level Security)
 eval/       Labels, evaluation results, demo-image generators
+demo/       18 demo strips by feature (everyday, expensive, batch alert, banned), verified
 docs/       Architecture, milestone notes (M0–M7), report, slides, demo script, viva Q&A
 ```
 

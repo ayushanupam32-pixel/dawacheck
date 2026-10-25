@@ -215,3 +215,19 @@ describe("wrong MRPs seen on real photos", () => {
     expect(extractMrp(cleanOcrText("ia 62 UIE Rs. Sm Ln An"))).toBeNull();
   });
 });
+
+describe("extractIngredients: a salt written over two lines with 'eq. to'", () => {
+  // Found with the demo strips: the second line was read alone and gave the salt "To Amlodipine".
+  it.each([
+    ["Amlodipine Besilate IP\neq. to Amlodipine 5 mg", "Amlodipine Besilate", 5],
+    ["Montelukast Sodium IP\neq. to Montelukast 10 mg", "Montelukast Sodium", 10],
+    ["Cefixime IP\neq. to anhydrous Cefixime 200 mg", "Cefixime", 200],
+    ["Atorvastatin Calcium IP\nEquivalent to Atorvastatin 10 mg", "Atorvastatin Calcium", 10],
+    ["eq. to Amlodipine 5 mg", "Amlodipine", 5],
+  ])("%j", (lines, salt, value) => {
+    const result = extractIngredients(
+      `Each film coated tablet contains:\n${lines}\nExcipients q.s.`,
+    );
+    expect(result?.value).toEqual([{ salt, value, unit: "mg" }]);
+  });
+});
