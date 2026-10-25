@@ -19,9 +19,13 @@ from real CDSCO alerts. Batch numbers starting with **DM** are demo numbers in n
 3. **Choose from gallery** → `front.jpg` → **Next** → `back.jpg` → **Next** → `stamp.jpg` →
    **Next**. Reading takes a few seconds.
 4. On "Check what we read", point at the fields, then **Find a cheaper generic**.
+   On Azee 500 and Galvus 50 the name may show a stray "|" in front ("| AZEE 500"): an OCR
+   artefact from the card's edge; matching still works, or delete it on screen.
 5. Scroll: the match ("This looks like…", with how sure it is), the five checks, and the saving.
 
 Before the demo, open the site once on that phone so the reading model is downloaded and cached.
+If a step ever stalls (we saw about one stall in 18 strips on a home connection, and the same
+strip worked when tried again), reload the page and choose the photos again.
 
 ## What each folder shows
 
