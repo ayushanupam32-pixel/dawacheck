@@ -1,5 +1,5 @@
 // Plain-JavaScript image operations for the evaluation script (scripts/eval.ts), which runs in
-// Node where there is no <canvas>. In the browser, lib/ai/ocr.ts uses canvas for the same steps.
+// Node where there is no <canvas>. In the browser, lib/ai/prepare.ts uses canvas for the same steps.
 // RGBA pixel arrays: 4 bytes per pixel, row by row.
 
 export type Rgba = { data: Uint8ClampedArray; width: number; height: number };

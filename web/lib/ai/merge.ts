@@ -5,7 +5,7 @@
 //     score = pattern confidence (from extract.ts) × OCR confidence of the text it came from
 // and keep the highest-scoring value per field. Pure function: tested in tests/merge.test.ts.
 
-import { extractFields, type ExtractedFields, type OcrLine } from "./extract";
+import { extractFields, plausibleBrand, type ExtractedFields, type OcrLine } from "./extract";
 
 export type OcrReading = {
   variant: string;
@@ -74,4 +74,41 @@ export function mergeReadings(front: OcrReading[], back: OcrReading[]): MergedRe
 /** True when every key field was read with at least GOOD_ENOUGH confidence. */
 export function isGoodEnough(fields: ExtractedFields): boolean {
   return KEY_FIELDS.every((key) => (fields[key]?.confidence ?? 0) >= GOOD_ENOUGH);
+}
+
+/** How many name guesses the matcher may try (each costs one or two database searches). */
+export const MAX_GUESSES = 3;
+/**
+ * Lowest OCR confidence (0–100) of a line used as a guess. Lower than the bar for SHOWING a name
+ * (extract.ts BRAND_MIN_OCR = 60) because a guess is never shown as read: it counts only if the
+ * matcher confirms it against the database. Tesseract gives short capitalised names little
+ * confidence even when it reads them right ("OMEE": 40%).
+ */
+export const GUESS_MIN_OCR = 30;
+
+/**
+ * Brand guesses for the matcher: the tallest plausible lines on the front, from every image
+ * variant, tallest first, without repeats. The brand is usually the biggest print, but on real
+ * photos the single tallest line is often a slogan or a mangled reading, and its confidence is
+ * too low to show (MIN_SHOW, BRAND_MIN_OCR). The matcher then "confirms" a guess against the brand database
+ * (lib/find-match.ts, matchGuesses): a guess counts only if it matches one brand confidently and
+ * nothing on the strip contradicts it. Height is compared within each reading, as a share of its
+ * tallest line, because the variants of a photo can differ in size (a quarter turn).
+ */
+export function brandGuesses(front: OcrReading[], max = MAX_GUESSES): string[] {
+  const lines = front.flatMap((reading) => {
+    const tallest = Math.max(1, ...reading.lines.map((l) => l.height));
+    return reading.lines
+      .filter((l) => l.confidence >= GUESS_MIN_OCR && plausibleBrand(l.text))
+      .map((l) => ({ text: l.text.trim(), size: l.height / tallest }));
+  });
+  const seen = new Set<string>();
+  return lines
+    .sort((a, b) => b.size - a.size)
+    .map((l) => l.text)
+    .filter((text) => {
+      const key = text.toUpperCase().replace(/[^A-Z0-9]/g, "");
+      return !seen.has(key) && seen.add(key);
+    })
+    .slice(0, max);
 }

@@ -63,7 +63,8 @@ dawacheck/
 │   ├── app/api/match/            GET: brand search, generic lookup; POST: scan matching (M4)
 │   ├── app/api/eval/             labeling-tool backend (dev only)
 │   ├── components/               client components (*-client.tsx, kendra-*, label-tool)
-│   ├── lib/ai/                   AI core: preprocess, ocr, reader, merge, extract, image, score,
+│   ├── lib/ai/                   AI core: preprocess, prepare (+ prepare.worker), ocr, reader,
+│   │                             merge, extract, image, score,
 │   │                             normalize + rerank (M4 matcher), salt-rules.json (GENERATED),
 │   │                             match-weights.json (written by `pnpm eval:match --fit`)
 │   ├── lib/geo/                  geohash, nearest Kendras (Haversine)
@@ -72,9 +73,9 @@ dawacheck/
 │   ├── lib/{match,find-match,run-checks,savings,supabase}.ts
 │   ├── messages/                 en.json, hi.json, ta.json (same keys; a test enforces it)
 │   ├── public/data/              GENERATED Kendra/PIN files (pipeline/build_static.py)
-│   ├── public/demo/              generated DEMO strip images for Demo mode
+│   ├── public/demo/              generated DEMO strips (telmikind, omee) for Demo mode
 │   ├── scripts/                  eval.ts (`pnpm eval`), eval-match.ts (`pnpm eval:match`),
-│   │                             ocr-experiment.ts
+│   │                             ocr-experiment.ts, speed-experiment.ts
 │   ├── tests/                    Vitest tests; tests/fixtures/ocr-snippets.ts
 │   └── proxy.ts                  redirects / to the browser's language
 ├── pipeline/                     Python data pipeline

@@ -1,5 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { matchStrip, parseMatchInput, toCandidate, type BrandRow } from "@/lib/find-match";
+import {
+  matchGuesses,
+  parseGuesses,
+  parseMatchInput,
+  toCandidate,
+  type BrandRow,
+} from "@/lib/find-match";
 import {
   MIN_SEARCH_SCORE,
   type Generic,
@@ -104,26 +110,29 @@ async function genericFor(brandId: number) {
 }
 
 /**
- * POST /api/match  body: what the scan read and the user confirmed (lib/ai/rerank.ts MatchInput)
+ * POST /api/match  body: what the scan read and the user confirmed (lib/ai/rerank.ts MatchInput),
+ *                  plus `brandGuesses` (other name guesses from the photo, used only when the
+ *                  user left the name as read)
  *               -> the matched brand, or "abstain" with up to 3 options to pick from
  *
  * POST, not GET, so the medicine details are not written into URLs (and server logs).
  * Nothing is stored or logged.
  */
 export async function POST(request: NextRequest) {
-  const input = parseMatchInput(await request.json().catch(() => null));
+  const body = await request.json().catch(() => null);
+  const input = parseMatchInput(body);
   if (!input) return NextResponse.json({ error: "Invalid request" }, { status: 400 });
 
   let decision;
   try {
-    decision = await matchStrip(supabase(), input);
+    decision = await matchGuesses(supabase(), input, parseGuesses(body));
   } catch {
     return NextResponse.json({ error: "Match failed" }, { status: 502 });
   }
   const options = decision.ranked
     .slice(0, 3)
     .map((r) => ({ brand: r.candidate, probability: r.probability, features: r.features }));
-  const body: ScanMatchResponse =
+  const response: ScanMatchResponse =
     decision.status === "match"
       ? {
           status: "match",
@@ -132,5 +141,5 @@ export async function POST(request: NextRequest) {
           options,
         }
       : { status: "abstain", reason: decision.reason, confidence: decision.confidence, options };
-  return NextResponse.json(body);
+  return NextResponse.json(response);
 }

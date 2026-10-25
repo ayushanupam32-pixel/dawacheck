@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isGoodEnough, mergeReadings, type OcrReading } from "@/lib/ai/merge";
+import { brandGuesses, isGoodEnough, mergeReadings, type OcrReading } from "@/lib/ai/merge";
 
 const reading = (variant: string, text: string, confidence: number): OcrReading => ({
   variant,
@@ -83,5 +83,36 @@ describe("hiding low-confidence free text", () => {
     const { fields } = mergeReadings([blurry], [blurry]);
     expect(fields.brand).toBeNull();
     expect(fields.batchNo?.value).toBe("GT2304");
+  });
+});
+
+describe("brandGuesses", () => {
+  const line = (text: string, height: number, confidence = 90) => ({ text, height, confidence });
+  it("lists plausible lines tallest first, from all variants, without repeats", () => {
+    const binary: OcrReading = {
+      variant: "binary",
+      text: "",
+      confidence: 70,
+      lines: [
+        line("Each tablet contains:", 20), // a label, never a brand
+        line("FINCOVER-1", 60),
+        line("Finasteride Tablets USP 1 mg", 25), // has "tablets": not a brand
+        line("Favipill Ema", 70, 20), // tall but the OCR was very unsure: noise
+        line("Cipla Healthcare", 30),
+      ],
+    };
+    // Another variant of the same photo, read at a different size.
+    const ink: OcrReading = {
+      variant: "ink",
+      text: "",
+      confidence: 60,
+      lines: [line("Fincover 1", 120), line("FINCOVER-1", 110), line("Protect hair", 30)],
+    };
+    // "FINCOVER-1" is the same name as "Fincover 1" once case and punctuation are ignored.
+    expect(brandGuesses([binary, ink])).toEqual(["Fincover 1", "Cipla Healthcare", "Protect hair"]);
+  });
+
+  it("returns nothing when no line looks like a name", () => {
+    expect(brandGuesses([reading("binary", "|| — 12", 40)])).toEqual([]);
   });
 });

@@ -373,7 +373,7 @@ export function extractManufacturer(text: string): Field<string> {
   return null;
 }
 
-const BRAND_MIN_OCR = 60;
+export const BRAND_MIN_OCR = 60;
 
 const NOT_BRAND =
   /\b(each|contains|tablets?|capsules?|ip|bp|usp|mrp|batch|exp|mfg|rx|schedule|warning|store|keep|dosage|manufactured|marketed|composition|only|prescription|drug)\b/i;
@@ -383,18 +383,22 @@ const NOT_BRAND =
  * the tallest plausible line; without them, the first plausible line. Matching (Stage 4)
  * confirms or rejects it against the brand database.
  */
+/**
+ * Could this line be a brand name? Real OCR of busy photos produces lines like
+ * "pe fav TRE ER Ema" or "— | DEMO". A brand has a word of 4+ letters with a vowel, is mostly
+ * letters and digits, and is not a label word ("Each tablet contains", "Batch").
+ */
+export function plausibleBrand(s: string): boolean {
+  const t = s.trim();
+  const wordy = /\b[A-Za-z]*[AEIOUaeiou][A-Za-z]*\b/.test(t) && /[A-Za-z]{4}/.test(t);
+  const clean = t.replace(/[^A-Za-z0-9]/g, "").length / Math.max(1, t.replace(/\s/g, "").length);
+  return t.length >= 3 && t.length <= 40 && wordy && clean >= 0.8 && !NOT_BRAND.test(t);
+}
+
 export function extractBrand(text: string, lines?: OcrLine[]): Field<string> {
-  const plausible = (s: string) => {
-    const t = s.trim();
-    // Real OCR of busy photos produces lines like "pe fav TRE ER Ema" or "— | DEMO". A brand
-    // has a word of 4+ letters with a vowel, and is mostly letters and digits.
-    const wordy = /\b[A-Za-z]*[AEIOUaeiou][A-Za-z]*\b/.test(t) && /[A-Za-z]{4}/.test(t);
-    const clean = t.replace(/[^A-Za-z0-9]/g, "").length / Math.max(1, t.replace(/\s/g, "").length);
-    return t.length >= 3 && t.length <= 40 && wordy && clean >= 0.8 && !NOT_BRAND.test(t);
-  };
   if (lines?.length) {
     // Lines the OCR itself was unsure about are noise more often than not.
-    const candidates = lines.filter((l) => l.confidence >= BRAND_MIN_OCR && plausible(l.text));
+    const candidates = lines.filter((l) => l.confidence >= BRAND_MIN_OCR && plausibleBrand(l.text));
     if (candidates.length) {
       const tallest = candidates.reduce((a, b) => (b.height > a.height ? b : a));
       const ratio = tallest.height / Math.max(...lines.map((l) => l.height));
@@ -404,7 +408,7 @@ export function extractBrand(text: string, lines?: OcrLine[]): Field<string> {
       };
     }
   }
-  const first = text.split("\n").find(plausible);
+  const first = text.split("\n").find(plausibleBrand);
   return first ? { value: first.trim(), confidence: 0.4 } : null;
 }
 

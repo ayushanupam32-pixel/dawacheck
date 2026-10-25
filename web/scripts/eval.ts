@@ -13,7 +13,7 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import jpeg from "jpeg-js";
 import { PNG } from "pngjs";
-import { createWorker } from "tesseract.js";
+import { createScheduler, createWorker } from "tesseract.js";
 import {
   applyOrientation,
   jpegOrientation,
@@ -22,9 +22,11 @@ import {
   type Rgba,
 } from "../lib/ai/image";
 import { estimateSkew, makeVariants, targetSize, type Variant } from "../lib/ai/preprocess";
+import { brandGuesses } from "../lib/ai/merge";
 import { pageToReading, readProgressively } from "../lib/ai/reader";
-import { buildMatchInput, nameIdentity } from "../lib/ai/rerank";
-import { matchStrip } from "../lib/find-match";
+import { buildMatchInput, nameIdentity, type Decision } from "../lib/ai/rerank";
+import { matchGuesses } from "../lib/find-match";
+import type { BrandCandidate } from "../lib/match";
 import { createClient } from "@supabase/supabase-js";
 import {
   addScores,
@@ -61,7 +63,7 @@ function decode(path: string): Rgba {
   return applyOrientation(rgba, jpegOrientation(bytes));
 }
 
-/** Same steps as prepare() in lib/ai/ocr.ts, without a canvas. */
+/** Same steps as preparePhoto() in lib/ai/prepare.ts, without a canvas. */
 function prepareFull(photo: Rgba): Variant[] {
   const { width, height } = targetSize(photo.width, photo.height);
   let rgba = resizeRgba(photo, width, height);
@@ -97,7 +99,9 @@ type Row = {
   /** OCR confidence of each reading, to spot photos the OCR could hardly read at all. */
   ocr: string[];
   /** Photo -> medicine with no corrections by the user (M4), if the label says what to expect. */
-  match?: { got: string; outcome: "right" | "wrong" | "abstained" };
+  match?: { got: string; outcome: "right" | "wrong" | "abstained"; guesses?: string[] };
+  /** The same, matching only the one name the reader picked (no other brand guesses). */
+  matchSingle?: Row["match"];
 };
 
 async function main() {
@@ -106,9 +110,15 @@ async function main() {
   const labels = all.filter((l) => (final ? l.split === "test" : l.split !== "test"));
   if (!labels.length) throw new Error(`No ${final ? "test" : "dev/demo"} labels in ${labelsPath}`);
 
-  const worker = await createWorker("eng", 1, { cachePath: join(EVAL_DIR, ".cache") });
+  // Two Tesseract workers, like the app on a phone with 4+ cores (lib/ai/ocr.ts), so the timing
+  // below describes the app. The baseline reads one photo at a time anyway.
+  const worker = createScheduler();
+  for (let i = 0; i < 2; i++) {
+    worker.addWorker(await createWorker("eng", 1, { cachePath: join(EVAL_DIR, ".cache") }));
+  }
   const recognize = async (variant: Variant) => {
-    const { data } = await worker.recognize(
+    const { data } = await worker.addJob(
+      "recognize",
       toPng(variant.gray, variant.width, variant.height),
       {},
       { text: true, blocks: true },
@@ -133,7 +143,15 @@ async function main() {
     );
     const ms = performance.now() - started;
     const recognizeRaw = (path: string) => async () => {
-      const { data } = await worker.recognize(readFileSync(path), {}, { text: true, blocks: true });
+      const { data } = await worker.addJob(
+        "recognize",
+        readFileSync(path),
+        {},
+        {
+          text: true,
+          blocks: true,
+        },
+      );
       return pageToReading("raw", data);
     };
     const base = await readProgressively(
@@ -150,18 +168,17 @@ async function main() {
     );
     const row: Row = { label, full: emptyScores(), base: emptyScores(), ms, read, ocr };
     if (db && label.matchBrand !== undefined) {
-      // Exactly what the app sends when the user taps "Find" without correcting anything.
-      const d = await matchStrip(
-        db,
-        buildMatchInput({
-          brand: full.fields.brand?.value ?? "",
-          ingredients: full.fields.ingredients?.value ?? [],
-          form: full.fields.form?.value ?? null,
-          manufacturer: full.fields.manufacturer?.value ?? null,
-          ocrText: [...full.front, ...full.back].map((r) => r.text).join("\n"),
-        }),
-      );
-      row.match =
+      // Exactly what the app sends when the user taps "Find" without correcting anything: the
+      // name as read plus the other brand guesses (components/scan-client.tsx). Ablation: the
+      // same without the guesses (only the one name the reader picked, as before M7).
+      const input = buildMatchInput({
+        brand: full.fields.brand?.value ?? "",
+        ingredients: full.fields.ingredients?.value ?? [],
+        form: full.fields.form?.value ?? null,
+        manufacturer: full.fields.manufacturer?.value ?? null,
+        ocrText: [...full.front, ...full.back].map((r) => r.text).join("\n"),
+      });
+      const outcome = (d: Decision<BrandCandidate>): Row["match"] =>
         d.status === "match"
           ? {
               got: d.best.candidate.name,
@@ -172,6 +189,9 @@ async function main() {
                   : "wrong",
             }
           : { got: `abstain (${d.reason})`, outcome: "abstained" };
+      const guesses = brandGuesses(full.front);
+      row.match = { ...outcome(await matchGuesses(db, input, guesses))!, guesses };
+      row.matchSingle = outcome(await matchGuesses(db, input));
     }
     addScores(row.full, full.fields, label);
     addScores(row.base, base.fields, label);
@@ -188,12 +208,14 @@ function matchSection(rows: Row[]): string[] {
   const matched = rows.filter((r) => r.match);
   if (!matched.length)
     return ["", "## Photo → medicine", "", "Skipped: no database key or no `matchBrand` labels."];
-  const count = (outcome: string, inDataset?: boolean) =>
+  const count = (pick: (r: Row) => Row["match"], outcome: string, inDataset?: boolean) =>
     matched.filter(
       (r) =>
-        r.match!.outcome === outcome &&
+        pick(r)!.outcome === outcome &&
         (inDataset === undefined || Boolean(r.label.matchBrand) === inDataset),
     ).length;
+  const summary = (pick: (r: Row) => Row["match"]) =>
+    `Right: ${count(pick, "right")} · Wrong: ${count(pick, "wrong")} · Abstained: ${count(pick, "abstained", true)} in dataset, ${count(pick, "abstained", false)} not in dataset`;
   const inDataset = matched.filter((r) => r.label.matchBrand).length;
   return [
     ``,
@@ -204,13 +226,15 @@ function matchSection(rows: Row[]): string[] {
     `others, abstaining is the right answer. In the app the user can fix the name first, which`,
     `\`pnpm eval:match\` measures.`,
     ``,
-    `Right: ${count("right")} · Wrong: ${count("wrong")} · Abstained: ${count("abstained", true)} in dataset, ${count("abstained", false)} not in dataset`,
+    `- With brand guesses (the tallest plausible lines on the front, confirmed by matching):`,
+    `  ${summary((r) => r.match)}`,
+    `- Ablation, only the one name the reader picked: ${summary((r) => r.matchSingle)}`,
     ``,
-    `| Photo | Expected | DawaCheck | |`,
-    `| --- | --- | --- | --- |`,
+    `| Photo | Expected | DawaCheck | | Without guesses | Guesses tried |`,
+    `| --- | --- | --- | --- | --- | --- |`,
     ...matched.map(
       (r) =>
-        `| ${r.label.id} | ${r.label.matchBrand ?? "(abstain: not in dataset)"} | ${r.match!.got} | ${r.match!.outcome === "wrong" ? "**wrong**" : r.match!.outcome} |`,
+        `| ${r.label.id} | ${r.label.matchBrand ?? "(abstain: not in dataset)"} | ${r.match!.got} | ${r.match!.outcome === "wrong" ? "**wrong**" : r.match!.outcome} | ${r.matchSingle!.outcome === "wrong" ? "**wrong**" : r.matchSingle!.outcome} | ${(r.match!.guesses ?? []).join(" / ").replace(/\|/g, "\\|")} |`,
     ),
   ];
 }
@@ -295,6 +319,7 @@ function writeReport(rows: Row[]) {
         ocr: r.ocr,
         read: r.read,
         match: r.match,
+        matchSingle: r.matchSingle,
         full: r.full,
         base: r.base,
       })),

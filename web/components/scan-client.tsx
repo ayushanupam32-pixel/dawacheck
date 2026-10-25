@@ -8,7 +8,7 @@ import { ResultCard, type ResultCardInput } from "@/components/result-card";
 import { Button, buttonVariants } from "@/components/ui/button";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { extractIngredients, type ExtractedFields, type Ingredient } from "@/lib/ai/extract";
-import type { FieldKey } from "@/lib/ai/merge";
+import { brandGuesses, type FieldKey } from "@/lib/ai/merge";
 import { buildMatchInput, type Features } from "@/lib/ai/rerank";
 import type { Stage, StripReading } from "@/lib/ai/ocr";
 import type { BrandCandidate, ScanMatchResponse, ScanOption } from "@/lib/match";
@@ -127,13 +127,17 @@ export function ScanClient({
     }
   }
 
-  // Demo mode: the same reader, on two sample photos shipped with the site (public/demo).
-  // Lets the app be demonstrated without depending on the light in the exam hall.
-  async function readDemo() {
+  // Demo mode: the same reader, on sample photos shipped with the site (public/demo, made by
+  // eval/make_demo_images.py). Lets the app be demonstrated without depending on the light in the
+  // exam hall. Two strips: a blood-pressure medicine with a cheaper generic, and a strip whose
+  // batch is in a real CDSCO quality alert.
+  async function readDemo(name: "telmikind" | "omee") {
     setStep({ name: "reading", stage: "loading-model" });
     try {
       const [demoFront, demoBack] = await Promise.all(
-        ["/demo/front.jpg", "/demo/back.jpg"].map((url) => fetch(url).then((r) => r.blob())),
+        [`/demo/${name}-front.jpg`, `/demo/${name}-back.jpg`].map((url) =>
+          fetch(url).then((r) => r.blob()),
+        ),
       );
       setFront(demoFront);
       const { readStrip } = await import("@/lib/ai/ocr");
@@ -214,9 +218,14 @@ export function ScanClient({
         {privacy}
         {step.name === "front" && (
           <div className="flex flex-col gap-1 rounded-xl border border-dashed border-border p-3">
-            <Button variant="outline" onClick={readDemo} className="w-fit">
-              {t.demoButton}
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" onClick={() => readDemo("telmikind")}>
+                {t.demoBp}
+              </Button>
+              <Button variant="outline" onClick={() => readDemo("omee")}>
+                {t.demoAlert}
+              </Button>
+            </div>
             <p className="text-sm text-muted-foreground">{t.demoNote}</p>
           </div>
         )}
@@ -325,6 +334,10 @@ function Confirm({
     () => extractIngredients(values.ingredients)?.value ?? [],
     [values.ingredients],
   );
+  // Other name guesses from the photo (the tallest plausible lines), tried by the matcher as well,
+  // but only while the name field is as read: a name the user typed is the one to trust.
+  const guesses = useMemo(() => brandGuesses(reading.front), [reading.front]);
+  const nameAsRead = values.brand.trim() === (f.brand?.value ?? "").trim();
   const matchInput = () =>
     buildMatchInput({
       brand: values.brand,
@@ -336,12 +349,15 @@ function Confirm({
 
   // For the safety checks. A batch number the user typed or corrected counts as certain; one
   // left as read keeps the reader's confidence (low = "Please check" = not looked up).
+  // The user can also tick "It matches my strip" under a batch marked "Please check": retyping
+  // the same characters would otherwise leave it unsure, and the batch could never be checked.
   const readBatch = f.batchNo?.value ?? "";
+  const [batchChecked, setBatchChecked] = useState(false);
   const facts: StripFacts = {
     stripIngredients: stripIngredients.map(({ salt, value, unit }) => ({ salt, value, unit })),
     batchNo: values.batchNo.trim(),
     batchConfidence:
-      values.batchNo.trim() && values.batchNo.trim() !== readBatch
+      values.batchNo.trim() && (batchChecked || values.batchNo.trim() !== readBatch)
         ? 1
         : (f.batchNo?.confidence ?? 0),
     names: [values.brand.trim()].filter(Boolean),
@@ -368,7 +384,7 @@ function Confirm({
       const res = await fetch("/api/match", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(matchInput()),
+        body: JSON.stringify({ ...matchInput(), brandGuesses: nameAsRead ? guesses : [] }),
       });
       if (!res.ok) throw new Error(String(res.status));
       const response = (await res.json()) as ScanMatchResponse;
@@ -400,12 +416,32 @@ function Confirm({
             multiline={multiline}
             placeholder={placeholder}
             t={t}
-          />
+          >
+            {key === "batchNo" &&
+              values.batchNo.trim() === readBatch &&
+              readBatch &&
+              (f.batchNo?.confidence ?? 0) < CHECK_BELOW && (
+                <label className="flex min-h-12 w-fit cursor-pointer items-center gap-3 text-base">
+                  <input
+                    type="checkbox"
+                    checked={batchChecked}
+                    onChange={(e) => setBatchChecked(e.target.checked)}
+                    className="size-6 accent-primary"
+                  />
+                  {t.batchChecked}
+                </label>
+              )}
+          </ConfirmField>
         ))}
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Button onClick={findMedicine} disabled={!values.brand.trim() || match.step === "matching"}>
+        <Button
+          onClick={findMedicine}
+          disabled={
+            !(values.brand.trim() || (nameAsRead && guesses.length)) || match.step === "matching"
+          }
+        >
           <Search aria-hidden="true" />
           {t.lookUp}
         </Button>
@@ -630,6 +666,8 @@ function ConfirmField(props: {
   multiline?: boolean;
   placeholder?: string;
   t: T;
+  /** Extra controls under the field (the batch's "It matches my strip"). */
+  children?: React.ReactNode;
 }) {
   const id = useId();
   const hintId = useId();
@@ -674,6 +712,7 @@ function ConfirmField(props: {
           {props.t.notRead}
         </p>
       )}
+      {props.children}
     </div>
   );
 }

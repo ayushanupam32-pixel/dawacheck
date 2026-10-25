@@ -1,28 +1,45 @@
 // Stage 2: read the photos with Tesseract.js, entirely in the browser.
 //
-// The photo never leaves the phone: Tesseract runs in its own Web Worker on the device. The only
+// The photo never leaves the phone: Tesseract runs in Web Workers on the device. The only
 // downloads are Tesseract's program and its English model (once; the browser caches them).
 // This file is the "glue" between <canvas> pixels and the pure, tested stages:
 //   preprocess.ts (Stage 1) -> Tesseract (Stage 2) -> extract.ts (Stage 3) via merge.ts.
+// Two kinds of worker keep the page responsive and the reading fast:
+//   - prepare.worker.ts makes the image variants (Stage 1) off the main thread;
+//   - up to 2 Tesseract workers read variants at the same time (reader.ts starts all reads of a
+//     pass together). On the dev photos this cut the median time from ~9.9 s to ~7.1 s with
+//     exactly the same fields read (scripts/speed-experiment.ts).
 
-import { createWorker, type Worker } from "tesseract.js";
+import { createScheduler, createWorker, type Scheduler } from "tesseract.js";
 import type { MergedResult, OcrReading } from "./merge";
-import { estimateSkew, grayToRgba, makeVariants, targetSize, type Variant } from "./preprocess";
+import { preparePhoto, type Prepared } from "./prepare";
+import { grayToRgba, type Variant } from "./preprocess";
 import { pageToReading, readProgressively } from "./reader";
 
 export type Stage = "loading-model" | "preparing" | "reading" | "reading-more" | "done";
 
-type Prepared = { width: number; height: number; variants: Variant[]; skew: number };
+let schedulerPromise: Promise<Scheduler> | null = null;
 
-let workerPromise: Promise<Worker> | null = null;
-
-/** One Tesseract worker for the whole visit; creating it downloads the model the first time. */
-function getWorker(): Promise<Worker> {
-  workerPromise ??= createWorker("eng", 1 /* LSTM engine */);
-  return workerPromise;
+/**
+ * Tesseract workers for the whole visit. Each worker is a separate copy of the OCR engine
+ * (tens of MB of memory), so phones with fewer than 4 cores get just one. The first worker downloads
+ * the model the first time; the second starts afterwards, loading the model from the browser's
+ * cache, and joins in when ready (jobs already waiting are shared out as soon as it arrives).
+ */
+function getScheduler(): Promise<Scheduler> {
+  schedulerPromise ??= (async () => {
+    const scheduler = createScheduler();
+    scheduler.addWorker(await createWorker("eng", 1 /* LSTM engine */));
+    if ((navigator.hardwareConcurrency ?? 1) >= 4) {
+      // If the second worker cannot start (e.g. low memory), the first one simply does it all.
+      void createWorker("eng", 1)
+        .then((worker) => scheduler.addWorker(worker))
+        .catch(() => {});
+    }
+    return scheduler;
+  })();
+  return schedulerPromise;
 }
-
-const nextFrame = () => new Promise((resolve) => setTimeout(resolve, 0));
 
 function canvasOf(width: number, height: number): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
@@ -31,33 +48,48 @@ function canvasOf(width: number, height: number): HTMLCanvasElement {
   return canvas;
 }
 
-/**
- * Load a photo, scale it to ~1600 px, straighten it if the text is tilted, and make the
- * 3 variants. `imageOrientation: "from-image"` honours the phone's rotation flag (EXIF).
- */
-export async function prepare(photo: Blob): Promise<Prepared> {
-  const bitmap = await createImageBitmap(photo, { imageOrientation: "from-image" });
-  const { width, height } = targetSize(bitmap.width, bitmap.height);
-  const canvas = canvasOf(width, height);
-  const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
-  ctx.drawImage(bitmap, 0, 0, width, height);
-  bitmap.close();
+let prepWorker: Worker | null | undefined;
+let nextJob = 0;
+const waiting = new Map<number, { resolve: (p: Prepared) => void; reject: (e: Error) => void }>();
 
-  let variants = makeVariants(ctx.getImageData(0, 0, width, height).data, width, height);
-  await nextFrame(); // let the progress message paint before the next heavy step
-  const skew = estimateSkew(variants[1].gray, width, height);
-  if (Math.abs(skew) >= 1) {
-    // Rotate the original photo the other way, on a white background, then redo the variants.
-    const straight = canvasOf(width, height);
-    const sctx = straight.getContext("2d", { willReadFrequently: true })!;
-    sctx.fillStyle = "#fff";
-    sctx.fillRect(0, 0, width, height);
-    sctx.translate(width / 2, height / 2);
-    sctx.rotate((-skew * Math.PI) / 180);
-    sctx.drawImage(canvas, -width / 2, -height / 2);
-    variants = makeVariants(sctx.getImageData(0, 0, width, height).data, width, height);
+/** The preparing worker, or null on browsers without Web Workers + OffscreenCanvas. */
+function getPrepWorker(): Worker | null {
+  if (prepWorker !== undefined) return prepWorker;
+  if (typeof Worker === "undefined" || typeof OffscreenCanvas === "undefined") {
+    return (prepWorker = null);
   }
-  return { width, height, variants, skew };
+  prepWorker = new Worker(new URL("./prepare.worker.ts", import.meta.url), { type: "module" });
+  prepWorker.onmessage = ({ data }) => {
+    const job = waiting.get(data.id);
+    waiting.delete(data.id);
+    if (data.error) job?.reject(new Error(data.error));
+    else job?.resolve(data.prepared);
+  };
+  // The worker script itself failed (e.g. blocked): fail the waiting jobs so they are redone on
+  // the page, and stop using the worker.
+  prepWorker.onerror = () => {
+    for (const job of waiting.values()) job.reject(new Error("prepare worker failed"));
+    waiting.clear();
+    prepWorker = null;
+  };
+  return prepWorker;
+}
+
+/** Make the variants of one photo: in the worker if possible, otherwise on the page. */
+export async function prepare(photo: Blob): Promise<Prepared> {
+  const worker = getPrepWorker();
+  if (worker) {
+    try {
+      const id = nextJob++;
+      return await new Promise<Prepared>((resolve, reject) => {
+        waiting.set(id, { resolve, reject });
+        worker.postMessage({ id, photo });
+      });
+    } catch {
+      // e.g. a browser whose OffscreenCanvas cannot decode this photo: fall through.
+    }
+  }
+  return preparePhoto(photo, canvasOf);
 }
 
 /** Run Tesseract on one variant and keep the text, confidence and line heights. */
@@ -67,8 +99,8 @@ async function read(variant: Variant): Promise<OcrReading> {
   canvas
     .getContext("2d")!
     .putImageData(new ImageData(grayToRgba(variant.gray), variant.width, variant.height), 0, 0);
-  const worker = await getWorker();
-  const { data } = await worker.recognize(canvas, {}, { text: true, blocks: true });
+  const scheduler = await getScheduler();
+  const { data } = await scheduler.addJob("recognize", canvas, {}, { text: true, blocks: true });
   return pageToReading(variant.name, data);
 }
 
@@ -91,13 +123,13 @@ export async function readStrip(
 ): Promise<StripReading> {
   const started = performance.now();
   onStage("loading-model");
-  const workerReady = getWorker(); // start downloading the model while we prepare the images
+  const ocrReady = getScheduler(); // start downloading the model while we prepare the images
 
   onStage("preparing");
   const front = await prepare(frontPhoto);
   const backs = [];
   for (const photo of [backPhoto, stampPhoto]) if (photo) backs.push(await prepare(photo));
-  await workerReady;
+  await ocrReady;
 
   onStage("reading");
   const result = await readProgressively(

@@ -10,6 +10,7 @@ import {
   similarity,
 } from "@/lib/ai/normalize";
 import {
+  combineDecisions,
   compositionDiffers,
   decide,
   features,
@@ -21,7 +22,7 @@ import {
   type MatchInput,
   type Weights,
 } from "@/lib/ai/rerank";
-import { cleanedQuery, parseMatchInput } from "@/lib/find-match";
+import { cleanedQuery, parseGuesses, parseMatchInput } from "@/lib/find-match";
 
 // Real rows from the brand database (names, makers and composition keys as stored).
 const brand = (id: number, name: string, compositionKey: string, manufacturer = "Maker Ltd") =>
@@ -389,5 +390,50 @@ describe("parseMatchInput", () => {
     });
     expect(parseMatchInput(null)).toBeNull();
     expect(parseMatchInput("telma")).toBeNull();
+  });
+});
+
+describe("combineDecisions (several name guesses for one strip)", () => {
+  const diazepam10 = [{ salt: "Diazepam", value: 10, unit: "mg" }];
+  const valium = decide(input({ brand: "Valium", ingredients: diazepam10 }), [VALIUM_5, VALIUM_10]);
+  const garbage = decide(input({ brand: "Abbott Healthcare" }), []);
+
+  it("takes the guess that matched when the others found nothing", () => {
+    expect(valium.status).toBe("match");
+    const d = combineDecisions([garbage, valium]);
+    expect(d.status).toBe("match");
+    expect(d.ranked[0].candidate).toBe(VALIUM_10);
+  });
+
+  it("abstains when two guesses match different medicines", () => {
+    const suhagra = decide(input({ brand: "Suhagra 100" }), [SUHAGRA_100, SUHAGRA_50]);
+    expect(suhagra.status).toBe("match");
+    const d = combineDecisions([valium, suhagra]);
+    expect(d.status).toBe("abstain");
+    expect(d.ranked.map((s) => s.candidate.name).sort()).toEqual([
+      "Suhagra 100 Tablet",
+      "Valium 10mg Tablet",
+    ]);
+  });
+
+  it("keeps the match when two guesses name the same product", () => {
+    const again = decide(input({ brand: "VALIUM 10", ingredients: diazepam10 }), [VALIUM_10]);
+    expect(combineDecisions([valium, again]).status).toBe("match");
+  });
+
+  it("with no match, offers the options of the first guess that found any", () => {
+    const unsure = decide(input({ brand: "Valium" }), [VALIUM_5, VALIUM_10]);
+    const d = combineDecisions([garbage, unsure]);
+    expect(d.status).toBe("abstain");
+    expect(d.ranked).toHaveLength(2);
+  });
+
+  it("accepts at most 3 short guesses from a request", () => {
+    expect(parseGuesses({ brandGuesses: ["Telma 40", "", 5, "x".repeat(80), "A", "B"] })).toEqual([
+      "Telma 40",
+      "x".repeat(60),
+      "A",
+    ]);
+    expect(parseGuesses({})).toEqual([]);
   });
 });

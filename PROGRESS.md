@@ -1,10 +1,10 @@
 # DawaCheck progress
 
-Last updated: 2026-10-24 (M4 commit, pushed to `main`).
+Last updated: 2026-10-25 (M7 started: speed, brand guesses, real-brand demo strips; not committed yet).
 
 ## Where we are
 
-**M0–M5 are done and live. M6 was dropped by the user. Next: M7 (evaluation and polish).**
+**M0–M5 are done and live. M6 was dropped by the user. M7 (evaluation and polish) is in progress.**
 
 - Live site: https://dawacheck-psi.vercel.app (deploys automatically on every push to `main`)
 
@@ -17,7 +17,7 @@ Last updated: 2026-10-24 (M4 commit, pushed to `main`).
 | M4 Matching OCR → medicine                            | done        |                                                                  | re-ranker + choice model + safety rules; top-1 89% dev / 86% test    |
 | M5 Safety checks (NSQ, NPPA, banned FDC, result card) | done        |                                                                  |                                                                      |
 | M6 Family cabinet + PWA                               | dropped     |                                                                  |                                                                      |
-| M7 Evaluation + polish                                | not started |                                                                  |                                                                      |
+| M7 Evaluation + polish                                | in progress |                                                                  |                                                                      |
 
 Viva notes for each finished milestone: `docs/milestones/M0-setup.md` … `M4-matching.md`.
 
@@ -107,14 +107,13 @@ corrections): 1/5 matched, 0 wrong: the M3 reader rarely reads the brand name.
 
 ## Known bugs and limits
 
-- **Too slow:** 10 s median per strip on a laptop; phones will be slower. Preprocessing runs on
-  the main thread (the page can stutter while it works).
+- **Too slow:** 7.1 s median per strip on a laptop (was 10 s); phones will be slower. Preparing
+  runs in a Web Worker now, but the quarter turns of pass 3 still run on the page.
 - **Brand and ingredient reading are weak** (2/14 and 2/10, and 4 wrong each). M4 copes (it
   abstains, 0 wrong), but the fully automatic photo → medicine path matched only 1 of 5. Idea:
   use the matcher to confirm brand guesses (the 3 tallest lines on the front) before the
   confirm screen, as the brief's Stage 3 suggests ("confirmed by matching").
-- **The demo strip's brand ("DEMOTEL") is made up**, so Demo mode ends in "couldn't find this
-  name". Correct behaviour, but a weak demo; type "Telma 40" on the confirm screen to show a match.
+- **Omee demo:** the browser's OCR misses "OMEE"; type the name (see M7 progress).
 - **English OCR only** (`eng`). Hindi text on strips is not read.
 - **Kendra PMBJK23337** (Thane, shown at Mumbai CST) may be misplaced in the official data; it
   passed our district check. Not fixed.
@@ -274,18 +273,58 @@ See `docs/milestones/M5-safety-checks.md`.
 - `web/.prettierignore` exists because Prettier only reads the ignore file of the folder it runs
   in; `web/lib/ai/salt-rules.json` must never be reformatted (a pytest checks it).
 
+## M7 progress (2026-10-25)
+
+Agreed order with the user: improvements that change the reader/matcher first (the final test-set
+eval runs only once), then About page + accessibility + Playwright, then final eval and docs.
+
+- **Speed:** `lib/ai/reader.ts` now starts all reads of a pass together; `lib/ai/ocr.ts` runs 2
+  Tesseract workers (`createScheduler`; 1 on phones with < 4 cores) and prepares photos in a Web
+  Worker (`lib/ai/prepare.worker.ts`, OffscreenCanvas; falls back to the page). Shared code in
+  `lib/ai/prepare.ts`. `pnpm eval` uses 2 workers too. Same 13 dev photos: median **9.9 s → 7.1 s**,
+  p95 **16.8 s → 10.8 s**, every field score unchanged. `scripts/speed-experiment.ts`: 1200 px
+  photos would be faster still (4.6 s) but lost one mfg and one exp date, so we stay at 1600 px.
+  Not measured on a phone yet.
+- **Brand guesses ("confirmed by matching", brief Stage 3):** `brandGuesses()` in `lib/ai/merge.ts`
+  takes the 3 tallest plausible lines on the front (OCR confidence ≥ 30, lower than the 60 needed
+  to SHOW a name, because guesses must be confirmed). The scan page sends them with POST
+  /api/match while the name field is as read; `matchGuesses()` (`lib/find-match.ts`) tries each,
+  and `combineDecisions()` (`lib/ai/rerank.ts`) accepts a match only if all matching guesses agree
+  on one product. **Result on dev photos: no change** (1/5 right before and after on the web
+  photos, 0 wrong; the 4 misses have no readable name at all: the OCR is the bottleneck). `pnpm
+eval` reports both (with / without guesses). Word-level guesses were tried and rejected: no gain
+  ("Neorejax" finds nothing) and risk ("Metformin 500" would match another maker's brand).
+- **Demo mode now has 2 real-brand strips** (user agreed): `telmikind` (Telmikind 40, Mankind,
+  10 tabs, ₹38.59 from the dataset, demo batch DM2506) → match, generic saving, fair price
+  within; `omee` (CDSCO NSQ alert Sep 2026: Omee, Alkem, batch 25281124, Mfg 06/2025, Exp
+  05/2027, dissolution failure; ₹61.87/20 from the dataset) → red batch alert. Generated by
+  `eval/make_demo_images.py`; old DEMOTEL images deleted; `eval/labels.json` has `demo-telmikind`
+  and `demo-omee`. Verified in the browser (dev and production build).
+- **Found while testing the demo:** an upright red "DEMO" mark was read as the brand and matched
+  the real "Demo 20mg Capsule" (Medoz, omeprazole 20) at 98%: wrong medicine. The mark is now
+  sideways. Lesson for the report: any prominent word that is also a brand name can match.
+- **Known demo limit:** in the browser Tesseract does not read the big "OMEE" (in Node it reads
+  it at 40% confidence). In the Omee demo the presenter types "Omee", ticks "It matches my strip"
+  for the batch, then taps Find.
+- **New: "It matches my strip" tick box** under a batch marked "Please check". Before, a batch
+  read right but with low confidence (any "1", "O", "I" or "L" lowers it) could never be checked:
+  retyping the same value still counted as unsure. Texts in en/hi/ta.
+- Web tests: 399, including the new `tests/reader.test.ts`, brand guesses and combineDecisions.
+
 ## Exact next steps
 
-1. **Start M7 (evaluation and polish)** — M6 is dropped. From the brief: final test-set
+0. **Commit the M7 work above** (not committed yet), push, check the live demo on a phone (time
+   it: "How we read this" shows the seconds).
+1. **Continue M7** — M6 is dropped. From the brief: final test-set
    evaluation (`pnpm eval -- --final`, `pnpm eval:match -- --final`), ablations, About page with
    the results table and data sources (credit CC BY-SA brand data), accessibility pass
    (Lighthouse ≥ 90), SUS study with 15–20 users (the user runs it), docs (README GIF,
    architecture diagram, report, slides, viva Q&A). Also the brief's Playwright end-to-end test
    (sample photos → confirm → result card).
 2. **Spot-check `eval/labels.json`** (human) before final numbers go into the report.
-3. **Speed:** move preprocessing and OCR into a Web Worker; try a smaller first-pass image; skip
-   the inverted variant when the ink variant already found the key fields; measure on a phone.
-4. **Brand reading:** use the matcher to confirm brand guesses before the confirm screen.
+3. **Speed:** done on a laptop (7.1 s median); measure on a mid-range Android phone.
+4. **Brand reading:** guesses are in, but the OCR rarely reads names on real photos; more phone
+   photos will show whether it helps.
 5. **More photos:** the user takes ~15–20 strip photos with their own phone (front, back, stamp
    close-up), copies them into `eval/photos/`, labels them at `/en/eval/label` (including the
    new "match brand": the exact brand name in the database, or empty if not in it).

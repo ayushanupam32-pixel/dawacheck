@@ -2,7 +2,7 @@
 //
 // Pure functions on plain pixel arrays (no canvas, no DOM), so each step is unit-tested in
 // tests/preprocess.test.ts and its effect can be measured in the evaluation (with vs without).
-// The browser code in lib/ai/ocr.ts only moves pixels between a <canvas> and these functions.
+// The browser code in lib/ai/prepare.ts only moves pixels between a <canvas> and these functions.
 //
 // Why no OpenCV.js: it is an 8–10 MB download, too heavy for a ₹10,000 phone on mobile data.
 // Everything here is a few dozen lines of arithmetic.

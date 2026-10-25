@@ -5,7 +5,8 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { coreName } from "./ai/normalize";
-import { decide, type Decision, type MatchInput } from "./ai/rerank";
+import { MAX_GUESSES } from "./ai/merge";
+import { combineDecisions, decide, type Decision, type MatchInput } from "./ai/rerank";
 import type { BrandCandidate, Ingredient } from "./match";
 
 export type BrandRow = {
@@ -108,8 +109,37 @@ export async function matchStrip(
   return decide(input, candidates);
 }
 
+/**
+ * Stage 3 "confirmed by matching": try the name on the confirm screen and the reader's other
+ * brand guesses (all searched at once), then combine the answers (rerank.ts combineDecisions).
+ * A guess is accepted only through the same safety rules as a typed name, and if two guesses
+ * match different products nothing is accepted. With no guesses this is just matchStrip.
+ */
+export async function matchGuesses(
+  db: SupabaseClient,
+  input: MatchInput,
+  guesses: string[] = [],
+): Promise<Decision<BrandCandidate>> {
+  const seen = new Set<string>();
+  const names = [input.brand ?? "", ...guesses]
+    .map((name) => name.trim())
+    .filter((name) => name && !seen.has(name.toUpperCase()) && seen.add(name.toUpperCase()))
+    .slice(0, 1 + MAX_GUESSES);
+  if (names.length <= 1) return matchStrip(db, { ...input, brand: names[0] ?? null });
+  const decisions = await Promise.all(names.map((brand) => matchStrip(db, { ...input, brand })));
+  return combineDecisions(decisions);
+}
+
 const text = (value: unknown, max: number) =>
   typeof value === "string" && value.trim() ? value.trim().slice(0, max) : null;
+
+/** The reader's brand guesses from a POST body: at most MAX_GUESSES short strings. */
+export function parseGuesses(body: unknown): string[] {
+  const guesses = (body as Record<string, unknown> | null)?.brandGuesses;
+  return Array.isArray(guesses)
+    ? guesses.flatMap((g) => text(g, 60) ?? []).slice(0, MAX_GUESSES)
+    : [];
+}
 
 /** Check a POST body from the scan page; anything unexpected is dropped, never trusted. */
 export function parseMatchInput(body: unknown): MatchInput | null {

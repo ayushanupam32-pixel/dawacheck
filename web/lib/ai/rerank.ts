@@ -284,6 +284,32 @@ export function decide<C extends MatchCandidate>(
     : abstain("unsure");
 }
 
+/**
+ * Several names were tried for one strip (the name on the confirm screen and the reader's other
+ * guesses, lib/ai/merge.ts brandGuesses): one decision per name, in that order. Combine them:
+ * - every name that matched points to the same product -> that match (the most confident);
+ * - names matched DIFFERENT products -> abstain: the strip is ambiguous, let the user pick;
+ * - nothing matched -> the first decision that has options to offer (else the first one).
+ */
+export function combineDecisions<C extends MatchCandidate>(decisions: Decision<C>[]): Decision<C> {
+  const matches = decisions
+    .filter((d) => d.status === "match")
+    .sort((a, b) => b.confidence - a.confidence);
+  const products = new Set(matches.map((d) => nameIdentity(d.best.candidate.name)));
+  if (products.size === 1) return matches[0];
+  if (products.size > 1) {
+    const seen = new Set<string>();
+    const ranked = matches
+      .map((d) => d.best)
+      .filter((s) => {
+        const id = nameIdentity(s.candidate.name);
+        return !seen.has(id) && seen.add(id);
+      });
+    return { status: "abstain", reason: "unsure", confidence: matches[0].confidence, ranked };
+  }
+  return decisions.find((d) => d.ranked.length) ?? decisions[0];
+}
+
 // ------------------------------------------------------------------ learning the weights
 
 /**

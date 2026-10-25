@@ -42,24 +42,32 @@ export async function readProgressively(
 
   const frontReadings: OcrReading[] = [];
   const backReadings: OcrReading[] = [];
-  const readSide = async (side: Side, names: string[], into: OcrReading[]) => {
-    for (const name of names) {
-      const variant = byName(side.variants, name);
-      if (variant) into.push(await side.recognize(variant));
-    }
+  // All reads of one pass are started together. With one Tesseract worker they simply queue;
+  // with several (lib/ai/ocr.ts uses 2 on phones with enough cores) they run at the same time.
+  // Results are kept in a fixed order (front, then each back photo; variants in the order asked),
+  // so the merged answer is the same however the reads were scheduled.
+  const readPass = async (names: string[]) => {
+    const jobs = (side: Side) =>
+      names.flatMap((name) => {
+        const variant = byName(side.variants, name);
+        return variant ? [side.recognize(variant)] : [];
+      });
+    const [frontDone, ...backsDone] = await Promise.all(
+      [front, ...backs].map((side) => Promise.all(jobs(side))),
+    );
+    frontReadings.push(...frontDone);
+    backReadings.push(...backsDone.flat());
   };
 
   // Pass 1
-  await readSide(front, [first], frontReadings);
-  for (const side of backs) await readSide(side, [first], backReadings);
+  await readPass([first]);
   let merged = mergeReadings(frontReadings, backReadings);
   if (!preprocess || !progressive) return { ...merged, front: frontReadings, back: backReadings };
 
   // Pass 2
   if (!isGoodEnough(merged.fields)) {
     options.onMorePasses?.();
-    await readSide(front, ["ink", "enhanced", "inverted"], frontReadings);
-    for (const side of backs) await readSide(side, ["ink", "enhanced", "inverted"], backReadings);
+    await readPass(["ink", "enhanced", "inverted"]);
     merged = mergeReadings(frontReadings, backReadings);
   }
 
@@ -68,9 +76,8 @@ export async function readProgressively(
   const stamp = backs.at(-1);
   const ink = stamp && byName(stamp.variants, "ink");
   if (ink && STAMP_FIELDS.some((key) => (merged.fields[key]?.confidence ?? 0) < 0.5)) {
-    for (const clockwise of [true, false]) {
-      backReadings.push(await stamp.recognize(straighten(rotateQuarter(ink, clockwise))));
-    }
+    const turned = [true, false].map((clockwise) => straighten(rotateQuarter(ink, clockwise)));
+    backReadings.push(...(await Promise.all(turned.map((v) => stamp.recognize(v)))));
     merged = mergeReadings(frontReadings, backReadings);
   }
   return { ...merged, front: frontReadings, back: backReadings };

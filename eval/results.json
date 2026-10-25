@@ -1,21 +1,149 @@
 [
   {
-    "id": "demo",
+    "id": "demo-telmikind",
     "split": "demo",
-    "ms": 742,
-    "ocr": ["binary:86", "binary:91"],
+    "ms": 614,
+    "ocr": ["binary:81", "binary:89"],
     "read": {
-      "brand": "DEMOTEL 40",
+      "brand": "TELMIKIND 40",
       "ingredients": "Telmisartan 40 mg",
-      "mrp": "122.98",
-      "packSize": "15",
-      "batchNo": "DM2504",
-      "mfgDate": "2025-09",
-      "expDate": "2027-08"
+      "mrp": "38.59",
+      "packSize": "10",
+      "batchNo": "DM2506",
+      "mfgDate": "2025-06",
+      "expDate": "2027-05"
     },
     "match": {
-      "got": "abstain (no_candidates)",
-      "outcome": "abstained"
+      "got": "Telmikind 40 Tablet",
+      "outcome": "right",
+      "guesses": ["TELMIKIND 40"]
+    },
+    "matchSingle": {
+      "got": "Telmikind 40 Tablet",
+      "outcome": "right"
+    },
+    "full": {
+      "brand": {
+        "correct": 1,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 0
+      },
+      "ingredients": {
+        "correct": 1,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 0
+      },
+      "mrp": {
+        "correct": 1,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 0
+      },
+      "packSize": {
+        "correct": 1,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 0
+      },
+      "batchNo": {
+        "correct": 1,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 0
+      },
+      "mfgDate": {
+        "correct": 1,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 0
+      },
+      "expDate": {
+        "correct": 1,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 0
+      }
+    },
+    "base": {
+      "brand": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "ingredients": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "mrp": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "packSize": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "batchNo": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "mfgDate": {
+        "correct": 0,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 1
+      },
+      "expDate": {
+        "correct": 1,
+        "wrong": 0,
+        "total": 1,
+        "cerSum": 0
+      }
+    }
+  },
+  {
+    "id": "demo-omee",
+    "split": "demo",
+    "ms": 1326,
+    "ocr": [
+      "binary:70",
+      "ink:0",
+      "enhanced:43",
+      "inverted:67",
+      "binary:87",
+      "ink:0",
+      "enhanced:49",
+      "inverted:87",
+      "ink-r90:0",
+      "ink-r270:0"
+    ],
+    "read": {
+      "brand": "OMEE",
+      "ingredients": "Omeprazole 20 mg",
+      "mrp": "61.87",
+      "packSize": "20",
+      "batchNo": "25281124",
+      "mfgDate": "2025-06",
+      "expDate": "2027-05"
+    },
+    "match": {
+      "got": "Omee Capsule",
+      "outcome": "right",
+      "guesses": ["OMEE"]
+    },
+    "matchSingle": {
+      "got": "Omee Capsule",
+      "outcome": "right"
     },
     "full": {
       "brand": {
@@ -109,7 +237,7 @@
   {
     "id": "favipill800",
     "split": "dev",
-    "ms": 16456,
+    "ms": 10177,
     "ocr": [
       "binary:25",
       "ink:42",
@@ -132,6 +260,15 @@
       "expDate": "2021-04"
     },
     "match": {
+      "got": "abstain (contradiction)",
+      "outcome": "abstained",
+      "guesses": [
+        "Favipil R00 i & a 3 7",
+        "Favipill I : HYz=>",
+        "Riewatdn of hited ean Sw. ois Tes. EE x"
+      ]
+    },
+    "matchSingle": {
       "got": "abstain (no_brand)",
       "outcome": "abstained"
     },
@@ -227,7 +364,7 @@
   {
     "id": "fincover1",
     "split": "dev",
-    "ms": 15940,
+    "ms": 9405,
     "ocr": [
       "binary:26",
       "ink:29",
@@ -250,6 +387,11 @@
       "expDate": "2012-11"
     },
     "match": {
+      "got": "abstain (unsure)",
+      "outcome": "abstained",
+      "guesses": ["Wiis ames BDO A fre 8 of", "ARG CA CRE Rae Sinks o gue © x gi", "Prati APR"]
+    },
+    "matchSingle": {
       "got": "abstain (no_brand)",
       "outcome": "abstained"
     },
@@ -345,7 +487,7 @@
   {
     "id": "suhagra100",
     "split": "dev",
-    "ms": 2740,
+    "ms": 2291,
     "ocr": ["binary:21", "ink:39", "enhanced:30", "inverted:20"],
     "read": {
       "brand": "| Suhagra-100",
@@ -357,6 +499,11 @@
       "expDate": ""
     },
     "match": {
+      "got": "Suhagra 100 Tablet",
+      "outcome": "right",
+      "guesses": ["| Suhagra-100", "pave -"]
+    },
+    "matchSingle": {
       "got": "Suhagra 100 Tablet",
       "outcome": "right"
     },
@@ -452,7 +599,7 @@
   {
     "id": "neorelax-mr",
     "split": "dev",
-    "ms": 12611,
+    "ms": 7831,
     "ocr": [
       "binary:28",
       "ink:38",
@@ -475,6 +622,15 @@
       "expDate": ""
     },
     "match": {
+      "got": "abstain (no_candidates)",
+      "outcome": "abstained",
+      "guesses": [
+        "Exgipients AHN mg cade en Ta a sd",
+        "Joe E70 2950 PIS Natagarh, Distt. of Sty",
+        "EC 5 ated tatrsi ne ENS 3 JEAN 2X A ="
+      ]
+    },
+    "matchSingle": {
       "got": "abstain (no_brand)",
       "outcome": "abstained"
     },
@@ -570,7 +726,7 @@
   {
     "id": "crocin-cold-flu",
     "split": "dev",
-    "ms": 9885,
+    "ms": 7131,
     "ocr": [
       "binary:22",
       "ink:40",
@@ -593,6 +749,15 @@
       "expDate": "2014-12"
     },
     "match": {
+      "got": "abstain (no_candidates)",
+      "outcome": "abstained",
+      "guesses": [
+        ".Rs15.00 INCL.OF C0 ; Fy",
+        ".Rs15.00 INCL.OF ay ; Fy",
+        ": ST ; h. N Re Ny asians lf"
+      ]
+    },
+    "matchSingle": {
       "got": "abstain (no_brand)",
       "outcome": "abstained"
     },
@@ -688,7 +853,7 @@
   {
     "id": "metformin500-zanza",
     "split": "dev",
-    "ms": 2194,
+    "ms": 1663,
     "ocr": ["binary:33", "ink:19", "enhanced:32", "inverted:33"],
     "read": {
       "brand": "rmin",
@@ -700,6 +865,11 @@
       "expDate": ""
     },
     "match": {
+      "got": "abstain (unsure)",
+      "outcome": "abstained",
+      "guesses": ["| Metformin t", "| Metformin 4", "rmin"]
+    },
+    "matchSingle": {
       "got": "abstain (unsure)",
       "outcome": "abstained"
     },
@@ -795,7 +965,7 @@
   {
     "id": "warfarin2-label",
     "split": "dev",
-    "ms": 2899,
+    "ms": 2118,
     "ocr": ["binary:56", "ink:69", "enhanced:57", "inverted:54"],
     "read": {
       "brand": "—— WARFARIN",
@@ -807,6 +977,11 @@
       "expDate": ""
     },
     "match": {
+      "got": "abstain (contradiction)",
+      "outcome": "abstained",
+      "guesses": ["—— WARFARIN", "Forman, OUT OF THE REACH OF CHILDREN", "Expr Armedabad, India"]
+    },
+    "matchSingle": {
       "got": "abstain (contradiction)",
       "outcome": "abstained"
     },
@@ -902,7 +1077,7 @@
   {
     "id": "azithromycin250-sandoz",
     "split": "dev",
-    "ms": 11204,
+    "ms": 7721,
     "ocr": ["binary:21", "ink:22", "enhanced:27", "inverted:21"],
     "read": {
       "brand": "",
@@ -914,6 +1089,11 @@
       "expDate": ""
     },
     "match": {
+      "got": "abstain (no_candidates)",
+      "outcome": "abstained",
+      "guesses": ["te LEA Shad A A. A Vy 3 ; !", "Fido Ee | EY\" GW", "ak EE RO AE ol Aa ERE FOTN."]
+    },
+    "matchSingle": {
       "got": "abstain (no_brand)",
       "outcome": "abstained"
     },
@@ -1009,7 +1189,7 @@
   {
     "id": "anterone50",
     "split": "dev",
-    "ms": 2212,
+    "ms": 1797,
     "ocr": ["binary:39", "ink:31", "enhanced:60", "inverted:36"],
     "read": {
       "brand": "cyproterone acetate 50 mg EE one 50",
@@ -1021,6 +1201,11 @@
       "expDate": ""
     },
     "match": {
+      "got": "abstain (contradiction)",
+      "outcome": "abstained",
+      "guesses": ["Anterone 50 LL em", "1 Anterone 50 i ee", "1 Anterone 50 i ea"]
+    },
+    "matchSingle": {
       "got": "abstain (no_candidates)",
       "outcome": "abstained"
     },
@@ -1116,7 +1301,7 @@
   {
     "id": "citalopram20",
     "split": "dev",
-    "ms": 10213,
+    "ms": 9513,
     "ocr": ["binary:23", "ink:90", "enhanced:40", "inverted:24"],
     "read": {
       "brand": "HEUMANN Jf",
@@ -1128,6 +1313,11 @@
       "expDate": ""
     },
     "match": {
+      "got": "abstain (no_candidates)",
+      "outcome": "abstained",
+      "guesses": ["HEUMANN Jf", "1 ~ Heuma a", "gh 20 Filmtablet ey Siig"]
+    },
+    "matchSingle": {
       "got": "abstain (no_candidates)",
       "outcome": "abstained"
     },
@@ -1223,7 +1413,7 @@
   {
     "id": "cialis20",
     "split": "dev",
-    "ms": 4135,
+    "ms": 3221,
     "ocr": ["binary:22", "ink:35", "enhanced:27", "inverted:22"],
     "read": {
       "brand": "",
@@ -1235,6 +1425,11 @@
       "expDate": ""
     },
     "match": {
+      "got": "abstain (no_candidates)",
+      "outcome": "abstained",
+      "guesses": ["NT JENN SN"]
+    },
+    "matchSingle": {
       "got": "abstain (no_brand)",
       "outcome": "abstained"
     },
@@ -1330,7 +1525,7 @@
   {
     "id": "dexedrine5",
     "split": "dev",
-    "ms": 3722,
+    "ms": 2885,
     "ocr": ["binary:25", "ink:23", "enhanced:31", "inverted:25"],
     "read": {
       "brand": "",
@@ -1342,6 +1537,15 @@
       "expDate": ""
     },
     "match": {
+      "got": "abstain (no_candidates)",
+      "outcome": "abstained",
+      "guesses": [
+        "Ek > > pexedrine® bl NS 5 $d “Zn 7 he",
+        "x > = — Sa ce aersdn a",
+        "3 tots Smo Dexedrine® tn NG oe"
+      ]
+    },
+    "matchSingle": {
       "got": "abstain (no_brand)",
       "outcome": "abstained"
     },
@@ -1437,7 +1641,7 @@
   {
     "id": "androcur50",
     "split": "dev",
-    "ms": 16818,
+    "ms": 10788,
     "ocr": ["binary:24", "ink:22", "enhanced:21", "inverted:25"],
     "read": {
       "brand": "",
@@ -1449,6 +1653,15 @@
       "expDate": ""
     },
     "match": {
+      "got": "abstain (contradiction)",
+      "outcome": "abstained",
+      "guesses": [
+        "i : ile a blet: al hy ile",
+        "HN A rocurds A lin a",
+        "{hi PREY Bie ) ig hb SF 75 sn Yi"
+      ]
+    },
+    "matchSingle": {
       "got": "abstain (no_brand)",
       "outcome": "abstained"
     },
