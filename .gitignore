@@ -21,3 +21,7 @@ pipeline/clean/
 # Evaluation: real strip photos stay on this computer (privacy); only labels are committed
 eval/photos/
 eval/.cache/
+
+# AI assistant working files (kept locally, not part of the project)
+.claude/
+CLAUDE.md

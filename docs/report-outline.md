@@ -107,7 +107,7 @@ banned (yes / maybe / no), Kendra (geohash + Haversine).
 
 ## 6. Implementation
 
-- Tech stack table (CLAUDE.md) and why (Next.js 16 App Router, Cache Components; Tesseract.js;
+- Tech stack table (README "How it works", `web/package.json`, `pipeline/pyproject.toml`) and why (Next.js 16 App Router, Cache Components; Tesseract.js;
   Canvas not OpenCV; Supabase + pg_trgm; Python pipeline with uv).
 - Code organisation: pure tested modules vs thin glue; same code for app and evaluation.
 - i18n (built-in dictionaries), accessibility measures, Demo mode.
