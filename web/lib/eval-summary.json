@@ -152,18 +152,18 @@
       {
         "field": "brand",
         "total": 13,
-        "correct": 1,
-        "wrong": 4,
+        "correct": 0,
+        "wrong": 3,
         "baseCorrect": 0,
-        "baseWrong": 3
+        "baseWrong": 0
       },
       {
         "field": "ingredients",
         "total": 9,
         "correct": 1,
-        "wrong": 4,
+        "wrong": 3,
         "baseCorrect": 0,
-        "baseWrong": 2
+        "baseWrong": 0
       },
       {
         "field": "mrp",
@@ -206,8 +206,8 @@
         "baseWrong": 0
       }
     ],
-    "medianMs": 7258,
-    "p95Ms": 10909
+    "medianMs": 7141,
+    "p95Ms": 10766
   },
   "readerFinal": {
     "generated": "2026-10-25",

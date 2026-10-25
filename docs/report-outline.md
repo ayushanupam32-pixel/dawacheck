@@ -124,7 +124,9 @@ and checked (empty form, spot-check by a person: `eval/SPOT-CHECK.md`).
 CER; foil vs matte. Test set: 0 fields right; wrong brand 1/3, wrong ingredients 2/2; plain OCR
 1/2 pack sizes. Discuss honestly: photo difficulty (foreign packs, OCR confidence 23–44%), the
 front-only defect it exposed (missing back counted as 100% confident), and that the test set is
-too small (3) to generalise. Do not re-tune on it.
+too small (3) to generalise. Do not re-tune on it. Then the fix made after the final run
+(missing back no longer counts as 100% confident), evaluated on dev photos only: wrong values
+8 → 6, everything else unchanged; state clearly that the test numbers are pre-fix.
 7.3 **Ablation: preprocessing** — full pipeline vs raw Tesseract (the brief's first baseline).
 7.4 **Matching** (`eval/match-results.md`): exact-name baseline, trigram only, re-ranking without
 abstention, DawaCheck; top-1, top-3, wrong of answered, wrong generic, abstention; on simulated

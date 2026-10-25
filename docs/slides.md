@@ -47,8 +47,8 @@ after timing a phone and after the usability study.
 
 12. **Usability study** — **[SUS]** n, mean SUS with 95% CI, task completion, two quotes.
 
-13. **Limitations** — Test set: 0/3 photos read well, 0 wrong medicines; front-only photos
-    over-trusted (defect found by the test run); small photo set (16), weak brand reading on real photos, simulated matching
+13. **Limitations** — Test set: 0/3 photos read well, 0 wrong medicines; a front-only
+    photo defect found by the test run (fixed after it, checked on dev photos); small photo set (16), weak brand reading on real photos, simulated matching
     data, 2022 brand snapshot, English OCR only, phone speed. Say them before you're asked.
 
 14. **Future work and thanks** — Phone photo set, on-device speed, Hindi OCR, offline PWA,

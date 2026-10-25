@@ -116,3 +116,22 @@ describe("brandGuesses", () => {
     expect(brandGuesses([reading("binary", "|| — 12", 40)])).toEqual([]);
   });
 });
+
+describe("mergeReadings without a back photo", () => {
+  // Found by the final test run: a missing back used to count as a 100% confident reading, so a
+  // front read at 24% scored like one read at 62%, and garbage passed MIN_SHOW as ingredients.
+  it("uses the front's own confidence, so a poorly read front shows no free text", () => {
+    const garbage = reading("binary", "Cee 8000 mg\nNee 2 %", 24);
+    const { fields } = mergeReadings([garbage], []);
+    expect(fields.ingredients).toBeNull();
+  });
+
+  it("still reads structured fields from a well-read front", () => {
+    const clear = reading("binary", "M.R.P. Rs. 122.98\nB.No. GT2304", 90);
+    const { fields } = mergeReadings([clear], []);
+    expect(fields.mrp?.value).toBe(122.98);
+    expect(fields.batchNo?.value).toBe("GT2304");
+    // Pattern confidence × the front's 90%, not × the old (90 + 100) / 2 = 95%.
+    expect(fields.mrp!.confidence).toBeLessThanOrEqual(0.9);
+  });
+});

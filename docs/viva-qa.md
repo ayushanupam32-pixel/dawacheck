@@ -84,8 +84,8 @@ Answer in your own words; these are the points to hit. Each milestone note
     switch, three languages, focus moves to each new screen.
 
 15. **What is the biggest limitation?**
-    Reading brand names and ingredients on real, busy photos: 1/13 brands right on dev photos
-    (4 wrong). The app stays safe (the user confirms, it abstains, 0 wrong medicines), but the user
+    Reading brand names and ingredients on real, busy photos: 0/13 brands pre-filled right on
+    dev photos (3 wrong; the right one now fails the confidence bar but still matches via guesses). The app stays safe (the user confirms, it abstains, 0 wrong medicines), but the user
     often types the name. Also: only 16 labelled photos.
 
 16. **What would you do with more time?**
@@ -108,4 +108,5 @@ Answer in your own words; these are the points to hit. Each milestone note
     confirms, Valium 10 matched and the others said "not sure". The test also caught a real defect
     (a missing back photo was counted as a confident reading, letting garbage ingredients show),
     which the dev photos had hidden. That's what a frozen test set is for; we report it rather than
-    re-tune on it. With 3 photos, it is also far too small to generalise.
+    re-tune on it. We fixed the defect afterwards and checked the fix on dev photos only (wrong
+    values 8 → 6); the test numbers are still the pre-fix ones. With 3 photos, it is also far too small to generalise.

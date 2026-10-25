@@ -75,12 +75,14 @@ of in-list strips. Wrong _generic_ given: 0%. Simulated strips are easier than r
 | Expiry      | 3/4             | 0/4             | 1/4             |
 | MRP         | 1/4             | 0/4             | 0/4             |
 | Pack size   | 3/10            | 0/10            | 1/10            |
-| Ingredients | 1/9             | 4/9             | 0/9             |
-| Brand       | 1/13            | 4/13            | 0/13            |
+| Ingredients | 1/9             | 3/9             | 0/9             |
+| Brand       | 0/13            | 3/13            | 0/13            |
 
 **Frozen test set** (3 photos, labels checked by a person, run once on 2026-10-25): no field was read correctly; wrong values shown: brand 1/3, ingredients 2/2; plain OCR read 1 of 2 pack sizes, DawaCheck none. Two of the three are foreign packs (French Augmentin, German Sortis) and OCR confidence was only 23–44%, so almost nothing was readable. The run also exposed a defect: with no back photo, the merge step counts the missing back as a fully confident reading, which doubled weak front readings and let garbage ingredients ("Cee 8000 mg") past the bar for showing free text. The test result stands as measured.
 
-Reading time on a laptop: 7.3 s median, 10.9 s p95 (was 9.9 s / 16.8 s before the 2-worker
+**Fixed after the final run** (2026-10-25, checked on the 13 dev photos only; the test-set numbers above were measured before the fix and are not re-run): a photo without a back side now counts only the front's own confidence. Dev photos: wrong values shown 8 → 6 (one garbage name and two garbage ingredient lines no longer shown), batch, dates, MRP and pack size unchanged, speed unchanged; one correct but low-confidence name ("Suhagra-100") is no longer pre-filled, yet its automatic match still succeeds through the brand guesses.
+
+Reading time on a laptop: 7.1 s median, 10.8 s p95 (was 9.9 s / 16.8 s before the 2-worker
 reader). On real photos the user's name correction matters: with names as confirmed, 3/5
 in-list photos matched and 0 were wrong; fully automatic, 1/5 and 0 wrong. On the test photos, with the names a user would confirm: 1 of 2 in-list strips matched (Valium 10mg, 86%), 0 wrong; Augmentin said "not sure" (several strengths, none read) and Sortis correctly said it is not in the list. The always-answer baselines got 67–100% of their answers wrong. Fully automatic: 0 right, 0 wrong (all three abstained).
 
@@ -151,9 +153,6 @@ docs/       Architecture, milestone notes (M0–M7), report, slides, demo script
 
 ## Limitations
 
-- **Front-only photos are over-trusted** (found by the final test run): a missing back photo
-  counts as a fully confident reading, so weak front text can be shown as ingredients. To be
-  fixed and checked on development photos only.
 - **Small photo set:** 16 web photos (13 dev, 3 test); the brief asks for ~200. Real-phone photos
   are still to be added, so the reading numbers are rough.
 - **Brand and ingredient reading is weak** on busy real photos (OCR quality is the bottleneck);

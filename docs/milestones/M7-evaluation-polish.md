@@ -98,8 +98,13 @@ section of `eval/match-results.md`; the About page shows them (`readerFinal`).
 - **Fully automatic:** 0 right, 0 wrong (all abstained).
 - **Defect found:** for a photo without a back side, `mergeReadings` uses a placeholder back
   reading with confidence 100, so `(front + back) / 200` doubles a weak front's score (24% → 62%)
-  and garbage passes `MIN_SHOW`. The dev set hid this. The test numbers stand as measured; a fix
-  must be checked on dev photos only.
+  and garbage passes `MIN_SHOW`. The dev set hid this. The test numbers stand as measured.
+- **Fixed after the final run** (checked on dev photos only, `--final` not re-run): with no
+  back photo, only the front's confidence counts (`mergeReadings`; 2 new unit tests, which fail
+  on the old code). Dev photos: wrong values shown 8 → 6; batch, dates, MRP, pack size, speed
+  and every automatic match unchanged; the correct but low-confidence "Suhagra-100" is no longer
+  pre-filled, but its automatic match still succeeds through the brand guesses (their first real
+  win). All 19 Playwright tests pass.
 
 ## How to test it
 

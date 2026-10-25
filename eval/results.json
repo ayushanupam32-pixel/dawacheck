@@ -2,7 +2,7 @@
   {
     "id": "demo-telmikind",
     "split": "demo",
-    "ms": 616,
+    "ms": 606,
     "ocr": ["binary:81", "binary:89"],
     "read": {
       "brand": "TELMIKIND 40",
@@ -114,7 +114,7 @@
   {
     "id": "demo-omee",
     "split": "demo",
-    "ms": 1351,
+    "ms": 1312,
     "ocr": [
       "binary:70",
       "ink:0",
@@ -237,7 +237,7 @@
   {
     "id": "favipill800",
     "split": "dev",
-    "ms": 10108,
+    "ms": 9928,
     "ocr": [
       "binary:25",
       "ink:42",
@@ -364,7 +364,7 @@
   {
     "id": "fincover1",
     "split": "dev",
-    "ms": 9545,
+    "ms": 9293,
     "ocr": [
       "binary:26",
       "ink:29",
@@ -487,10 +487,10 @@
   {
     "id": "suhagra100",
     "split": "dev",
-    "ms": 2352,
+    "ms": 2299,
     "ocr": ["binary:21", "ink:39", "enhanced:30", "inverted:20"],
     "read": {
-      "brand": "| Suhagra-100",
+      "brand": "",
       "ingredients": "",
       "mrp": "",
       "packSize": "",
@@ -504,15 +504,15 @@
       "guesses": ["| Suhagra-100", "pave -"]
     },
     "matchSingle": {
-      "got": "Suhagra 100 Tablet",
-      "outcome": "right"
+      "got": "abstain (no_brand)",
+      "outcome": "abstained"
     },
     "full": {
       "brand": {
-        "correct": 1,
+        "correct": 0,
         "wrong": 0,
         "total": 1,
-        "cerSum": 0
+        "cerSum": 1
       },
       "ingredients": {
         "correct": 0,
@@ -599,7 +599,7 @@
   {
     "id": "neorelax-mr",
     "split": "dev",
-    "ms": 7937,
+    "ms": 7891,
     "ocr": [
       "binary:28",
       "ink:38",
@@ -726,7 +726,7 @@
   {
     "id": "crocin-cold-flu",
     "split": "dev",
-    "ms": 7258,
+    "ms": 7141,
     "ocr": [
       "binary:22",
       "ink:40",
@@ -853,10 +853,10 @@
   {
     "id": "metformin500-zanza",
     "split": "dev",
-    "ms": 1648,
+    "ms": 1630,
     "ocr": ["binary:33", "ink:19", "enhanced:32", "inverted:33"],
     "read": {
-      "brand": "rmin",
+      "brand": "",
       "ingredients": "",
       "mrp": "",
       "packSize": "",
@@ -865,20 +865,20 @@
       "expDate": ""
     },
     "match": {
-      "got": "abstain (unsure)",
+      "got": "abstain (strength_unknown)",
       "outcome": "abstained",
       "guesses": ["| Metformin t", "| Metformin 4", "rmin"]
     },
     "matchSingle": {
-      "got": "abstain (unsure)",
+      "got": "abstain (no_brand)",
       "outcome": "abstained"
     },
     "full": {
       "brand": {
         "correct": 0,
-        "wrong": 1,
+        "wrong": 0,
         "total": 1,
-        "cerSum": 0.5555555555555556
+        "cerSum": 1
       },
       "ingredients": {
         "correct": 0,
@@ -920,7 +920,7 @@
     "base": {
       "brand": {
         "correct": 0,
-        "wrong": 1,
+        "wrong": 0,
         "total": 1,
         "cerSum": 1
       },
@@ -965,7 +965,7 @@
   {
     "id": "warfarin2-label",
     "split": "dev",
-    "ms": 2137,
+    "ms": 2100,
     "ocr": ["binary:56", "ink:69", "enhanced:57", "inverted:54"],
     "read": {
       "brand": "—— WARFARIN",
@@ -1077,11 +1077,11 @@
   {
     "id": "azithromycin250-sandoz",
     "split": "dev",
-    "ms": 7972,
+    "ms": 7713,
     "ocr": ["binary:21", "ink:22", "enhanced:27", "inverted:21"],
     "read": {
       "brand": "",
-      "ingredients": "A Oso Preg 5 %\nLien Yh 1 %",
+      "ingredients": "",
       "mrp": "",
       "packSize": "",
       "batchNo": "",
@@ -1106,9 +1106,9 @@
       },
       "ingredients": {
         "correct": 0,
-        "wrong": 1,
+        "wrong": 0,
         "total": 1,
-        "cerSum": 0.9473684210526315
+        "cerSum": 1
       },
       "mrp": {
         "correct": 0,
@@ -1189,7 +1189,7 @@
   {
     "id": "anterone50",
     "split": "dev",
-    "ms": 1806,
+    "ms": 1778,
     "ocr": ["binary:39", "ink:31", "enhanced:60", "inverted:36"],
     "read": {
       "brand": "cyproterone acetate 50 mg EE one 50",
@@ -1256,13 +1256,13 @@
     "base": {
       "brand": {
         "correct": 0,
-        "wrong": 1,
+        "wrong": 0,
         "total": 1,
-        "cerSum": 0.45454545454545453
+        "cerSum": 1
       },
       "ingredients": {
         "correct": 0,
-        "wrong": 1,
+        "wrong": 0,
         "total": 1,
         "cerSum": 1
       },
@@ -1301,7 +1301,7 @@
   {
     "id": "citalopram20",
     "split": "dev",
-    "ms": 9732,
+    "ms": 9607,
     "ocr": ["binary:23", "ink:90", "enhanced:40", "inverted:24"],
     "read": {
       "brand": "HEUMANN Jf",
@@ -1368,15 +1368,15 @@
     "base": {
       "brand": {
         "correct": 0,
-        "wrong": 1,
+        "wrong": 0,
         "total": 1,
-        "cerSum": 0.8333333333333334
+        "cerSum": 1
       },
       "ingredients": {
         "correct": 0,
-        "wrong": 1,
+        "wrong": 0,
         "total": 1,
-        "cerSum": 0.625
+        "cerSum": 1
       },
       "mrp": {
         "correct": 0,
@@ -1413,7 +1413,7 @@
   {
     "id": "cialis20",
     "split": "dev",
-    "ms": 3309,
+    "ms": 3267,
     "ocr": ["binary:22", "ink:35", "enhanced:27", "inverted:22"],
     "read": {
       "brand": "",
@@ -1525,7 +1525,7 @@
   {
     "id": "dexedrine5",
     "split": "dev",
-    "ms": 2937,
+    "ms": 2913,
     "ocr": ["binary:25", "ink:23", "enhanced:31", "inverted:25"],
     "read": {
       "brand": "",
@@ -1641,11 +1641,11 @@
   {
     "id": "androcur50",
     "split": "dev",
-    "ms": 10909,
+    "ms": 10766,
     "ocr": ["binary:24", "ink:22", "enhanced:21", "inverted:25"],
     "read": {
       "brand": "",
-      "ingredients": "Toh Ir 7000 mg",
+      "ingredients": "",
       "mrp": "",
       "packSize": "",
       "batchNo": "",

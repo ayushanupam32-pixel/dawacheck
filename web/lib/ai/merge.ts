@@ -30,7 +30,8 @@ export const MIN_SHOW = 0.3;
 const FREE_TEXT: FieldKey[] = ["brand", "ingredients", "manufacturer"];
 
 export function mergeReadings(front: OcrReading[], back: OcrReading[]): MergedResult {
-  const backs = back.length ? back : [{ variant: "none", text: "", confidence: 100, lines: [] }];
+  const noBack = back.length === 0;
+  const backs = noBack ? [{ variant: "none", text: "", confidence: 0, lines: [] }] : back;
   const fields = {} as ExtractedFields;
   const best = {} as Record<FieldKey, number>;
   const source: MergedResult["source"] = {};
@@ -38,7 +39,10 @@ export function mergeReadings(front: OcrReading[], back: OcrReading[]): MergedRe
   for (const f of front) {
     for (const b of backs) {
       const extracted = extractFields(f.text, b.text, f.lines);
-      const ocr = (f.confidence + b.confidence) / 200;
+      // With no back photo, everything was read from the front, so only the front's confidence
+      // counts. (Found by the final test run: the missing back used to count as a 100% confident
+      // reading, which doubled a weak front's score and let garbage through as ingredients.)
+      const ocr = noBack ? f.confidence / 100 : (f.confidence + b.confidence) / 200;
       for (const key of Object.keys(extracted) as FieldKey[]) {
         const field = extracted[key];
         if (!field) {

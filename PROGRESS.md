@@ -374,16 +374,17 @@ shows the test-set reading table).
 - Fully automatic: 0 right, 0 wrong.
 - **Defect found:** `mergeReadings` gives a missing back photo a placeholder reading with
   confidence 100, so `(front + back) / 200` doubles a weak front's score and garbage ingredients
-  pass `MIN_SHOW`. Not fixed yet; any fix is evaluated on dev photos only (test numbers stand).
+  pass `MIN_SHOW`. **Fixed after the final run (same day):** with no back photo only the
+  front's confidence counts. Checked on dev photos only (`--final` not re-run): wrong values
+  8 → 6, structured fields, speed and automatic matches unchanged; "Suhagra-100" no longer
+  pre-filled but still matched via brand guesses. 401 unit tests, 19 Playwright tests pass.
 - README, report outline, slides, viva Q&A (new Q19) and M7 notes updated; phone-speed
   placeholders are now **[PHONE]**.
 
 ## Exact next steps
 
-1. **Fix the front-only confidence defect** (above) and check it with `pnpm eval` on dev photos
-   only; never re-run `--final`.
-2. **Time the live demo on a phone** ("How we read this" shows the seconds) → fill **[PHONE]**.
-3. **SUS study** with 15–20 people (`docs/sus/README.md`), then `sus_score.py` → fill **[SUS]**.
-4. Write the report and slides from the outlines; record the demo.
-5. Optional: Playwright in CI (add `SUPABASE_PUBLISHABLE_KEY` as a GitHub secret); native-speaker
+1. **Time the live demo on a phone** ("How we read this" shows the seconds) → fill **[PHONE]**.
+2. **SUS study** with 15–20 people (`docs/sus/README.md`), then `sus_score.py` → fill **[SUS]**.
+3. Write the report and slides from the outlines; record the demo.
+4. Optional: Playwright in CI (add `SUPABASE_PUBLISHABLE_KEY` as a GitHub secret); native-speaker
    review of Hindi/Tamil texts; more phone photos (a new test set would need its own freeze).
