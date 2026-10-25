@@ -1,6 +1,7 @@
 # DawaCheck progress
 
-Last updated: 2026-10-25 (final test-set evaluation done; SUS study and phone timing wait for the user).
+Last updated: 2026-10-26 (M7 built and in CI; AI working files untracked; SUS study, phone timing
+and the written report wait for the user).
 
 ## Where we are
 
@@ -9,16 +10,16 @@ evaluation ran once (2026-10-25). Waiting for the user: the SUS study and timing
 
 - Live site: https://dawacheck-psi.vercel.app (deploys automatically on every push to `main`)
 
-| Milestone                                             | Status  | Commits                                                          | Notes                                                                |
-| ----------------------------------------------------- | ------- | ---------------------------------------------------------------- | -------------------------------------------------------------------- |
-| M0 Setup                                              | done    | `052cbcd`                                                        | Next.js + pnpm workspace, CI, Vercel, 3 languages, large-text toggle |
-| M1 Generic lookup                                     | done    | `eff1cd6`, `bc365fe`, `8726de1`, `1c4fee9`, `c1b090f`, `ca3d59c` | type a brand → exact Jan Aushadhi generic + savings                  |
-| M2 Nearest Kendra                                     | done    | `da80334`, `c9ffe2b` (data refresh)                              | computed on the phone from static files                              |
-| M3 Reading strips                                     | done    | `2b6b700`, `317324e`, `db927f1`                                  | in-browser OCR, confirm screen, evaluation                           |
-| M4 Matching OCR → medicine                            | done    |                                                                  | re-ranker + choice model + safety rules; top-1 89% dev / 86% test    |
-| M5 Safety checks (NSQ, NPPA, banned FDC, result card) | done    |                                                                  |                                                                      |
-| M6 Family cabinet + PWA                               | dropped |                                                                  |                                                                      |
-| M7 Evaluation + polish                                | built   |                                                                  |                                                                      |
+| Milestone                                             | Status  | Commits                                                                                | Notes                                                                |
+| ----------------------------------------------------- | ------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| M0 Setup                                              | done    | `052cbcd`                                                                              | Next.js + pnpm workspace, CI, Vercel, 3 languages, large-text toggle |
+| M1 Generic lookup                                     | done    | `eff1cd6`, `bc365fe`, `8726de1`, `1c4fee9`, `c1b090f`, `ca3d59c`                       | type a brand → exact Jan Aushadhi generic + savings                  |
+| M2 Nearest Kendra                                     | done    | `da80334`, `c9ffe2b` (data refresh)                                                    | computed on the phone from static files                              |
+| M3 Reading strips                                     | done    | `2b6b700`, `317324e`, `db927f1`                                                        | in-browser OCR, confirm screen, evaluation                           |
+| M4 Matching OCR → medicine                            | done    | `7709e1d`                                                                              | re-ranker + choice model + safety rules; top-1 89% dev / 86% test    |
+| M5 Safety checks (NSQ, NPPA, banned FDC, result card) | done    | `5b52369`, `c1b8af2`, `b0d8430`, `783bb3a`, `9073f4f`                                  | five-row result card (cabinet row dropped with M6)                   |
+| M6 Family cabinet + PWA                               | dropped |                                                                                        |                                                                      |
+| M7 Evaluation + polish                                | built   | `f656e60`, `3703161`, `06143a8`, `b6bc37b`, `02fbbc7`, `3e406de`, `baec22d`, `c8985fc` | final eval run once; SUS + phone timing pending (user)               |
 
 Viva notes for each milestone: `docs/milestones/M0-setup.md` … `M7-evaluation-polish.md`.
 Other deliverables in `docs/` (see `docs/README.md`): architecture diagram, demo GIF, report
@@ -94,11 +95,11 @@ corrections): 1/5 matched, 0 wrong: the M3 reader rarely reads the brand name.
 - **Photo set is small:** 16 openly licensed web photos + demo, not the ~30 needed for M3 (or the
   ~200 the brief wants by M7). No phone photos taken by the user yet. The photos are not in git:
   `eval/photo-sources.json` says where to download each one again.
-- **Labels were typed by Claude**, from the web photos, with an empty form (no pre-fill). A human
-  should spot-check `eval/labels.json` against the photos before the numbers go in the report.
-- **Scan flow not clicked through end to end in a browser** with real photos (front → back →
-  stamp → confirm). Demo mode was clicked through, including M4's match / pick / abstain screens
-  (by typing "Telma 40" and "Valium" as the name). Unit tests and `pnpm eval` cover the logic.
+- **Labels were typed by Claude**, from the web photos, with an empty form (no pre-fill); the
+  user spot-checked them on 2026-10-25 (no corrections) before the final run.
+- **Scan flow end to end:** verified through the real upload screens (front → back → stamp →
+  confirm → Find) with the 18 `demo/` strips (generated images) and in Playwright, but **not yet
+  with photos taken on a real phone**.
 - **M4 brief targets not all met:** top-3 90% (target 95%; ~10% of names too garbled for the
   search to find) and abstention on in-dataset strips 28% (target ≤ 20%; mostly correct caution:
   strength not read for a brand sold in several strengths).
@@ -107,16 +108,21 @@ corrections): 1/5 matched, 0 wrong: the M3 reader rarely reads the brand name.
 - **Hindi and Tamil translations** were written by Claude and need review by a native speaker.
 - **Tesseract model is downloaded from the CDN** at first use (M6, which would have self-hosted
   it for offline use, was dropped).
+- **Not done (user's part):** SUS study (`docs/sus/`), timing on a mid-range Android phone,
+  writing the report and slides from `docs/report-outline.md` and `docs/slides.md`.
 
 ## Known bugs and limits
 
 - **Too slow:** 7.1 s median per strip on a laptop (was 10 s); phones will be slower. Preparing
   runs in a Web Worker now, but the quarter turns of pass 3 still run on the page.
-- **Brand and ingredient reading are weak** (2/14 and 2/10, and 4 wrong each). M4 copes (it
-  abstains, 0 wrong), but the fully automatic photo → medicine path matched only 1 of 5. Idea:
-  use the matcher to confirm brand guesses (the 3 tallest lines on the front) before the
-  confirm screen, as the brief's Stage 3 suggests ("confirmed by matching").
-- **Omee demo:** the browser's OCR misses "OMEE"; type the name (see M7 progress).
+- **Brand and ingredient reading are weak** on real web photos: dev 0/13 brands pre-filled
+  right (3 wrong), ingredients 1/9 (3 wrong); final test set 0 right. Matching copes (abstains,
+  0 wrong medicines); brand guesses "confirmed by matching" are in but gave no gain on dev photos.
+- **In-app Omee demo:** the browser's OCR sometimes misses "OMEE" on that image; the presenter
+  types it. (The `demo/3-batch-alert/01-omee` strip reads it.)
+- **Matcher weakness:** "CETZINE 10" matches another maker's "Cetzin 10mg" (93%) because GSK's
+  Cetzine 10 is not in the 2022 dataset. Not fixed. Look-alike siblings ("Azithral 500" vs
+  "Azithral 5D") make it abstain, which is correct caution.
 - **English OCR only** (`eng`). Hindi text on strips is not read.
 - **Kendra PMBJK23337** (Thane, shown at Mumbai CST) may be misplaced in the official data; it
   passed our district check. Not fixed.
@@ -414,6 +420,18 @@ shows the test-set reading table).
 - `ci.yml`: the build and a new "End-to-end tests (Playwright)" step get `SUPABASE_URL` and the
   key; Playwright uses the runner's Chrome; skipped when the secret is unavailable (fork PRs);
   report uploaded on failure. First run 40225372468: **22 passed (44 s)**. Job timeout 20 min.
+
+### Repository housekeeping (2026-10-26)
+
+- At the user's request, `CLAUDE.md` and `.claude/` are **no longer tracked in git** (`edd9778`):
+  kept on the developer's Mac and listed in `.gitignore`, so Claude sessions still read them. The
+  website and pipeline never used them (site checked live afterwards).
+- Not changed, on purpose: git history (old commits still contain those files and the
+  "Co-Authored-By: Claude" lines) and the AI-use disclosures in the docs ("labels typed by
+  Claude", "Hindi/Tamil written by Claude"). Advice given: declare AI assistance in the report
+  and viva, per the college's policy.
+
+## Exact next steps
 
 1. **Time the live demo on a phone** ("How we read this" shows the seconds) → fill **[PHONE]**.
 2. **SUS study** with 15–20 people (`docs/sus/README.md`), then `sus_score.py` → fill **[SUS]**.
