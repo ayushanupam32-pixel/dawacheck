@@ -455,7 +455,10 @@ Kendras and About; Skiper UI pieces (skiper04, 26, 37, 40) credited in the foote
 `framer-motion` 14.1.0, `@number-flow/react` 0.6.2. Checks: 409 Vitest, 31 Playwright (axe in light
 and dark, theme tests; 3 green runs), 197 pytest, lint, types, format; responsive sweep of 240
 views clean; Lighthouse accessibility 100 on 7 pages after the redesign. Delete `web/.next` before
-building when checking CSS (stale Turbopack cache seen once).
+building when checking CSS (stale Turbopack cache seen once). Commits `c1927ef` (redesign) and `9eaa339`
+(Playwright `openPage()` waits for React hydration before typing: the first CI run passed only on
+retry because the search box was filled before hydration). CI run 40284284184: 31/31 first try;
+live site verified in en/hi/ta.
 
 ## Exact next steps
 
