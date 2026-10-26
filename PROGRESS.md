@@ -467,7 +467,8 @@ check of the demo strip; palette Ink + Marigold (user's choice of three); Bricol
 headings; count-up real data counts, scroll card stack, scroll letters, cursor glow (Skiper UI
 skiper16, 19-idea, 31, 37, 61); ink footer; animated inner headers. `lib/segment.ts`
 (Intl.Segmenter) keeps Hindi/Tamil letters whole. 416 Vitest, 33 Playwright, sweep clean,
-Lighthouse a11y 100. Details: M7 note, "Second pass".
+Lighthouse a11y 100. Details: M7 note, "Second pass". Commits `ee64576` and `7f1f78c` (steadier test timing after
+2 flaky tests); CI run 40288156774: 33/33 first try; live in en/hi/ta.
 
 ## Exact next steps
 
