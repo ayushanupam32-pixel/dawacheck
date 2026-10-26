@@ -77,7 +77,7 @@ top of the page; it now moves to the new screen's heading.
 | Speed per strip (≤ 5 s p95 on phone) | 7.1 s median, 10.8 s p95 on a laptop (was 9.9 / 16.8); phone: [PHONE]                                             |
 | Lighthouse accessibility (≥ 90)      | 100 on every page tested                                                                                          |
 | axe WCAG 2.1 AA                      | 0 violations, 5 pages × 3 languages + 4 interactive screens                                                       |
-| Playwright end to end                | 31 tests pass (both demos, search + checks, Kendras, privacy, theme, axe light + dark)                            |
+| Playwright end to end                | 33 tests pass (both demos, search + checks, Kendras, privacy, theme, reduced motion, axe light + dark)            |
 | Brand guesses (ablation)             | no change on dev photos: 1/5 right, 0 wrong, with or without                                                      |
 | SUS (≥ 70)                           | [SUS]                                                                                                             |
 | Final test set (3 photos, run once)  | reading: 0 fields right, wrong brand 1/3, wrong ingredients 2/2; matching with confirmed names 1/2 right, 0 wrong |
@@ -128,7 +128,7 @@ Building them found two things:
 
 ## How to test it
 
-- `pnpm build && pnpm test:e2e` (needs `web/.env.local`): 31 tests, ~15 s.
+- `pnpm build && pnpm test:e2e` (needs `web/.env.local`): 33 tests, ~35 s.
 - Live: Scan → "Demo: blood-pressure strip" → Find; "Demo: strip with a quality alert" → type
   "Omee", tick "It matches my strip" → Find → red alert. About page: refresh dates + results.
 - `python3 docs/sus/sus_score.py docs/sus/responses.csv` once responses exist.
@@ -170,7 +170,7 @@ or matcher do, so the evaluation numbers are unaffected.
   and a tiny script that applies the saved choice before the first paint, so there is no flash.
   `components/theme-toggle.tsx`: a header menu (Base UI Menu, keyboard-friendly) and a three-way
   switch in the phone menu. "Same as phone" follows the operating system live.
-- **Design system** (`app/globals.css`, `components/ui/field.tsx`): one accent (the brand teal),
+- **Design system** (`app/globals.css`, `components/ui/field.tsx`): one accent (first the brand teal; replaced by Ink + Marigold in the second pass below),
   cool neutrals, status colours tuned separately for light and dark, input borders with 3:1
   contrast, soft tinted shadows, one corner-radius rule, shared input, panel and skeleton styles.
   Noto Sans stays: it is the one family that matches across Latin, Devanagari and Tamil.
@@ -212,3 +212,48 @@ characters. New dependencies: `framer-motion` 14.1.0, `@number-flow/react` 0.6.2
 
 **Limitations:** the new Hindi and Tamil texts were written by Claude and need a native speaker's
 review, like the rest; Lighthouse was run on a laptop, not a phone.
+
+## Second pass: Ink + Marigold and motion (2026-10-26)
+
+The user found the first redesign too plain: the demo-strip photo in the hero looked cheap, there
+was little motion on entering the site, and the teal palette looked generic. They chose a palette
+from three options: **Ink + Marigold**.
+
+**Palette.** Deep ink blue for text and for "stages" (the hero and the footer), marigold as the one
+accent. Marigold is a fill colour (buttons, highlights) with ink text on it; text and icons on the
+page use a deeper marigold token, `--brand`, that passes 4.5:1. The warning colour moved to a rust
+orange so it is never confused with the brand. Headings use Bricolage Grotesque for Latin letters
+(Hindi and Tamil headings still use Noto, which matches those scripts).
+
+**Home page, rebuilt.**
+
+- The demo-strip photo is gone. The hero is a deep-ink stage with two slowly drifting lights, a
+  fine dot grid and a marigold glow that follows the mouse (Skiper UI skiper61). The headline rises
+  word by word, and the highlighted phrase ("government data") gets a hand-drawn underline that
+  draws itself (the idea of skiper19). Next to it, a **live check** of the demo strip: the five
+  checks tick in one by one and the saving counts up. Every value in it is a real result for that
+  strip (₹78.63 a month at one tablet a day, shown as ₹79), marked DEMO.
+- Real counts from the latest data refresh (Kendras, CDSCO alerts, brands, NPPA prices) count up
+  as they come into view (skiper37, Number Flow). They are read from `data_sources`, never typed in.
+- The five checks build into a **card stack** while scrolling (skiper16): each card pins and the
+  ones behind it shrink. Marigold, ink and three quieter cards, each with its data source.
+- "Same medicine. Less money." assembles letter by letter as it scrolls in (skiper31), above the
+  real price example (₹3.86 vs ₹1.24 a tablet).
+- The footer is an ink stage too, so every page ends on the brand colours. Inner page headers rise
+  in on load with a marigold icon tile.
+
+**How the motion is built (`components/motion.tsx`, `app/globals.css`).** Above-the-fold entrances
+are pure CSS animations, so they play as soon as the page appears without waiting for scripts.
+Scroll reveals use an IntersectionObserver and only hide content once JavaScript has run (a `js`
+class set by the pre-paint script). Scroll-linked pieces use framer-motion. Only transform and
+opacity are animated. With "reduce motion" everything is still: no entrance animation, reveals
+shown at once, the card stack a plain list (an e2e test checks this). **Letters are split with
+`Intl.Segmenter`** (`lib/segment.ts`, unit-tested), not `split("")`, which would cut a Hindi or
+Tamil letter from its vowel sign; this is what made letter animations possible in all three
+languages.
+
+**Checks.** 416 Vitest (new `segment.test.ts`), 33 Playwright (new `motion.spec.ts`: reduced
+motion, live numbers, headline), axe 0 violations in light and dark; responsive sweep of 240 views
+clean after two fixes (the Tamil hero and Search headings were too wide at 320-375 px; headings now
+scale with the screen); Lighthouse accessibility 100 on 7 pages. Found by axe: the scroll letters
+first faded from 15%, which is unreadable; they now move at full strength.

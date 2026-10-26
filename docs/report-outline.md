@@ -111,7 +111,7 @@ banned (yes / maybe / no), Kendra (geohash + Haversine).
   Canvas not OpenCV; Supabase + pg_trgm; Python pipeline with uv).
 - Code organisation: pure tested modules vs thin glue; same code for app and evaluation.
 - i18n (built-in dictionaries), accessibility measures, Demo mode.
-- Testing: 409 unit tests (Vitest), 197 pipeline tests (pytest), 31 Playwright tests (end to end, privacy network log, theme, axe in light and dark), CI
+- Testing: 416 unit tests (Vitest), 197 pipeline tests (pytest), 33 Playwright tests (end to end, privacy network log, theme, reduced motion, axe in light and dark), CI
   on every push, Lighthouse 100.
 - Deployment: Vercel from `main`, monthly data refresh commits.
 

@@ -131,8 +131,8 @@ pnpm dev                             # http://localhost:3000
 
 | Command                        | What it does                                                  |
 | ------------------------------ | ------------------------------------------------------------- |
-| `pnpm test`                    | Unit tests (Vitest, 409)                                      |
-| `pnpm build && pnpm test:e2e`  | Playwright end to end, privacy, theme, axe light + dark (31)  |
+| `pnpm test`                    | Unit tests (Vitest, 416)                                      |
+| `pnpm build && pnpm test:e2e`  | Playwright end to end, privacy, theme, motion, axe (33)       |
 | `pnpm lint` / `pnpm typecheck` | ESLint / TypeScript strict                                    |
 | `pnpm eval`                    | Strip reader on the labelled photos (`-- --final`: test set)  |
 | `pnpm eval:match`              | Matching evaluation (`--fit` refits the weights on dev cases) |

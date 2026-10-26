@@ -661,11 +661,16 @@ components) is kept thin. **The evaluation scripts call the same code as the app
   first paint, so the page never flashes in the wrong theme. Dark mode has its own colour set (not
   an inversion), checked for contrast with axe like the light one. Switching animates a circle
   growing from the button (the View Transitions API), skipped when the user asks for reduced motion.
-- **One design system:** a single accent (the brand's teal), tokens for surfaces, borders and status
+- **One design system:** deep ink blue with a single marigold accent, tokens for surfaces, borders and status
   colours, one corner-radius rule and shared field, panel and skeleton styles. Loading states are
-  skeletons shaped like the result that is coming. A few interactions are adapted from the Skiper UI
-  component library (theme icon and reveal, the animated savings figure, the external-link style),
-  credited in the footer as its free licence requires.
+  skeletons shaped like the result that is coming.
+- **Motion with a purpose:** the home page opens with the headline rising word by word and a
+  "live check" of the demo strip ticking through the five checks; real counts from the data
+  refresh count up; the five checks build into a card stack while scrolling. Interactions adapted
+  from the Skiper UI component library (free tier, credited in the footer): theme icon and reveal,
+  card stack, scroll letters, cursor glow, rolling numbers, external-link style. Letter animations
+  split text with `Intl.Segmenter`, so Hindi and Tamil letters stay whole. Everything is still when
+  the user asks for reduced motion (tested).
 - **Demo mode** has two strips built from real records (Telmikind 40 from the brand data; Omee
   with the batch, dates and maker of a real CDSCO alert), clearly marked DEMO. `demo/` holds 18
   more strips covering every feature, each verified through the live upload flow (18/18).
@@ -674,11 +679,11 @@ components) is kept thin. **The evaluation scripts call the same code as the app
 
 | Suite                   | Count | What it covers                                                                                                                                       |
 | ----------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Vitest (web)            | 409   | Preprocessing, extraction (including real OCR snippets), merging, matching, checks, languages                                                        |
+| Vitest (web)            | 416   | Preprocessing, extraction (including real OCR snippets), merging, matching, checks, languages                                                        |
 | pytest (pipeline)       | 197   | Parsers, normalisation, validation, the NPPA 30-price check, rule-file freshness                                                                     |
-| Playwright (end to end) | 31    | Both demos end to end, typed search with all checks, Kendras by PIN, privacy network log, theme menu, axe on every page and screen in light and dark |
+| Playwright (end to end) | 33    | Both demos end to end, typed search with all checks, Kendras by PIN, privacy network log, theme menu, axe on every page and screen in light and dark |
 
-Vitest and pytest pass (run on 26 October 2026); the 31 Playwright tests pass in CI. Every push to `main` runs formatting, lint, type
+Vitest and pytest pass (run on 26 October 2026); the 33 Playwright tests pass in CI. Every push to `main` runs formatting, lint, type
 checks, Vitest, the production build, Playwright against that build, and the pipeline's ruff and
 pytest, then deploys to Vercel.
 
@@ -1150,8 +1155,8 @@ Full URLs: `eval/photo-sources.json`.
 ```bash
 pnpm install
 cp web/.env.example web/.env.local   # SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY
-pnpm test                            # 409 unit tests
-pnpm build && pnpm test:e2e          # 31 end-to-end, privacy, theme and accessibility tests
+pnpm test                            # 416 unit tests
+pnpm build && pnpm test:e2e          # 33 end-to-end, privacy, theme, motion and accessibility tests
 pnpm eval                            # strip reader on the development photos
 pnpm eval:match                      # matching: simulated and labelled cases
 cd pipeline && uv run pytest -q      # 197 pipeline tests

@@ -20,5 +20,7 @@ export function resolveTheme(preference: ThemePreference, systemDark: boolean): 
 /**
  * Runs in <head> before the page paints (layout.tsx). Same logic as the two functions above,
  * written out because it must be a plain string. Reads localStorage only; nothing leaves the phone.
+ * It also marks the page with the class "js": scroll-reveal styles only hide content when the
+ * script that will reveal it can run.
  */
-export const themeScript = `try{var p=localStorage.getItem("${THEME_KEY}");if(p!=="light"&&p!=="dark")p="system";var d=p==="dark"||(p==="system"&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d)}catch(e){}`;
+export const themeScript = `try{var p=localStorage.getItem("${THEME_KEY}");if(p!=="light"&&p!=="dark")p="system";var d=p==="dark"||(p==="system"&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",d)}catch(e){}document.documentElement.classList.add("js")`;

@@ -90,9 +90,9 @@ function PhotoPicker({
         // A strip-shaped guide frame, so people know what to fill the photo with.
         <div
           aria-hidden="true"
-          className="flex aspect-[16/9] w-full items-center justify-center rounded-2xl border-2 border-dashed border-primary/50 bg-accent/40"
+          className="flex aspect-[16/9] w-full items-center justify-center rounded-2xl border-2 border-dashed border-brand/50 bg-accent/40"
         >
-          <span className="flex size-16 items-center justify-center rounded-2xl bg-card text-primary shadow-soft">
+          <span className="flex size-16 items-center justify-center rounded-2xl bg-card text-brand shadow-soft">
             <Camera className="size-8" />
           </span>
         </div>
@@ -213,7 +213,7 @@ export function ScanClient({
   );
   const privacy = (
     <p className="flex items-start gap-2 text-base">
-      <Lock aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-primary" />
+      <Lock aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-brand" />
       {t.privacyPhoto}
     </p>
   );
@@ -279,7 +279,7 @@ export function ScanClient({
         {step.name === "front" && (
           <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-input p-4">
             <p className="flex items-center gap-2 text-base font-semibold">
-              <Sparkles aria-hidden="true" className="size-5 text-primary" />
+              <Sparkles aria-hidden="true" className="size-5 text-brand" />
               {t.demoTitle}
             </p>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -319,7 +319,7 @@ export function ScanClient({
         <p role="status" className="flex items-center gap-3 text-xl font-semibold">
           <Loader2
             aria-hidden="true"
-            className="size-6 animate-spin text-primary motion-reduce:animate-none"
+            className="size-6 animate-spin text-brand motion-reduce:animate-none"
           />
           {label}
         </p>
@@ -330,7 +330,7 @@ export function ScanClient({
               className={`flex items-center gap-3 text-base ${i <= at ? "text-foreground" : "text-muted-foreground"}`}
             >
               <span
-                className={`flex size-6 items-center justify-center rounded-full border ${i < at ? "border-primary bg-primary text-primary-foreground" : i === at ? "border-primary" : "border-border"}`}
+                className={`flex size-6 items-center justify-center rounded-full border ${i < at ? "border-brand bg-primary text-primary-foreground" : i === at ? "border-brand" : "border-border"}`}
               >
                 {i < at && <Check className="size-4" />}
               </span>
@@ -673,7 +673,7 @@ function MatchResult({
     const auto = response.status === "match" && response.brand.id === chosen.id;
     return (
       <section className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2 rounded-2xl border-2 border-primary/50 bg-card p-5 shadow-soft motion-safe:animate-in motion-safe:fade-in">
+        <div className="flex flex-col gap-2 rounded-2xl border-2 border-brand/50 bg-card p-5 shadow-soft motion-safe:animate-in motion-safe:fade-in">
           <p className="text-base text-muted-foreground">{auto ? t.matchedTitle : t.youChose}</p>
           <p className="text-2xl font-bold tracking-tight">{chosen.name}</p>
           {chosen.manufacturer && <p className="text-base">{chosen.manufacturer}</p>}

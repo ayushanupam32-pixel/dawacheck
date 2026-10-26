@@ -1,12 +1,11 @@
 import { notFound } from "next/navigation";
-import { cacheLife } from "next/cache";
 import { BookOpen } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { ExternalLink } from "@/components/ui/external-link";
 import { evalSummary, type ReaderSummary } from "@/lib/eval-summary";
 import { isLocale } from "@/lib/i18n/config";
 import { getDictionary, type Dictionary } from "@/lib/i18n/dictionaries";
-import { supabase } from "@/lib/supabase";
+import { refreshDates } from "@/lib/data-sources";
 
 // About page (brief, section 6): every data source with its last-updated date, the evaluation
 // results, the privacy explanation and the disclaimer. The numbers come from
@@ -27,26 +26,6 @@ const SOURCES = [
   },
   { key: "osm", url: "https://www.openstreetmap.org/copyright" },
 ] as const;
-
-type SourceRow = { source: string; last_run_at: string; rows_loaded: number };
-
-/**
- * When the monthly refresh last loaded each source. Cached for an hour, so the page stays a fast
- * static page and the database is asked at most once an hour. If the database can't be reached
- * (e.g. a build without its keys), the page still works and just says the date isn't available.
- */
-async function refreshDates(): Promise<SourceRow[] | null> {
-  "use cache";
-  cacheLife("hours");
-  try {
-    const { data, error } = await supabase()
-      .from("data_sources")
-      .select("source, last_run_at, rows_loaded");
-    return error ? null : (data as SourceRow[]);
-  } catch {
-    return null;
-  }
-}
 
 export async function generateMetadata({ params }: PageProps<"/[locale]/about">) {
   const { locale } = await params;
@@ -100,7 +79,7 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/about">
               <li key={id}>
                 <a
                   href={`#${id}`}
-                  className="inline-flex min-h-12 items-center rounded-lg border border-border px-3 text-base font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none lg:-ml-px lg:rounded-none lg:border-0 lg:border-l-2 lg:border-transparent lg:hover:border-primary"
+                  className="inline-flex min-h-12 items-center rounded-lg border border-border px-3 text-base font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none lg:-ml-px lg:rounded-none lg:border-0 lg:border-l-2 lg:border-transparent lg:hover:border-brand"
                 >
                   {label}
                 </a>

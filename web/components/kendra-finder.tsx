@@ -159,7 +159,7 @@ export function KendraFinder({ t, locale }: { t: T; locale: string }) {
           </form>
         </div>
         <p className="flex items-start gap-2 text-base">
-          <Lock aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-primary" />
+          <Lock aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-brand" />
           {t.privacy}
         </p>
       </div>

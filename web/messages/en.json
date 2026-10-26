@@ -11,7 +11,6 @@
     "uploadBody": "Choose photos from your gallery",
     "typeTitle": "Type the medicine name",
     "typeBody": "Search by brand name",
-    "comingSoon": "Coming soon",
     "checksTitle": "What DawaCheck checks",
     "checks": {
       "generic": "Cheaper Jan Aushadhi generic",
@@ -27,8 +26,6 @@
     "heroTitle": "Check your medicine strip against government data",
     "scanCta": "Scan a strip",
     "typeCta": "Type a name",
-    "demoAlt": "A demo medicine strip of Telmikind 40, marked DEMO, as DawaCheck reads it",
-    "demoCaption": "One of the demo strips you can try on the Scan page.",
     "checkBodies": {
       "generic": "Only an exact match: same salts, strength, form and release.",
       "batch": "Is this batch in a CDSCO quality alert?",
@@ -40,7 +37,24 @@
     "exampleBrand": "Telmikind 40, per tablet",
     "exampleGeneric": "Jan Aushadhi telmisartan 40 mg, per tablet",
     "exampleNote": "From our data: 2022 brand price, current Jan Aushadhi price. Same composition.",
-    "waysTitle": "Ways to start"
+    "waysTitle": "Ways to start",
+    "heroHighlight": "government data",
+    "live": {
+      "label": "Example: the demo strip, checked",
+      "medicine": "Telmikind 40",
+      "maker": "Mankind Pharma",
+      "batch": "Batch DM2506: not in any alert",
+      "price": "Within the government ceiling",
+      "banned": "Not on the banned lists",
+      "kendra": "The 3 nearest, found on your phone"
+    },
+    "statsTitle": "Checked against real government lists",
+    "statKendras": "Jan Aushadhi Kendras",
+    "statAlerts": "quality alerts from CDSCO",
+    "statBrands": "medicine brands we can match",
+    "statCeilings": "NPPA ceiling prices",
+    "statsNote": "Counts from the latest monthly refresh.",
+    "bandLine": "Same medicine. Less money."
   },
   "common": {
     "language": "Language",

@@ -1,6 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
-import { Noto_Sans, Noto_Sans_Devanagari, Noto_Sans_Tamil } from "next/font/google";
+import {
+  Bricolage_Grotesque,
+  Noto_Sans,
+  Noto_Sans_Devanagari,
+  Noto_Sans_Tamil,
+} from "next/font/google";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -16,6 +21,8 @@ const notoDevanagari = Noto_Sans_Devanagari({
   variable: "--font-noto-devanagari",
 });
 const notoTamil = Noto_Sans_Tamil({ subsets: ["tamil"], variable: "--font-noto-tamil" });
+// Display face for headings (Latin only; Hindi and Tamil headings use the Noto fonts above).
+const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-display" });
 
 // Pre-render /en, /hi and /ta at build time so pages are served as static files.
 export function generateStaticParams() {
@@ -34,8 +41,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   // The browser's toolbar colour follows the theme (the page background in each).
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f7fafa" },
-    { media: "(prefers-color-scheme: dark)", color: "#111a1d" },
+    { media: "(prefers-color-scheme: light)", color: "#fbfaf7" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b1022" },
   ],
 };
 
@@ -52,7 +59,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   return (
     <html
       lang={locale}
-      className={`${notoLatin.variable} ${notoDevanagari.variable} ${notoTamil.variable} h-full antialiased`}
+      className={`${notoLatin.variable} ${notoDevanagari.variable} ${notoTamil.variable} ${display.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>

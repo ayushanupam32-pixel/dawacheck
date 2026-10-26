@@ -20,7 +20,7 @@ export function ExternalLink({
       target="_blank"
       rel="noreferrer"
       className={cn(
-        "group inline-flex min-h-12 items-center gap-1 font-medium text-primary underline decoration-1 underline-offset-4 transition-[text-decoration-thickness] hover:decoration-2 focus-visible:rounded-sm focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
+        "group inline-flex min-h-12 items-center gap-1 font-medium text-brand underline decoration-1 underline-offset-4 transition-[text-decoration-thickness] hover:decoration-2 focus-visible:rounded-sm focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
         className,
       )}
     >

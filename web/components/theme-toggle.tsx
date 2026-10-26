@@ -201,7 +201,7 @@ export function ThemeMenu({ t }: { t: T }) {
                     <Icon aria-hidden="true" className="size-5" />
                     <span>{label(t)}</span>
                     <Menu.RadioItemIndicator className="flex">
-                      <Check aria-hidden="true" className="size-5 text-primary" />
+                      <Check aria-hidden="true" className="size-5 text-brand" />
                     </Menu.RadioItemIndicator>
                   </Menu.RadioItem>
                 ))}

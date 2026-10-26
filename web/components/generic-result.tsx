@@ -39,7 +39,7 @@ export function BrandButton({
     <button
       type="button"
       onClick={onChoose}
-      className="flex min-h-12 w-full flex-col items-start gap-1 rounded-2xl border border-border bg-card p-4 text-left shadow-soft transition-[border-color,background-color,scale] hover:border-primary/60 hover:bg-accent/50 focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none active:scale-[0.99] motion-reduce:transition-none"
+      className="flex min-h-12 w-full flex-col items-start gap-1 rounded-2xl border border-border bg-card p-4 text-left shadow-soft transition-[border-color,background-color,scale] hover:border-brand/60 hover:bg-accent/50 focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none active:scale-[0.99] motion-reduce:transition-none"
     >
       <span className="text-lg font-semibold">{brand.name}</span>
       {brand.manufacturer && (

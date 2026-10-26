@@ -63,7 +63,7 @@ export function SiteHeader({ t, locale }: { t: HeaderText; locale: Locale }) {
                 <Link
                   href={href}
                   aria-current={isCurrent(href) ? "page" : undefined}
-                  className="relative inline-flex min-h-12 items-center rounded-lg px-3 text-base font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none aria-[current=page]:text-foreground aria-[current=page]:after:absolute aria-[current=page]:after:inset-x-3 aria-[current=page]:after:-bottom-[9px] aria-[current=page]:after:h-0.5 aria-[current=page]:after:rounded-full aria-[current=page]:after:bg-primary"
+                  className="relative inline-flex min-h-12 items-center rounded-lg px-3 text-base font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none aria-[current=page]:text-foreground aria-[current=page]:after:absolute aria-[current=page]:after:inset-x-3 aria-[current=page]:after:-bottom-[9px] aria-[current=page]:after:h-0.5 aria-[current=page]:after:rounded-full aria-[current=page]:after:bg-brand"
                 >
                   {label}
                 </Link>
@@ -134,7 +134,7 @@ function MobileMenu({
                     }
                     className={mobileLink}
                   >
-                    <Pill aria-hidden="true" className="size-5 text-primary" />
+                    <Pill aria-hidden="true" className="size-5 text-brand" />
                     {t.home}
                   </Link>
                 </li>
@@ -146,7 +146,7 @@ function MobileMenu({
                       aria-current={isCurrent(href) ? "page" : undefined}
                       className={mobileLink}
                     >
-                      <Icon aria-hidden="true" className="size-5 text-primary" />
+                      <Icon aria-hidden="true" className="size-5 text-brand" />
                       {label}
                     </Link>
                   </li>
@@ -172,4 +172,4 @@ function MobileMenu({
 }
 
 const mobileLink =
-  "flex min-h-14 w-full items-center gap-3 rounded-xl border border-border bg-card px-4 text-lg font-medium hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none aria-[current=page]:border-primary aria-[current=page]:bg-accent";
+  "flex min-h-14 w-full items-center gap-3 rounded-xl border border-border bg-card px-4 text-lg font-medium hover:bg-accent focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none aria-[current=page]:border-brand aria-[current=page]:bg-accent";

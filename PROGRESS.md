@@ -460,6 +460,15 @@ building when checking CSS (stale Turbopack cache seen once). Commits `c1927ef` 
 retry because the search box was filled before hydration). CI run 40284284184: 31/31 first try;
 live site verified in en/hi/ta.
 
+### Second pass: Ink + Marigold and motion (2026-10-26)
+
+At the user's request: the demo-strip photo hero replaced by an animated ink "stage" with a live
+check of the demo strip; palette Ink + Marigold (user's choice of three); Bricolage Grotesque
+headings; count-up real data counts, scroll card stack, scroll letters, cursor glow (Skiper UI
+skiper16, 19-idea, 31, 37, 61); ink footer; animated inner headers. `lib/segment.ts`
+(Intl.Segmenter) keeps Hindi/Tamil letters whole. 416 Vitest, 33 Playwright, sweep clean,
+Lighthouse a11y 100. Details: M7 note, "Second pass".
+
 ## Exact next steps
 
 1. **Time the live demo on a phone** ("How we read this" shows the seconds) → fill **[PHONE]**.
