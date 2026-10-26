@@ -9,7 +9,7 @@ We cannot tell from the data alone whether a two-ingredient row is complete, so 
 composition_complete = False and the app must ask the user to confirm the ingredients printed on
 their strip before showing a generic. One-ingredient rows are always complete.
 
-Run: uv run python -m dawacheck_pipeline.parse_brands
+Run: uv run python -m medicheck_pipeline.parse_brands
 Output: pipeline/clean/brands.csv
 """
 
@@ -20,7 +20,7 @@ from decimal import Decimal
 
 import pandas as pd
 
-from dawacheck_pipeline.normalize import (
+from medicheck_pipeline.normalize import (
     STRENGTH_RE,
     Ingredient,
     clean_text,
@@ -31,7 +31,7 @@ from dawacheck_pipeline.normalize import (
     normalize_salt,
     parse_strength,
 )
-from dawacheck_pipeline.paths import CLEAN_DIR, latest_raw_dir
+from medicheck_pipeline.paths import CLEAN_DIR, latest_raw_dir
 
 SOURCE_NAME = "kaggle:shudhanshusingh/az-medicine-dataset-of-india (CC BY-SA 4.0)"
 

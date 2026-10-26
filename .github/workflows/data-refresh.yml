@@ -37,38 +37,38 @@ jobs:
       - run: uv sync --locked
 
       - name: Fetch Jan Aushadhi product list
-        run: uv run python -m dawacheck_pipeline.fetch_jan_aushadhi
+        run: uv run python -m medicheck_pipeline.fetch_jan_aushadhi
       - name: Parse Jan Aushadhi product list
-        run: uv run python -m dawacheck_pipeline.parse_jan_aushadhi
+        run: uv run python -m medicheck_pipeline.parse_jan_aushadhi
       # Parsed every month (cheap): the banned-FDC parser uses its salt names. Loading the
       # brands into Supabase stays optional (--with-brands below).
       - name: Parse brand dataset
-        run: uv run python -m dawacheck_pipeline.parse_brands
+        run: uv run python -m medicheck_pipeline.parse_brands
       - name: Fetch Jan Aushadhi Kendra list
-        run: uv run python -m dawacheck_pipeline.fetch_kendras
+        run: uv run python -m medicheck_pipeline.fetch_kendras
       - name: Parse Kendras (geocodes only new or misplaced addresses, with a cache)
-        run: uv run python -m dawacheck_pipeline.parse_kendras
+        run: uv run python -m medicheck_pipeline.parse_kendras
       - name: Fetch CDSCO NSQ and spurious drug alerts (latest 3 months + new months)
-        run: uv run python -m dawacheck_pipeline.fetch_cdsco_alerts
+        run: uv run python -m medicheck_pipeline.fetch_cdsco_alerts
       - name: Parse CDSCO alerts
-        run: uv run python -m dawacheck_pipeline.parse_cdsco_alerts
+        run: uv run python -m medicheck_pipeline.parse_cdsco_alerts
       - name: Fetch CDSCO lists of prohibited FDCs
-        run: uv run python -m dawacheck_pipeline.fetch_cdsco_fdc
+        run: uv run python -m medicheck_pipeline.fetch_cdsco_fdc
       - name: Parse prohibited FDCs
-        run: uv run python -m dawacheck_pipeline.parse_cdsco_fdc
+        run: uv run python -m medicheck_pipeline.parse_cdsco_fdc
       # NPPA's ceiling prices change once a year (April); the orders are saved by hand in
       # pipeline/raw/nppa/<date>/ (NPPA's site refuses scripts). Parsed from the latest folder.
       - name: Parse NPPA ceiling prices
-        run: uv run python -m dawacheck_pipeline.parse_nppa
+        run: uv run python -m medicheck_pipeline.parse_nppa
       - name: Load into Supabase (validates first; fails without changing live data)
-        run: uv run python -m dawacheck_pipeline.load_supabase ${{ inputs.with_brands && '--with-brands' || '' }}
+        run: uv run python -m medicheck_pipeline.load_supabase ${{ inputs.with_brands && '--with-brands' || '' }}
       - name: Build static Kendra files for the website
-        run: uv run python -m dawacheck_pipeline.build_static
+        run: uv run python -m medicheck_pipeline.build_static
 
       # Committing web/public/data triggers a Vercel redeploy with the new Kendra files.
       - name: Commit raw downloads, geocode cache and website data
         run: |
-          git config user.name "dawacheck-bot"
+          git config user.name "medicheck-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add raw/ cache/ ../web/public/data/
           git diff --cached --quiet || git commit -m "Data refresh $(date -u +%F)"

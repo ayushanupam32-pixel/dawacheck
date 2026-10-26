@@ -4,7 +4,7 @@ from decimal import Decimal
 
 import pytest
 
-from dawacheck_pipeline.parse_brands import (
+from medicheck_pipeline.parse_brands import (
     normalize_brand_name,
     parse_brand,
     parse_composition,

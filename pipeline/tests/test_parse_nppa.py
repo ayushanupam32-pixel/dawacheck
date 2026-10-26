@@ -1,7 +1,7 @@
 import pytest
 
-from dawacheck_pipeline.parse_jan_aushadhi import parse_generic_name
-from dawacheck_pipeline.parse_nppa import alternatives, jan_aushadhi_style, unit_kind
+from medicheck_pipeline.parse_jan_aushadhi import parse_generic_name
+from medicheck_pipeline.parse_nppa import alternatives, jan_aushadhi_style, unit_kind
 
 
 def key(medicine: str, dosage: str) -> str | None:

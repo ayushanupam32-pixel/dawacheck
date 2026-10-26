@@ -8,7 +8,7 @@ The batch number is normalized exactly like the strip reader does (web/lib/ai/ex
 normalizeBatch): uppercase, no spaces, dashes or slashes. "AOX-2402" on the alert and
 "B.No. AOX 2402" on a strip both become "AOX2402".
 
-Run: uv run python -m dawacheck_pipeline.parse_cdsco_alerts
+Run: uv run python -m medicheck_pipeline.parse_cdsco_alerts
 """
 
 import json
@@ -18,8 +18,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from dawacheck_pipeline.normalize import clean_text
-from dawacheck_pipeline.paths import CLEAN_DIR, latest_raw_dir
+from medicheck_pipeline.normalize import clean_text
+from medicheck_pipeline.paths import CLEAN_DIR, latest_raw_dir
 
 SOURCE_URL = "https://cdsco.gov.in/opencms/opencms/en/Notifications/nsq-drugs/"
 # Placeholders CDSCO writes where there is no value. "Not applicable" appears as a batch number on

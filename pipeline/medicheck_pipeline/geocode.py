@@ -7,8 +7,8 @@ once ever, and monthly runs only geocode new or changed addresses.
 
 import json
 
-from dawacheck_pipeline.http import PoliteSession
-from dawacheck_pipeline.paths import PIPELINE_DIR
+from medicheck_pipeline.http import PoliteSession
+from medicheck_pipeline.paths import PIPELINE_DIR
 
 CACHE_FILE = PIPELINE_DIR / "cache" / "geocode.json"
 NOMINATIM = "https://nominatim.openstreetmap.org/search"

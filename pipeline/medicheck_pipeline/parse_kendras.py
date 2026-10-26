@@ -13,9 +13,9 @@ Those rows are geocoded from their address with OpenStreetMap Nominatim
 (geo_precision = 'address'), falling back to the middle of the other Kendras with the same
 PIN code (geo_precision = 'pincode'). Rows we still cannot place are kept out of the map.
 
-The owner's personal name (contactPerson) is not copied: DawaCheck doesn't need it.
+The owner's personal name (contactPerson) is not copied: Medicheck doesn't need it.
 
-Run: uv run python -m dawacheck_pipeline.parse_kendras
+Run: uv run python -m medicheck_pipeline.parse_kendras
 Output: pipeline/clean/kendras.csv
 """
 
@@ -27,9 +27,9 @@ from math import asin, cos, radians, sin, sqrt
 
 import pandas as pd
 
-from dawacheck_pipeline.geocode import geocode_address
-from dawacheck_pipeline.normalize import clean_text
-from dawacheck_pipeline.paths import CLEAN_DIR, latest_raw_dir
+from medicheck_pipeline.geocode import geocode_address
+from medicheck_pipeline.normalize import clean_text
+from medicheck_pipeline.paths import CLEAN_DIR, latest_raw_dir
 
 INDIA_BOX = {"lat": (6.0, 37.5), "lng": (68.0, 97.5)}
 MAX_KM_FROM_STATE_CENTRE = 600

@@ -4,7 +4,7 @@ from decimal import Decimal
 
 import pytest
 
-from dawacheck_pipeline.parse_jan_aushadhi import parse_generic_name, parse_pack
+from medicheck_pipeline.parse_jan_aushadhi import parse_generic_name, parse_pack
 
 # (name in the source, expected composition_key)
 PARSED_OK = [

@@ -1,8 +1,8 @@
-// Normalization for Stage 4 (matching), mirroring pipeline/dawacheck_pipeline/normalize.py.
+// Normalization for Stage 4 (matching), mirroring pipeline/medicheck_pipeline/normalize.py.
 //
 // The database was normalized by the Python pipeline; text read from a strip must be normalized
 // the same way before the two can be compared. The rules come from the same file
-// (synonyms.yaml, copied to salt-rules.json by pipeline/dawacheck_pipeline/export_rules.py).
+// (synonyms.yaml, copied to salt-rules.json by pipeline/medicheck_pipeline/export_rules.py).
 
 import rules from "./salt-rules.json";
 

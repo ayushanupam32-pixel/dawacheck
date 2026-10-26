@@ -1,5 +1,5 @@
 {
- "_generated_by": "pipeline/dawacheck_pipeline/export_rules.py from synonyms.yaml",
+ "_generated_by": "pipeline/medicheck_pipeline/export_rules.py from synonyms.yaml",
  "synonyms": {
   "acetaminophen": "paracetamol",
   "acetylsalicylic acid": "aspirin",

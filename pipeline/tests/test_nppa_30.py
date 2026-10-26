@@ -8,8 +8,8 @@ key brands use) and exactly the official price.
 
 import pytest
 
-from dawacheck_pipeline.parse_nppa import parse
-from dawacheck_pipeline.paths import RAW_DIR
+from medicheck_pipeline.parse_nppa import parse
+from medicheck_pipeline.paths import RAW_DIR
 
 # (Sl. No. in the order, composition key, ceiling price in Rs. per tablet/capsule, excl. GST)
 OFFICIAL = [

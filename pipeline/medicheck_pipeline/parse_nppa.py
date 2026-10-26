@@ -14,7 +14,7 @@ by the same parser, so its composition key is built exactly like the brands' and
 
 Ceiling prices EXCLUDE GST (the order says "exclusive of Goods and Services Tax applicable").
 
-Run: uv run python -m dawacheck_pipeline.parse_nppa
+Run: uv run python -m medicheck_pipeline.parse_nppa
 """
 
 import re
@@ -23,9 +23,9 @@ from pathlib import Path
 import pandas as pd
 import pdfplumber
 
-from dawacheck_pipeline.normalize import STRENGTH_RE, clean_text
-from dawacheck_pipeline.parse_jan_aushadhi import parse_generic_name
-from dawacheck_pipeline.paths import CLEAN_DIR, latest_raw_dir
+from medicheck_pipeline.normalize import STRENGTH_RE, clean_text
+from medicheck_pipeline.parse_jan_aushadhi import parse_generic_name
+from medicheck_pipeline.paths import CLEAN_DIR, latest_raw_dir
 
 ORDERS_PAGE = "https://nppa.gov.in/en/view_more?id=4"
 DEVANAGARI = re.compile(r"[ऀ-ॿ]")

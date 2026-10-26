@@ -1,7 +1,7 @@
 import pytest
 
-from dawacheck_pipeline.geohash import encode
-from dawacheck_pipeline.parse_kendras import clean_phone, haversine_km
+from medicheck_pipeline.geohash import encode
+from medicheck_pipeline.parse_kendras import clean_phone, haversine_km
 
 
 # Known values, computed with the independent pygeohash library. The browser version
@@ -52,7 +52,7 @@ def _kendra(code: str, district: str, lat: float, lng: float) -> dict:
 
 
 def test_kendra_far_from_its_own_district_is_not_trusted() -> None:
-    from dawacheck_pipeline.parse_kendras import build_rows
+    from medicheck_pipeline.parse_kendras import build_rows
 
     raw = [_kendra(f"G{i}", "Ganganagar", 29.9 + i / 100, 73.88) for i in range(5)]
     # Same state, but placed in central Delhi, ~350 km from Ganganagar.

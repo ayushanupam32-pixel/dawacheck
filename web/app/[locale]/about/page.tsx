@@ -11,7 +11,7 @@ import { refreshDates } from "@/lib/data-sources";
 // results, the privacy explanation and the disclaimer. The numbers come from
 // lib/eval-summary.json, which the evaluation scripts write; nothing here is typed in by hand.
 
-const REPO = "https://github.com/ayushanupam32-pixel/dawacheck";
+const REPO = "https://github.com/ayushanupam32-pixel/medicheck";
 
 /** Our sources, in the order shown. `key` is the pipeline's row in `data_sources` (not OSM). */
 const SOURCES = [
@@ -147,7 +147,7 @@ export default async function AboutPage({ params }: PageProps<"/[locale]/about">
             </ul>
             <p className="text-base">
               {t.privacyCode}{" "}
-              <ExternalLink href={REPO}>github.com/ayushanupam32-pixel/dawacheck</ExternalLink>
+              <ExternalLink href={REPO}>github.com/ayushanupam32-pixel/medicheck</ExternalLink>
             </p>
           </section>
 
@@ -222,7 +222,7 @@ function MatchResults({ t, date }: { t: T; date: DateFormat }) {
         </thead>
         <tbody>
           {set.rows.map((r) => {
-            const ours = r.method === "dawacheck";
+            const ours = r.method === "medicheck";
             return (
               <tr
                 key={r.method}

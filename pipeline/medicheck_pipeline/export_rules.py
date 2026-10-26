@@ -7,13 +7,13 @@ this pipeline normalized the database, or "Metformin Hydrochloride IP" on a stri
 equal "metformin" in a composition key. One source of truth (synonyms.yaml), copied, and a test
 (tests/test_export_rules.py) fails if the copy is out of date.
 
-Run: uv run python -m dawacheck_pipeline.export_rules
+Run: uv run python -m medicheck_pipeline.export_rules
 """
 
 import json
 
-from dawacheck_pipeline.normalize import rules
-from dawacheck_pipeline.paths import PIPELINE_DIR
+from medicheck_pipeline.normalize import rules
+from medicheck_pipeline.paths import PIPELINE_DIR
 
 OUT = PIPELINE_DIR.parent / "web" / "lib" / "ai" / "salt-rules.json"
 KEYS = [
@@ -27,7 +27,7 @@ KEYS = [
 
 
 def render() -> str:
-    data = {"_generated_by": "pipeline/dawacheck_pipeline/export_rules.py from synonyms.yaml"}
+    data = {"_generated_by": "pipeline/medicheck_pipeline/export_rules.py from synonyms.yaml"}
     data.update({key: rules()[key] for key in KEYS})
     return json.dumps(data, ensure_ascii=False, indent=1) + "\n"
 

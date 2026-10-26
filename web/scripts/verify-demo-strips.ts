@@ -7,7 +7,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { chromium, devices, type Page } from "@playwright/test";
 
-const BASE = process.argv[2] ?? "https://dawacheck-psi.vercel.app";
+const BASE = process.argv[2] ?? "https://medicheck-in.vercel.app";
 const DEMO = resolve(__dirname, "..", "..", "demo");
 
 type Strip = {

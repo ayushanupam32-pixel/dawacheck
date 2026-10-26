@@ -11,7 +11,7 @@ Each document link returns a small page with an <iframe> pointing at the PDF; we
 
 Output: pipeline/raw/cdsco_fdc/<today>/<n>.pdf and documents.json (title, release date, PDF URL).
 
-Run: uv run python -m dawacheck_pipeline.fetch_cdsco_fdc
+Run: uv run python -m medicheck_pipeline.fetch_cdsco_fdc
 """
 
 import html
@@ -19,8 +19,8 @@ import json
 import re
 from urllib.parse import quote
 
-from dawacheck_pipeline.http import PoliteSession
-from dawacheck_pipeline.paths import raw_dir
+from medicheck_pipeline.http import PoliteSession
+from medicheck_pipeline.paths import raw_dir
 
 SITE = "https://cdsco.gov.in"
 PAGE = f"{SITE}/opencms/opencms/en/Drugs/FDC/"

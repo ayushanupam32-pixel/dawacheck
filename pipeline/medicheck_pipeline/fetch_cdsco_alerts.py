@@ -16,15 +16,15 @@ The responses are Latin-1 encoded (the "®" in brand names is byte 0xAE), not UT
 Output: pipeline/raw/cdsco_alerts/<today>/<tab>_<YYYY-MM>.json (nsq_2026-09.json, ...), each the
 response as received (decoded to UTF-8), plus months.json listing what was fetched.
 
-Run: uv run python -m dawacheck_pipeline.fetch_cdsco_alerts
+Run: uv run python -m medicheck_pipeline.fetch_cdsco_alerts
 """
 
 import json
 import shutil
 from datetime import datetime
 
-from dawacheck_pipeline.http import PoliteSession
-from dawacheck_pipeline.paths import RAW_DIR, raw_dir
+from medicheck_pipeline.http import PoliteSession
+from medicheck_pipeline.paths import RAW_DIR, raw_dir
 
 SOURCE = "cdsco_alerts"
 API = "https://cdscoonline.gov.in/CDSCO"

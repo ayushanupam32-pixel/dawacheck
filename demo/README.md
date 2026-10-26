@@ -15,7 +15,7 @@ from real CDSCO alerts. Batch numbers starting with **DM** are demo numbers in n
 
 1. Put this folder on the phone you'll demo with (AirDrop, Google Drive, or WhatsApp it to
    yourself), or use a laptop browser in a narrow window.
-2. Open https://dawacheck-psi.vercel.app/en → **Scan medicine strip**.
+2. Open https://medicheck-in.vercel.app/en → **Scan medicine strip**.
 3. **Choose from gallery** → `front.jpg` → **Next** → `back.jpg` → **Next** → `stamp.jpg` →
    **Next**. Reading takes a few seconds.
 4. On "Check what we read", point at the fields, then **Find a cheaper generic**.
@@ -99,7 +99,7 @@ No generic is offered for either (Cheaper generic: Not available).
 
 ```bash
 uv run --with pillow python demo/make_strips.py                       # redraw the images
-cd web && pnpm exec tsx scripts/verify-demo-strips.ts https://dawacheck-psi.vercel.app   # re-check all
+cd web && pnpm exec tsx scripts/verify-demo-strips.ts https://medicheck-in.vercel.app   # re-check all
 ```
 
 Re-check before the viva: alerts and prices come from live government data, refreshed monthly.

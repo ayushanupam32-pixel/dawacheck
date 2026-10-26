@@ -29,7 +29,7 @@
             "abstainedInDataset": 0.05239179954441914
           },
           {
-            "method": "dawacheck",
+            "method": "medicheck",
             "top1": 0.8906605922551253,
             "top3": 0.908883826879271,
             "wrongOfAnswered": 0.00964630225080386,
@@ -64,7 +64,7 @@
             "abstainedInDataset": 0.06134969325153374
           },
           {
-            "method": "dawacheck",
+            "method": "medicheck",
             "top1": 0.8588957055214724,
             "top3": 0.901840490797546,
             "wrongOfAnswered": 0.03305785123966942,
@@ -99,7 +99,7 @@
             "abstainedInDataset": 0
           },
           {
-            "method": "dawacheck",
+            "method": "medicheck",
             "top1": 0.8,
             "top3": 1,
             "wrongOfAnswered": 0,
@@ -134,7 +134,7 @@
             "abstainedInDataset": 0
           },
           {
-            "method": "dawacheck",
+            "method": "medicheck",
             "top1": 0.5,
             "top3": 0.5,
             "wrongOfAnswered": 0,

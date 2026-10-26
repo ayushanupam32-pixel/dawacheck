@@ -8,7 +8,7 @@ study, phone timing and finishing the report wait for the user).
 **M0–M5 are done and live. M6 was dropped by the user. M7 is built and live; the final test-set
 evaluation ran once (2026-10-25). Waiting for the user: the SUS study and timing on a phone.**
 
-- Live site: https://dawacheck-psi.vercel.app (deploys automatically on every push to `main`)
+- Live site: https://medicheck-in.vercel.app (deploys automatically on every push to `main`)
 
 | Milestone                                             | Status  | Commits                                                                                | Notes                                                                |
 | ----------------------------------------------------- | ------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
@@ -29,9 +29,12 @@ outline, slides, demo script, viva Q&A, SUS kit.
 
 ### Accounts and services (all free)
 
-- **GitHub** `ayushanupam32-pixel/dawacheck`. Actions secrets: `SUPABASE_URL`,
+- **GitHub** `ayushanupam32-pixel/medicheck` (renamed from `dawacheck` on 2026-10-26; GitHub
+  redirects the old URL). Actions secrets: `SUPABASE_URL`,
   `SUPABASE_SERVICE_KEY`. The `gh` CLI needs `GH_CONFIG_DIR=$HOME/.gh` on this Mac.
-- **Vercel** project `dawacheck`, team `ayushanupam32-6998`, Root Directory `web`, connected to
+- **Vercel** project `medicheck` (was `dawacheck`), team `ayushanupam32-6998`, Root Directory `web`,
+  live at https://medicheck-in.vercel.app (`medicheck.vercel.app` is taken by someone else; the old
+  `dawacheck-psi.vercel.app` redirects there with a 308), connected to
   the GitHub repo. Env vars: `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`.
 - **Supabase** project `hmfflngfvzhmrcfskfkp` (ap-south-1, free). Tables have RLS with a
   public-read policy; `pg_trgm` is in the `extensions` schema. Migrations are in
@@ -285,7 +288,7 @@ See `docs/milestones/M5-safety-checks.md`.
 ## M7 progress (2026-10-25)
 
 **Committed `f656e60`, CI green, live and verified:** both demos clicked through on
-https://dawacheck-psi.vercel.app (Telmikind: match 81%, generic, batch not in alerts, fair price;
+https://medicheck-in.vercel.app (Telmikind: match 81%, generic, batch not in alerts, fair price;
 Omee: type "Omee", tick the batch, Find → match 94% and the red CDSCO alert). Laptop read time on
 the live site 1.3–1.5 s per demo strip.
 
@@ -481,11 +484,12 @@ Lighthouse a11y 100. Details: M7 note, "Second pass". Commits `ee64576` and `7f1
   footer, README, docs, eval reports, the demo strips' credit line (images regenerated; 18/18 demo
   strips re-verified, `demo/VERIFIED.md`), the architecture diagram and the README demo GIF
   (`web/scripts/demo-screens.ts` now waits for animations before each screenshot).
-- **Kept the old name on purpose** (internal, or changing it would break things): the GitHub repo
-  `ayushanupam32-pixel/dawacheck`, the live address `dawacheck-psi.vercel.app`, the Vercel project,
-  the Python package `dawacheck_pipeline` and its User-Agent and comments, an already-applied SQL
-  migration comment, browser storage keys (`dc-theme`, `dc-large-text`), the working folder.
-  Renaming the repo or the Vercel address is the user's decision (it changes public links).
+- **Then (same day, at the user's request) the rest:** GitHub repo renamed to `medicheck` (old URL
+  redirects), Vercel project renamed, new address **medicheck-in.vercel.app** (old address
+  redirects with 308), Python package `dawacheck_pipeline` → `medicheck_pipeline` (workflow and
+  tests updated), User-Agent `Medicheck/0.1`, all links in code and docs. Still old, on purpose:
+  the already-applied SQL migration comments, browser storage keys (`dc-theme`, `dc-large-text`,
+  renaming would reset users' settings), raw data snapshots, and the local working folder.
 - Checks: 416 Vitest, 33 Playwright, responsive sweep clean, Lighthouse accessibility 100.
 - Commits `714a27e` (font + rename) and `fc3dd0a` (results slide in without fading, after 1 flaky
   axe check mid-fade). CI run 40304250518: 33/33 first try. Live: titles say Medicheck in

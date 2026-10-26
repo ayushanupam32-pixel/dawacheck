@@ -10,8 +10,8 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 USER_AGENT = (
-    "DawaCheck/0.1 (B.Tech class project; monthly low-volume fetch; "
-    "https://github.com/ayushanupam32-pixel/dawacheck)"
+    "Medicheck/0.1 (B.Tech class project; monthly low-volume fetch; "
+    "https://github.com/ayushanupam32-pixel/medicheck)"
 )
 
 

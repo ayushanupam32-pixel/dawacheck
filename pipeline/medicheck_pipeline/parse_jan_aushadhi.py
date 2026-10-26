@@ -9,7 +9,7 @@ The source has no separate salt / strength / form columns; everything is in one 
 It is strict on purpose: if any part is unclear the row is marked 'unparsed' and is never used for
 a generic suggestion. Missing a match is safe; a wrong match is not.
 
-Run: uv run python -m dawacheck_pipeline.parse_jan_aushadhi
+Run: uv run python -m medicheck_pipeline.parse_jan_aushadhi
 Output: pipeline/clean/ja_products.csv
 """
 
@@ -20,7 +20,7 @@ from decimal import Decimal
 
 import pandas as pd
 
-from dawacheck_pipeline.normalize import (
+from medicheck_pipeline.normalize import (
     STRENGTH_RE,
     Ingredient,
     Strength,
@@ -33,7 +33,7 @@ from dawacheck_pipeline.normalize import (
     parse_strength,
     rules,
 )
-from dawacheck_pipeline.paths import CLEAN_DIR, latest_raw_dir
+from medicheck_pipeline.paths import CLEAN_DIR, latest_raw_dir
 
 NON_DRUG_GROUPS = {"surgical & medical consumables"}
 

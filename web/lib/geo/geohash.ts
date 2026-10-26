@@ -1,5 +1,5 @@
 // Geohash: a short string naming a rectangle on the map. Same algorithm as
-// pipeline/dawacheck_pipeline/geohash.py, tested against the same known values.
+// pipeline/medicheck_pipeline/geohash.py, tested against the same known values.
 // With 3 characters a cell is 1.40625° × 1.40625° (about 156 km × 156 km in India).
 
 const BASE32 = "0123456789bcdefghjkmnpqrstuvwxyz";

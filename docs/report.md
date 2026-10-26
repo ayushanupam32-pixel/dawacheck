@@ -383,7 +383,7 @@ before any code depended on it. Examples of what inspection found:
 
 **Fetch → parse → normalise → validate → load → build static files.**
 
-- **Normalise** (`pipeline/dawacheck_pipeline/normalize.py`, rules in `synonyms.yaml`): salt
+- **Normalise** (`pipeline/medicheck_pipeline/normalize.py`, rules in `synonyms.yaml`): salt
   synonyms and suffixes, units, dosage forms and release types. One rule needs special mention:
   proton-pump inhibitor tablets (pantoprazole, rabeprazole, esomeprazole, omeprazole,
   lansoprazole) are always gastro-resistant, but brand records often omit the word, so the rule
@@ -698,7 +698,7 @@ the coordinates. Both tests fail when a leak is deliberately planted.
 ### 6.5 Deployment
 
 Vercel builds the `web/` folder on every push to `main`. The monthly data refresh commits the
-rebuilt Kendra files, which triggers a redeploy. Live at https://dawacheck-psi.vercel.app.
+rebuilt Kendra files, which triggers a redeploy. Live at https://medicheck-in.vercel.app.
 
 ---
 

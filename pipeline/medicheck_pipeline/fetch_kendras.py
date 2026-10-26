@@ -8,14 +8,14 @@ The endpoint refuses an empty state, so there is no single all-India request.
 Output: pipeline/raw/kendras/<today>/states.json and state_<census code>.json: the responses as
 received, except that the owner's personal name (contactPerson) is removed.
 
-Run: uv run python -m dawacheck_pipeline.fetch_kendras
+Run: uv run python -m medicheck_pipeline.fetch_kendras
 """
 
 import json
 
-from dawacheck_pipeline.fetch_jan_aushadhi import API_BASE
-from dawacheck_pipeline.http import PoliteSession
-from dawacheck_pipeline.paths import raw_dir
+from medicheck_pipeline.fetch_jan_aushadhi import API_BASE
+from medicheck_pipeline.http import PoliteSession
+from medicheck_pipeline.paths import raw_dir
 
 SOURCE_PAGE = "https://janaushadhi.gov.in/near-by-kendra"
 PERSONAL_FIELD = "contactPerson"
@@ -53,7 +53,7 @@ def main() -> None:
         data = resp.json()
         kendras = (data.get("responseBody") or {}).get("addKendraResponseList") or []
         # The one change we make to the raw response: drop the owner's personal name.
-        # DawaCheck doesn't need it, and the raw files are published in the repository.
+        # Medicheck doesn't need it, and the raw files are published in the repository.
         for kendra in kendras:
             kendra.pop(PERSONAL_FIELD, None)
         (out / f"state_{code}.json").write_text(json.dumps(data, ensure_ascii=False, indent=1))

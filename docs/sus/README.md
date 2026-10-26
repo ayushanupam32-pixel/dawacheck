@@ -16,7 +16,7 @@ SUS is the standard 10-question usability questionnaire (Brooke, 1996); scores r
 
 ## Tasks (read each one out; don't help unless they are stuck for a minute)
 
-1. "Open dawacheck-psi.vercel.app. Try the blood-pressure demo strip and find out how much you
+1. "Open medicheck-in.vercel.app. Try the blood-pressure demo strip and find out how much you
    would save at Jan Aushadhi."
 2. "Try the other demo strip. Is there anything wrong with that batch? What would you do?"
    (Right answer: show it to the pharmacist.)

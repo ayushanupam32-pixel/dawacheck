@@ -1,7 +1,7 @@
 """Turn the demo screenshots into docs/demo.gif for the README.
 
 Run (from the repo root):
-  cd web && pnpm exec tsx scripts/demo-screens.ts https://dawacheck-psi.vercel.app /tmp/screens
+  cd web && pnpm exec tsx scripts/demo-screens.ts https://medicheck-in.vercel.app /tmp/screens
   uv run --with pillow python eval/make_demo_gif.py /tmp/screens docs/demo.gif
 
 Each frame gets a one-line caption; key frames stay on screen longer.

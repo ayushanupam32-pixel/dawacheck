@@ -4,7 +4,7 @@
 a fair-price check, banned-combination check and the nearest Jan Aushadhi Kendra, from public
 government data, read on your phone, at ₹0 cost.**
 
-**Live:** https://dawacheck-psi.vercel.app (English, हिन्दी, தமிழ்) · B.Tech CSE (AI & ML) class
+**Live:** https://medicheck-in.vercel.app (English, हिन्दी, தமிழ்) · B.Tech CSE (AI & ML) class
 project.
 
 <p align="center"><img src="docs/demo.gif" alt="Medicheck demo: a demo strip is read on the phone, matched to Telmikind 40, the five checks and the Jan Aushadhi saving are shown; a second strip whose batch is in a CDSCO alert shows a red alert; then the nearest Kendras and the About page." width="360"></p>

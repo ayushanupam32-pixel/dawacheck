@@ -52,7 +52,7 @@ after timing a phone and after the usability study.
     data, 2022 brand snapshot, English OCR only, phone speed. Say them before you're asked.
 
 14. **Future work and thanks** — Phone photo set, on-device speed, Hindi OCR, offline PWA,
-    fresher brand list. Live link + QR code to https://dawacheck-psi.vercel.app. Questions.
+    fresher brand list. Live link + QR code to https://medicheck-in.vercel.app. Questions.
 
 Backup slides (only if asked): evaluation method and splits; calibration table; data pipeline
 validation (±20%); Kendra coordinate checks; test counts (416 unit, 197 pipeline, 33 end-to-end).

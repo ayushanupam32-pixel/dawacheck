@@ -7,13 +7,13 @@ token (no login, no password), then request the whole list in one call, exactly 
 
 Output: pipeline/raw/ja_products/<today>/products.json (the untouched API response).
 
-Run: uv run python -m dawacheck_pipeline.fetch_jan_aushadhi
+Run: uv run python -m medicheck_pipeline.fetch_jan_aushadhi
 """
 
 import json
 
-from dawacheck_pipeline.http import PoliteSession
-from dawacheck_pipeline.paths import raw_dir
+from medicheck_pipeline.http import PoliteSession
+from medicheck_pipeline.paths import raw_dir
 
 API_BASE = "https://janaushadhi.gov.in:8443"
 SOURCE_PAGE = "https://janaushadhi.gov.in/product-portfolio/product-mrp-list"

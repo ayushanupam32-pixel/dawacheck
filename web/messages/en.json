@@ -324,7 +324,7 @@
     "method_exact": "Exact name only",
     "method_trigram": "Similar names (trigram search), always answers",
     "method_rerank": "+ checks ingredients, strength and form, always answers",
-    "method_dawacheck": "Medicheck: + says “not sure” when unsure",
+    "method_medicheck": "Medicheck: + says “not sure” when unsure",
     "matchNote": "“Wrong answers” is the share of answers given that named the wrong medicine. Saying “not sure” keeps it low: you are then asked to pick from a short list or type the name. Made-up strips are easier than real photos, so expect real results to be lower.",
     "readTitle": "Reading the strip",
     "colField": "What is read",

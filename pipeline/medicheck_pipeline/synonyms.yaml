@@ -1,4 +1,4 @@
-# DawaCheck normalization rules. Edit freely; every change must keep `uv run pytest` green.
+# Medicheck normalization rules. Edit freely; every change must keep `uv run pytest` green.
 #
 # Goal: two sources that describe the SAME medicine must produce the SAME normalized text.
 # We are deliberately conservative: when unsure, do NOT merge names. A missed match only means

@@ -9,12 +9,12 @@ with per-unit prices and monthly savings.
 
 | Part         | File                                                   | What it does                                                                         |
 | ------------ | ------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| Fetch        | `pipeline/dawacheck_pipeline/fetch_jan_aushadhi.py`    | Downloads the official PMBI Product & MRP list (2,439 products) in 2 polite requests |
-| Rules        | `pipeline/dawacheck_pipeline/synonyms.yaml`            | Spellings, salt suffixes, dosage forms, release types: editable, commented           |
-| Normalize    | `pipeline/dawacheck_pipeline/normalize.py`             | Turns any source's text into the same `composition_key`                              |
-| Parse JA     | `pipeline/dawacheck_pipeline/parse_jan_aushadhi.py`    | Splits names like "A 100mg and B 325mg Tablets" into ingredients                     |
-| Parse brands | `pipeline/dawacheck_pipeline/parse_brands.py`          | Reads the A-Z Medicine Dataset of India (254k rows)                                  |
-| Load         | `pipeline/dawacheck_pipeline/load_supabase.py`         | Idempotent upserts into Supabase; refuses if counts move > 20%                       |
+| Fetch        | `pipeline/medicheck_pipeline/fetch_jan_aushadhi.py`    | Downloads the official PMBI Product & MRP list (2,439 products) in 2 polite requests |
+| Rules        | `pipeline/medicheck_pipeline/synonyms.yaml`            | Spellings, salt suffixes, dosage forms, release types: editable, commented           |
+| Normalize    | `pipeline/medicheck_pipeline/normalize.py`             | Turns any source's text into the same `composition_key`                              |
+| Parse JA     | `pipeline/medicheck_pipeline/parse_jan_aushadhi.py`    | Splits names like "A 100mg and B 325mg Tablets" into ingredients                     |
+| Parse brands | `pipeline/medicheck_pipeline/parse_brands.py`          | Reads the A-Z Medicine Dataset of India (254k rows)                                  |
+| Load         | `pipeline/medicheck_pipeline/load_supabase.py`         | Idempotent upserts into Supabase; refuses if counts move > 20%                       |
 | Schedule     | `.github/workflows/data-refresh.yml`                   | 5th of every month: fetch → parse → validate → load → commit raw data                |
 | Search       | `supabase/migrations/20261024000000_search_brands.sql` | Typo-tolerant trigram search                                                         |
 | API          | `web/app/api/match/route.ts`                           | `?q=` → brand candidates, `?brand=` → exact generics                                 |

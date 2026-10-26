@@ -29,12 +29,12 @@ listed on its "Circulars / Orders" page and served to any visitor; they are down
 
 | Part                  | File                                                                               |
 | --------------------- | ---------------------------------------------------------------------------------- |
-| Fetch alerts          | `pipeline/dawacheck_pipeline/fetch_cdsco_alerts.py`                                |
-| Parse alerts          | `pipeline/dawacheck_pipeline/parse_cdsco_alerts.py`                                |
-| Fetch FDC lists       | `pipeline/dawacheck_pipeline/fetch_cdsco_fdc.py`                                   |
-| Parse FDC lists       | `pipeline/dawacheck_pipeline/parse_cdsco_fdc.py` (pdfplumber)                      |
-| Parse NPPA orders     | `pipeline/dawacheck_pipeline/parse_nppa.py` (ceiling prices, 1.4.2026)             |
-| Load                  | `pipeline/dawacheck_pipeline/load_supabase.py` (`load_alerts`, `load_banned_fdcs`) |
+| Fetch alerts          | `pipeline/medicheck_pipeline/fetch_cdsco_alerts.py`                                |
+| Parse alerts          | `pipeline/medicheck_pipeline/parse_cdsco_alerts.py`                                |
+| Fetch FDC lists       | `pipeline/medicheck_pipeline/fetch_cdsco_fdc.py`                                   |
+| Parse FDC lists       | `pipeline/medicheck_pipeline/parse_cdsco_fdc.py` (pdfplumber)                      |
+| Parse NPPA orders     | `pipeline/medicheck_pipeline/parse_nppa.py` (ceiling prices, 1.4.2026)             |
+| Load                  | `pipeline/medicheck_pipeline/load_supabase.py` (`load_alerts`, `load_banned_fdcs`) |
 | Tables                | `supabase/migrations/20261024040000_safety_check_tables.sql`                       |
 | Checks (pure, tested) | `web/lib/checks/batch.ts`, `banned.ts`, `price.ts`, `types.ts`                     |
 | Checks with database  | `web/lib/run-checks.ts`, `POST /api/checks`                                        |

@@ -3,7 +3,7 @@ from decimal import Decimal
 
 import pytest
 
-from dawacheck_pipeline.normalize import (
+from medicheck_pipeline.normalize import (
     STRENGTH_RE,
     Ingredient,
     Strength,

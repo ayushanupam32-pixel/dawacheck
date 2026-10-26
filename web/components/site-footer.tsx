@@ -15,7 +15,7 @@ type T = {
   sourceCode: string;
 };
 
-const REPO = "https://github.com/ayushanupam32-pixel/dawacheck";
+const REPO = "https://github.com/ayushanupam32-pixel/medicheck";
 
 /**
  * The footer on every page: the medical disclaimer first, then links and credits. It is a deep-ink

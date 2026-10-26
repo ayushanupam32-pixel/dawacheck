@@ -20,7 +20,7 @@ When the same combination appears more than once, the latest notification wins: 
 Paracetamol was prohibited in 2018, quashed by the Delhi High Court in 2020, and prohibited again
 on 12.08.2024, so its status is "prohibited".
 
-Run: uv run python -m dawacheck_pipeline.parse_cdsco_fdc
+Run: uv run python -m medicheck_pipeline.parse_cdsco_fdc
 """
 
 import json
@@ -32,7 +32,7 @@ from pathlib import Path
 import pandas as pd
 import pdfplumber
 
-from dawacheck_pipeline.normalize import (
+from medicheck_pipeline.normalize import (
     STRENGTH_RE,
     clean_text,
     extract_phrases,
@@ -40,7 +40,7 @@ from dawacheck_pipeline.normalize import (
     normalize_salt,
     parse_strength,
 )
-from dawacheck_pipeline.paths import CLEAN_DIR, latest_raw_dir
+from medicheck_pipeline.paths import CLEAN_DIR, latest_raw_dir
 
 # The consolidated list's footnotes (page 33-34 of "Updated Banned Drugs List.pdf"):
 #   1# Presently stayed by the Hon'ble High Court of Madras.

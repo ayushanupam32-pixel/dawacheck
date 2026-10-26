@@ -15,7 +15,7 @@ reasons measured below.
 
 | Part                  | File                                                                         | What it does                                                                                                   |
 | --------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Shared rules          | `pipeline/dawacheck_pipeline/export_rules.py` → `web/lib/ai/salt-rules.json` | The pipeline's salt synonyms and form/release words, copied for the browser; a test fails if the copy is stale |
+| Shared rules          | `pipeline/medicheck_pipeline/export_rules.py` → `web/lib/ai/salt-rules.json` | The pipeline's salt synonyms and form/release words, copied for the browser; a test fails if the copy is stale |
 | Normalization         | `web/lib/ai/normalize.ts`                                                    | Same salt normalization as the pipeline; OCR-aware name comparison; strengths in names                         |
 | Re-ranker             | `web/lib/ai/rerank.ts`                                                       | Evidence per candidate, choice model, safety rules, decision                                                   |
 | Learned weights       | `web/lib/ai/match-weights.json`                                              | Written by `pnpm eval:match --fit`                                                                             |

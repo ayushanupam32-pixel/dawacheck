@@ -7,7 +7,7 @@ The browser downloads only the files for the user's area and computes distances 
 user's exact location (or typed PIN) never leaves the phone. Vercel serves these as plain files,
 with no database query per visit.
 
-Run: uv run python -m dawacheck_pipeline.build_static
+Run: uv run python -m medicheck_pipeline.build_static
 """
 
 import json
@@ -18,8 +18,8 @@ from datetime import date
 
 import pandas as pd
 
-from dawacheck_pipeline.geohash import encode
-from dawacheck_pipeline.paths import CLEAN_DIR, PIPELINE_DIR
+from medicheck_pipeline.geohash import encode
+from medicheck_pipeline.paths import CLEAN_DIR, PIPELINE_DIR
 
 WEB_DATA = PIPELINE_DIR.parent / "web" / "public" / "data"
 FIELDS = ["code", "address", "district", "state", "pin", "phone", "lat", "lng", "precision"]

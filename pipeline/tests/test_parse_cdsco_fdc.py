@@ -1,6 +1,6 @@
 import pytest
 
-from dawacheck_pipeline.parse_cdsco_fdc import entries, latest_date, repair, split_salts, status_of
+from medicheck_pipeline.parse_cdsco_fdc import entries, latest_date, repair, split_salts, status_of
 
 VOCAB = {
     "cetirizine",

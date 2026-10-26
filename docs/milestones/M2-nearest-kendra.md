@@ -9,11 +9,11 @@ Directions button, plus a map, without the user's location ever leaving their ph
 
 | Part         | File                                                                    | What it does                                                                              |
 | ------------ | ----------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Fetch        | `pipeline/dawacheck_pipeline/fetch_kendras.py`                          | Downloads the official Kendra list, one request per state (36), 2 s apart                 |
-| Parse        | `pipeline/dawacheck_pipeline/parse_kendras.py`                          | Cleans rows, checks every coordinate, fixes the bad ones                                  |
-| Geocode      | `pipeline/dawacheck_pipeline/geocode.py`                                | OpenStreetMap Nominatim, 1 request/second, cached in `pipeline/cache/geocode.json`        |
-| Geohash      | `pipeline/dawacheck_pipeline/geohash.py`, `web/lib/geo/geohash.ts`      | Same algorithm in Python and TypeScript, tested on the same values                        |
-| Static files | `pipeline/dawacheck_pipeline/build_static.py`                           | `web/public/data/kendras/<cell>.json`, `index.json`, `web/public/data/pins/<prefix>.json` |
+| Fetch        | `pipeline/medicheck_pipeline/fetch_kendras.py`                          | Downloads the official Kendra list, one request per state (36), 2 s apart                 |
+| Parse        | `pipeline/medicheck_pipeline/parse_kendras.py`                          | Cleans rows, checks every coordinate, fixes the bad ones                                  |
+| Geocode      | `pipeline/medicheck_pipeline/geocode.py`                                | OpenStreetMap Nominatim, 1 request/second, cached in `pipeline/cache/geocode.json`        |
+| Geohash      | `pipeline/medicheck_pipeline/geohash.py`, `web/lib/geo/geohash.ts`      | Same algorithm in Python and TypeScript, tested on the same values                        |
+| Static files | `pipeline/medicheck_pipeline/build_static.py`                           | `web/public/data/kendras/<cell>.json`, `index.json`, `web/public/data/pins/<prefix>.json` |
 | Nearest      | `web/lib/geo/nearest.ts`                                                | Haversine distance, top 3, "nothing within 10 km" flag                                    |
 | Page         | `web/app/[locale]/kendras/page.tsx`, `web/components/kendra-finder.tsx` | Location or PIN, the list, Call and Directions buttons                                    |
 | Map          | `web/components/kendra-map.tsx`                                         | Leaflet + OpenStreetMap, loaded only when the user taps "Show on map"                     |

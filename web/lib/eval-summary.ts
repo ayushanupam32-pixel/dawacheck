@@ -23,7 +23,7 @@ export type ReaderSummary = {
   p95Ms: number;
 };
 
-export const MATCH_METHODS = ["exact", "trigram", "rerank", "dawacheck"] as const;
+export const MATCH_METHODS = ["exact", "trigram", "rerank", "medicheck"] as const;
 export type MatchMethod = (typeof MATCH_METHODS)[number];
 export const MATCH_SETS = ["simDev", "simTest", "photosDev", "photosTest"] as const;
 export type MatchSet = (typeof MATCH_SETS)[number];

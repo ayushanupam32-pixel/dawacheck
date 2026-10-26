@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from dawacheck_pipeline.parse_cdsco_alerts import (
+from medicheck_pipeline.parse_cdsco_alerts import (
     normalize_batch,
     parse,
     parse_month,

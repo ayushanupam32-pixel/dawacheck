@@ -25,6 +25,6 @@ PUPPETEER_SKIP_DOWNLOAD=true pnpm dlx @mermaid-js/mermaid-cli@11.17.0 -i docs/ar
 Demo GIF (screenshots of the live site at phone size, then stitched with captions):
 
 ```bash
-cd web && pnpm exec tsx scripts/demo-screens.ts https://dawacheck-psi.vercel.app /tmp/screens && cd ..
+cd web && pnpm exec tsx scripts/demo-screens.ts https://medicheck-in.vercel.app /tmp/screens && cd ..
 uv run --with pillow python eval/make_demo_gif.py /tmp/screens docs/demo.gif
 ```

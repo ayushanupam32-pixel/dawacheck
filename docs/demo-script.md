@@ -1,7 +1,7 @@
 # 3-minute demo script
 
 Use **Demo mode**, not a real strip: it never depends on the light in the room. Open
-https://dawacheck-psi.vercel.app/en on a phone (mirrored to the projector) or a laptop in a
+https://medicheck-in.vercel.app/en on a phone (mirrored to the projector) or a laptop in a
 narrow window. Before the viva: open the site once so the OCR model is cached, and check the
 Wi-Fi. Plan B: `docs/demo.gif` on a slide.
 

@@ -9,7 +9,7 @@ dataset row id), and every write is an "upsert" (insert, or update if the id alr
 Jan Aushadhi products that disappeared from the official list are deleted, so the table always
 mirrors the latest list.
 
-Run: uv run python -m dawacheck_pipeline.load_supabase [--with-brands]
+Run: uv run python -m medicheck_pipeline.load_supabase [--with-brands]
 """
 
 import argparse
@@ -22,12 +22,12 @@ from datetime import UTC, date, datetime
 import pandas as pd
 import requests
 
-from dawacheck_pipeline.fetch_cdsco_fdc import PAGE as FDC_SOURCE_PAGE
-from dawacheck_pipeline.fetch_jan_aushadhi import SOURCE_PAGE as JA_SOURCE_PAGE
-from dawacheck_pipeline.fetch_kendras import SOURCE_PAGE as KENDRAS_SOURCE_PAGE
-from dawacheck_pipeline.parse_brands import SOURCE_NAME as BRANDS_SOURCE
-from dawacheck_pipeline.parse_cdsco_alerts import SOURCE_URL as ALERTS_SOURCE_PAGE
-from dawacheck_pipeline.paths import CLEAN_DIR
+from medicheck_pipeline.fetch_cdsco_fdc import PAGE as FDC_SOURCE_PAGE
+from medicheck_pipeline.fetch_jan_aushadhi import SOURCE_PAGE as JA_SOURCE_PAGE
+from medicheck_pipeline.fetch_kendras import SOURCE_PAGE as KENDRAS_SOURCE_PAGE
+from medicheck_pipeline.parse_brands import SOURCE_NAME as BRANDS_SOURCE
+from medicheck_pipeline.parse_cdsco_alerts import SOURCE_URL as ALERTS_SOURCE_PAGE
+from medicheck_pipeline.paths import CLEAN_DIR
 
 BATCH = 1000
 BRANDS_URL = "https://www.kaggle.com/datasets/shudhanshusingh/az-medicine-dataset-of-india"
