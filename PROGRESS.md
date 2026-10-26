@@ -490,6 +490,9 @@ Lighthouse a11y 100. Details: M7 note, "Second pass". Commits `ee64576` and `7f1
   tests updated), User-Agent `Medicheck/0.1`, all links in code and docs. Still old, on purpose:
   the already-applied SQL migration comments, browser storage keys (`dc-theme`, `dc-large-text`,
   renaming would reset users' settings), raw data snapshots, and the local working folder.
+  Commit `61fae8d`; CI run 40308424048 33/33; verified: new address serves the site, the old one
+  308-redirects (any path), GitHub redirects the old repo URL. Left for the user: the Supabase
+  project's display name is still "dawacheck" (dashboard Settings > General; no URL changes).
 - Checks: 416 Vitest, 33 Playwright, responsive sweep clean, Lighthouse accessibility 100.
 - Commits `714a27e` (font + rename) and `fc3dd0a` (results slide in without fading, after 1 flaky
   axe check mid-fade). CI run 40304250518: 33/33 first try. Live: titles say Medicheck in
