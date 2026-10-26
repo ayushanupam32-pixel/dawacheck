@@ -661,6 +661,9 @@ components) is kept thin. **The evaluation scripts call the same code as the app
   first paint, so the page never flashes in the wrong theme. Dark mode has its own colour set (not
   an inversion), checked for contrast with axe like the light one. Switching animates a circle
   growing from the button (the View Transitions API), skipped when the user asks for reduced motion.
+- **Typography:** Inter for English and Anek Devanagari / Anek Tamil for Hindi and Tamil, all
+  open-licensed and self-hosted. Apple's San Francisco was considered but cannot be embedded on a
+  website and does not cover Indian scripts.
 - **One design system:** deep ink blue with a single marigold accent, tokens for surfaces, borders and status
   colours, one corner-radius rule and shared field, panel and skeleton styles. Loading states are
   skeletons shaped like the result that is coming.

@@ -491,6 +491,15 @@ Lighthouse a11y 100. Details: M7 note, "Second pass". Commits `ee64576` and `7f1
   axe check mid-fade). CI run 40304250518: 33/33 first try. Live: titles say Medicheck in
   en/hi/ta, the stylesheet serves Anek Latin, Devanagari and Tamil.
 
+### English font: Inter (2026-10-26)
+
+The user asked which font Apple uses (San Francisco; its licence does not allow embedding it on
+a website, and it does not cover Hindi or Tamil) and chose, after a side-by-side comparison, the
+Apple-like option: **Inter** (Rasmus Andersson, SIL OFL) for English, with its optical-size axis
+for display headings; **Anek Devanagari and Anek Tamil** stay for Hindi and Tamil (Anek Latin is no
+longer loaded). Headings: bold, -0.025em tracking, normal width. Checks: 416 Vitest, 33 Playwright
+(twice), sweep clean, Lighthouse accessibility 100 on 7 pages; demo GIF regenerated.
+
 ## Exact next steps
 
 1. **Time the live demo on a phone** ("How we read this" shows the seconds) → fill **[PHONE]**.

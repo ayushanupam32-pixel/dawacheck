@@ -222,7 +222,8 @@ from three options: **Ink + Marigold**.
 **Palette.** Deep ink blue for text and for "stages" (the hero and the footer), marigold as the one
 accent. Marigold is a fill colour (buttons, highlights) with ink text on it; text and icons on the
 page use a deeper marigold token, `--brand`, that passes 4.5:1. The warning colour moved to a rust
-orange so it is never confused with the brand. Headings use Bricolage Grotesque for Latin letters
+orange so it is never confused with the brand. (Fonts, final: Inter for English, Anek for Hindi and
+Tamil; see the end of this note.) At first, headings used Bricolage Grotesque for Latin letters
 (Hindi and Tamil headings still use Noto, which matches those scripts).
 
 **Home page, rebuilt.**
@@ -257,3 +258,15 @@ motion, live numbers, headline), axe 0 violations in light and dark; responsive 
 clean after two fixes (the Tamil hero and Search headings were too wide at 320-375 px; headings now
 scale with the screen); Lighthouse accessibility 100 on 7 pages. Found by axe: the scroll letters
 first faded from 15%, which is unreadable; they now move at full strength.
+
+## Fonts (2026-10-26)
+
+After the second pass the user found the fonts basic. A web search of current pairings found only
+Latin-only fonts, so the first choice was **Anek** (Ek Type, Mumbai), the one family designed
+together for Latin, Devanagari and Tamil. The user then asked for an Apple-like look. Apple's San
+Francisco cannot be used on a website (its licence) and covers neither Hindi nor Tamil, so after a
+side-by-side comparison the user chose **Inter** for English (its optical-size axis gives display
+headings tighter shapes, like SF Pro Display) and **Anek Devanagari / Anek Tamil** for Hindi and
+Tamil. All fonts are SIL OFL and served from our own site by `next/font` (no request to Google from
+the visitor's browser). The project was also renamed from DawaCheck to **Medicheck** in everything
+users see; the repository, the Vercel address and internal identifiers keep the old name.

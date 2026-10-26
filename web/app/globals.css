@@ -9,10 +9,9 @@
   --color-foreground: var(--foreground);
   /* Latin first, then Devanagari and Tamil: the browser falls through per character. */
   --font-sans:
-    var(--font-anek-latin), var(--font-anek-devanagari), var(--font-anek-tamil), system-ui,
-    sans-serif;
+    var(--font-inter), var(--font-anek-devanagari), var(--font-anek-tamil), system-ui, sans-serif;
   --font-mono: ui-monospace, monospace;
-  /* Headings use the same family in a wider, heavier cut (font-stretch below). */
+  /* Headings: the same fonts, bolder and more tightly set (below). */
   --font-heading: var(--font-sans);
   /* Result-row colours. Always paired with an icon and words, never colour alone. */
   --color-status-ok: var(--status-ok);
@@ -186,19 +185,17 @@
   html[data-text="large"] {
     font-size: 125%;
   }
-  /* Body text: Anek at its normal width, slightly more open spacing for small sizes. */
+  /* Body text: Inter (English) and Anek (Hindi, Tamil) at their normal widths. */
   body {
-    font-stretch: 100%;
-    letter-spacing: 0.005em;
+    font-optical-sizing: auto;
   }
-  /* Headings: Anek's wide cut (its width axis), bold and tightly set: the brand's voice. */
+  /* Headings: bold and tightly set, Apple-style; Inter switches to its display shapes by itself. */
   h1,
   h2,
   h3,
   .font-heading {
     font-family: var(--font-heading);
-    font-stretch: 118%;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
     text-wrap: balance;
   }
   p {

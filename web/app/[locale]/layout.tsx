@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
-import { Anek_Devanagari, Anek_Latin, Anek_Tamil } from "next/font/google";
+import { Anek_Devanagari, Anek_Tamil, Inter } from "next/font/google";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -8,12 +8,12 @@ import { themeScript } from "@/lib/theme";
 import { isLocale, locales } from "@/lib/i18n/config";
 import "../globals.css";
 
-// Anek (Ek Type, Mumbai; SIL Open Font License): one family designed together for Latin,
-// Devanagari and Tamil, so English, Hindi and Tamil look like the same brand. Variable in weight
-// and width: body text uses the normal width, headings a wider, heavier cut (globals.css).
-// next/font downloads the files at build time and serves them from our own site: no request to
-// Google from the visitor's browser.
-const anekLatin = Anek_Latin({ subsets: ["latin"], axes: ["wdth"], variable: "--font-anek-latin" });
+// English: Inter (Rasmus Andersson; SIL OFL), the closest free relative of Apple's San Francisco.
+// Its optical-size axis gives big headings tighter "display" shapes automatically, as SF Pro
+// Display does. Hindi and Tamil: Anek (Ek Type, Mumbai; SIL OFL), which San Francisco and Inter
+// don't cover. next/font downloads the files at build time and serves them from our own site:
+// no request to Google from the visitor's browser.
+const inter = Inter({ subsets: ["latin"], axes: ["opsz"], variable: "--font-inter" });
 const anekDevanagari = Anek_Devanagari({
   subsets: ["devanagari"],
   axes: ["wdth"],
@@ -56,7 +56,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   return (
     <html
       lang={locale}
-      className={`${anekLatin.variable} ${anekDevanagari.variable} ${anekTamil.variable} h-full antialiased`}
+      className={`${inter.variable} ${anekDevanagari.variable} ${anekTamil.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
