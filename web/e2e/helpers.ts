@@ -35,3 +35,19 @@ export function checkRow(page: Page, title: string) {
     .getByRole("listitem")
     .filter({ has: page.getByRole("heading", { level: 3, name: title, exact: true }) });
 }
+
+/**
+ * Open a page and wait until React has hydrated it, i.e. attached its event handlers to the
+ * controls. Typing or clicking earlier goes to the bare HTML: React never sees the text, so a
+ * "Search" button stays disabled (seen in CI once the shared header added more JavaScript).
+ * The page's own controls are checked when it has any (they may hydrate after the header).
+ */
+export async function openPage(page: Page, path: string) {
+  await page.goto(path);
+  await page.waitForFunction(() => {
+    const control =
+      document.querySelector("#main input, #main button") ??
+      document.querySelector("header button");
+    return !!control && Object.keys(control).some((key) => key.startsWith("__reactProps"));
+  });
+}

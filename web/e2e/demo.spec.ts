@@ -3,7 +3,7 @@
 // (public/demo, made by eval/make_demo_images.py from real records).
 
 import { expect, test } from "@playwright/test";
-import { checkRow, expectAccessible } from "./helpers";
+import { checkRow, expectAccessible, openPage } from "./helpers";
 
 const ROWS = [
   "Cheaper generic",
@@ -14,7 +14,7 @@ const ROWS = [
 ];
 
 test("blood-pressure demo: read, match, all checks, accessible at every step", async ({ page }) => {
-  await page.goto("/en/scan");
+  await openPage(page, "/en/scan");
   await expectAccessible(page);
 
   await page.getByRole("button", { name: "Demo: blood-pressure strip" }).click();
@@ -43,7 +43,7 @@ test("blood-pressure demo: read, match, all checks, accessible at every step", a
 test("quality-alert demo: the batch from a real CDSCO alert shows a red alert", async ({
   page,
 }) => {
-  await page.goto("/en/scan");
+  await openPage(page, "/en/scan");
   await page.getByRole("button", { name: "Demo: strip with a quality alert" }).click();
   await expect(page.getByRole("heading", { name: "Check what we read" })).toBeVisible();
   await expect(page.getByLabel("Batch number")).toHaveValue("25281124");

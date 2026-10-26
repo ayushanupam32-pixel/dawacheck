@@ -2,12 +2,12 @@
 // Each step is also checked for accessibility, since these screens appear only after input.
 
 import { expect, test } from "@playwright/test";
-import { checkRow, expectAccessible } from "./helpers";
+import { checkRow, expectAccessible, openPage } from "./helpers";
 
 test("typed search: Telma 40 -> pick the pack -> Jan Aushadhi generic with savings", async ({
   page,
 }) => {
-  await page.goto("/en/search");
+  await openPage(page, "/en/search");
   await page.getByLabel("Medicine name on your strip").fill("Telma 40");
   await page.getByRole("button", { name: "Search", exact: true }).click();
   await expect(page.getByText("Which one is yours?")).toBeVisible();
@@ -23,7 +23,7 @@ test("typed search: Telma 40 -> pick the pack -> Jan Aushadhi generic with savin
 });
 
 test("nearest Kendra by PIN code: 3 Kendras with distances", async ({ page }) => {
-  await page.goto("/en/kendras");
+  await openPage(page, "/en/kendras");
   await page.getByLabel("Enter your PIN code").fill("110001");
   await page.getByRole("button", { name: "Find", exact: true }).click();
   await expect(page.getByText(/km away/)).toHaveCount(3);
@@ -34,7 +34,7 @@ test("nearest Kendra by PIN code: 3 Kendras with distances", async ({ page }) =>
 test("typed search runs all five checks: a batch from a real CDSCO alert gives a red alert", async ({
   page,
 }) => {
-  await page.goto("/en/search");
+  await openPage(page, "/en/search");
   await page.getByLabel("Medicine name on your strip").fill("Taxim-O 200");
   await page.getByRole("button", { name: "Search", exact: true }).click();
   await page

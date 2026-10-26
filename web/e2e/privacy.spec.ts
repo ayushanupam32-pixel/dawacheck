@@ -10,6 +10,7 @@
 
 import { resolve } from "node:path";
 import { expect, test, type Request } from "@playwright/test";
+import { openPage } from "./helpers";
 
 const STRIP = resolve(__dirname, "..", "..", "demo", "1-everyday", "01-telmikind-40");
 const OCR_CDN = "cdn.jsdelivr.net"; // Tesseract.js program, WebAssembly core and English model
@@ -33,7 +34,7 @@ test("a photo scan uploads no image: only small JSON to our own API", async ({ p
   const log = recorder(page);
   const ownHost = new URL(baseURL!).host;
 
-  await page.goto("/en/scan");
+  await openPage(page, "/en/scan");
   for (const photo of ["front.jpg", "back.jpg", "stamp.jpg"]) {
     await page.locator('input[type="file"]:not([capture])').setInputFiles(resolve(STRIP, photo));
     await page.getByRole("button", { name: "Next", exact: true }).click();
@@ -79,7 +80,7 @@ test("the nearest Kendra by GPS never sends the position", async ({ browser, bas
   const log = recorder(page);
   const ownHost = new URL(baseURL!).host;
 
-  await page.goto("/en/kendras");
+  await openPage(page, "/en/kendras");
   await page.getByRole("button", { name: "Use my location" }).click();
   await expect(page.getByText(/km away/)).toHaveCount(3);
 
