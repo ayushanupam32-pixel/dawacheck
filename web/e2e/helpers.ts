@@ -9,14 +9,19 @@ export async function expectAccessible(page: Page) {
   // Let entrance animations (fade-ins, the menu sheet sliding in) finish first: halfway through a
   // fade, text is partly transparent and axe would measure a contrast the user never settles on.
   // Endless animations (loading skeletons, spinners) are skipped, or this would never return.
-  await page.evaluate(() =>
-    Promise.all(
-      document
-        .getAnimations()
-        .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity)
-        .map((a) => a.finished.catch(() => undefined)),
-    ),
-  );
+  // Twice, a frame apart: content that was just inserted may start its animation a frame late.
+  await page.evaluate(async () => {
+    const settle = () =>
+      Promise.all(
+        document
+          .getAnimations()
+          .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity)
+          .map((a) => a.finished.catch(() => undefined)),
+      );
+    await settle();
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    await settle();
+  });
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
     // Leaflet's map tiles are third-party images; the map is optional and off by default.

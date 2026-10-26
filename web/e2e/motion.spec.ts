@@ -11,12 +11,12 @@ test.describe("reduced motion", () => {
     page,
   }) => {
     await openPage(page, "/en");
-    // Hero words: no animation at all.
-    const animation = await page
+    // Hero words: no animation running at all (and none on the page except endless ones).
+    const running = await page
       .locator(".rise-word")
       .first()
-      .evaluate((el) => getComputedStyle(el).animationName);
-    expect(animation).toBe("none");
+      .evaluate((el) => el.getAnimations().length);
+    expect(running).toBe(0);
     // Scroll reveals are visible straight away, without scrolling.
     await expect(page.getByRole("heading", { name: "Ways to start" })).toBeVisible();
     const opacity = await page

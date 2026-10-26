@@ -46,6 +46,7 @@ test.describe("dark theme, interactive screens", () => {
     await openPage(page, "/en/search");
     await page.getByLabel("Medicine name on your strip").fill("Taxim-O 200");
     await page.getByRole("button", { name: "Search", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Which one is yours?" })).toBeVisible();
     await expectAccessible(page);
     await page
       .getByRole("button", { name: /Taxim-O 200 Tablet/ })
