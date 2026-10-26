@@ -673,7 +673,7 @@ function MatchResult({
     const auto = response.status === "match" && response.brand.id === chosen.id;
     return (
       <section className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2 rounded-2xl border-2 border-brand/50 bg-card p-5 shadow-soft motion-safe:animate-in motion-safe:fade-in">
+        <div className="flex flex-col gap-2 rounded-2xl border-2 border-brand/50 bg-card p-5 shadow-soft motion-safe:animate-in motion-safe:slide-in-from-bottom-2">
           <p className="text-base text-muted-foreground">{auto ? t.matchedTitle : t.youChose}</p>
           <p className="text-2xl font-bold tracking-tight">{chosen.name}</p>
           {chosen.manufacturer && <p className="text-base">{chosen.manufacturer}</p>}

@@ -198,7 +198,7 @@ export function KendraFinder({ t, locale }: { t: T; locale: string }) {
               </p>
             )}
 
-            <ol className="flex flex-col gap-3 motion-safe:animate-in motion-safe:fade-in">
+            <ol className="flex flex-col gap-3 motion-safe:animate-in motion-safe:slide-in-from-bottom-2">
               {state.result.kendras.map((k, i) => (
                 <li key={k.code} className={panelClass("flex flex-col gap-2 p-5")}>
                   <div className="flex items-start justify-between gap-3">

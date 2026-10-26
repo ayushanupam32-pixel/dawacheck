@@ -186,7 +186,7 @@ function Result({
   }
 
   return (
-    <section className="flex flex-col gap-4 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-1">
+    <section className="flex flex-col gap-4 motion-safe:animate-in motion-safe:slide-in-from-bottom-2">
       <div className="flex flex-col gap-1">
         <h2 className="text-2xl font-bold tracking-tight">{brand.name}</h2>
         {ingredientList}

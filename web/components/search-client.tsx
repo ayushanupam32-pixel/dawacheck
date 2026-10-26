@@ -130,7 +130,7 @@ export function SearchClient({
         {state.step === "error" && <Notice kind="unknown">{t.error}</Notice>}
 
         {state.step === "candidates" && (
-          <section className="flex flex-col gap-3 motion-safe:animate-in motion-safe:fade-in">
+          <section className="flex flex-col gap-3 motion-safe:animate-in motion-safe:slide-in-from-bottom-2">
             <h2 className="text-2xl font-bold tracking-tight">{t.pickOne}</h2>
             <ul className="flex flex-col gap-2">
               {state.candidates.map((c) => (
