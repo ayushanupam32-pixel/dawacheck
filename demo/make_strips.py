@@ -121,7 +121,7 @@ def make(s, rng):
         (60, y + 170, f"M.R.P. Rs. {s['mrp']:.2f} (Incl. of all taxes)", 40, True),
         (60, y + 250, f"Strip of {s['count']} {unit.lower()}", 36, False),
         (60, y + 330, f"Marketed by: {s['maker']}", 36, False),
-        (60, y + 400, "Demo image made for DawaCheck, not a photo of a real pack.", 30, False),
+        (60, y + 400, "Demo image made for Medicheck, not a photo of a real pack.", 30, False),
     ]
     back = card(back_lines, h=max(800, y + 470))
     seed_tilt = rng.choice([-3, -2, 2, 3])

@@ -66,7 +66,7 @@ page reads, so nobody types a number in by hand, and the final run replaces the 
 itself. Demo strips are kept out of the metrics.
 
 **Accessibility beyond the first screen.** Lighthouse only sees a page as it loads; most of
-DawaCheck appears after you act. Playwright drives every flow and runs axe (the same rules) on
+Medicheck appears after you act. Playwright drives every flow and runs axe (the same rules) on
 each new screen. A keyboard pass found one real problem: after reading, focus fell back to the
 top of the page; it now moves to the new screen's heading.
 
@@ -193,7 +193,7 @@ characters. New dependencies: `framer-motion` 14.1.0, `@number-flow/react` 0.6.2
   shows the saving update as you type, panels fade in once. Everything is off with "reduce motion".
   The result card does not fade, because it refreshes on every keystroke in the batch box and would
   flicker.
-- **No em-dashes in the interface text** and plain " | DawaCheck" in page titles.
+- **No em-dashes in the interface text** and plain " | Medicheck" in page titles.
 - **Buttons may wrap to two lines** (still at least 48 px tall): a Tamil label that cannot wrap made
   the page wider than a 320 px phone.
 

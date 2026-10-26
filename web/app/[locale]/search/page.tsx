@@ -9,7 +9,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/search">
   const { locale } = await params;
   if (!isLocale(locale)) return {};
   const dict = await getDictionary(locale);
-  return { title: `${dict.search.title} | DawaCheck` };
+  return { title: `${dict.search.title} | Medicheck` };
 }
 
 export default async function SearchPage({ params }: PageProps<"/[locale]/search">) {

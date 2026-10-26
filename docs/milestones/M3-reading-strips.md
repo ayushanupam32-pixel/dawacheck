@@ -80,7 +80,7 @@ a scan shows only the app's own files; the OCR model is downloaded once from a C
 of the baseline resized and grayscaled the photo first, which made it read even less and would
 have exaggerated our improvement. Tesseract still does its own simple black-and-white step.
 
-**Labeling without bias.** The labeling form starts empty. If it were pre-filled with DawaCheck's
+**Labeling without bias.** The labeling form starts empty. If it were pre-filled with Medicheck's
 reading, people would tend to accept its mistakes, and the measured accuracy would be inflated.
 About 1 in 4 photos is frozen as the test set on first save (by a hash of its id).
 
@@ -116,7 +116,7 @@ ruled out image size and Tesseract's page mode as the cause, and showed three re
 
 **After the fixes** (`eval/results.md`):
 
-| Field        | DawaCheck correct | DawaCheck **wrong** | Raw Tesseract correct |
+| Field        | Medicheck correct | Medicheck **wrong** | Raw Tesseract correct |
 | ------------ | ----------------- | ------------------- | --------------------- |
 | Batch number | 4/4 (100%)        | 0                   | 1/4                   |
 | Mfg date     | 4/5 (80%)         | 0                   | 1/5                   |
@@ -128,7 +128,7 @@ ruled out image size and Tesseract's page mode as the cause, and showed three re
 
 **What this means:**
 
-- For the safety-critical stamp fields (batch, dates, MRP, pack) DawaCheck was **never wrong**:
+- For the safety-critical stamp fields (batch, dates, MRP, pack) Medicheck was **never wrong**:
   when unsure it leaves the field empty and the user types it. That is the behaviour the spec
   asks for ("a wrong answer is worse than no answer").
 - With a stamp close-up, the Indian strips' batch numbers and dates are read reliably; Favipill

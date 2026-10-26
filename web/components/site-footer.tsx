@@ -35,7 +35,7 @@ export function SiteFooter({ t, privacy, locale }: { t: T; privacy: string; loca
           aria-hidden="true"
           className="absolute -right-40 -bottom-56 -z-10 size-[34rem] rounded-full bg-[radial-gradient(circle,oklch(0.8_0.16_72/0.28),transparent_62%)]"
         />
-        <p className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">DawaCheck</p>
+        <p className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">Medicheck</p>
         <div className="grid gap-6 md:grid-cols-[1.4fr_1fr]">
           <p className="flex gap-3 text-base leading-relaxed">
             <Info aria-hidden="true" className="mt-1 size-5 shrink-0 text-[oklch(0.86_0.155_78)]" />

@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/about">)
   const { locale } = await params;
   if (!isLocale(locale)) return {};
   const dict = await getDictionary(locale);
-  return { title: `${dict.about.title} | DawaCheck` };
+  return { title: `${dict.about.title} | Medicheck` };
 }
 
 const fill = (text: string, values: Record<string, string | number>) =>
@@ -267,7 +267,7 @@ function ReaderResults({
         })}
       </p>
       <ScrollTable label={t.readTitle}>
-        {/* Two header rows: "DawaCheck" over right / wrong, "Plain OCR" over right. Short
+        {/* Two header rows: "Medicheck" over right / wrong, "Plain OCR" over right. Short
             headers keep the table within a phone's width in all three languages. */}
         <thead>
           <tr>

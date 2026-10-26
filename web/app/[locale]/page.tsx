@@ -23,7 +23,7 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { formatRupees } from "@/lib/savings";
 import { splitHighlight, words } from "@/lib/segment";
 
-// Numbers on this page come from DawaCheck's own data, never typed in for effect:
+// Numbers on this page come from Medicheck's own data, never typed in for effect:
 // - the price example: Telmikind 40 at ₹38.59 for 10 (2022 brand dataset) and the Jan Aushadhi
 //   product with exactly the same composition at ₹12.38 for 10 (docs/report.md, section 1.1);
 // - the saving in the live-check card is what the app shows for the Telmikind demo strip at one

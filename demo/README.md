@@ -1,6 +1,6 @@
 # Demo strips
 
-18 ready-made medicine strips for showing every DawaCheck feature, each as the three photos the
+18 ready-made medicine strips for showing every Medicheck feature, each as the three photos the
 website asks for: **front.jpg**, **back.jpg** and **stamp.jpg** (the zoomed-in batch / dates /
 MRP stamp). Every one was checked on the website through the same upload steps you will use
 (see [VERIFIED.md](VERIFIED.md)).

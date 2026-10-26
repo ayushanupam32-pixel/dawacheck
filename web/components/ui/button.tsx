@@ -20,8 +20,8 @@ const buttonVariants = cva(
         link: "border-transparent text-brand underline-offset-4 hover:underline",
       },
       size: {
-        // DawaCheck: default buttons are 48px tall with 16px text for easy tapping.
-        // DawaCheck: hero calls to action.
+        // Medicheck: default buttons are 48px tall with 16px text for easy tapping.
+        // Medicheck: hero calls to action.
         // Long Tamil or Hindi labels wrap onto a second line instead of overflowing a phone.
         xl: "min-h-14 gap-2.5 rounded-xl px-6 py-2.5 text-center text-lg leading-snug [&_svg:not([class*='size-'])]:size-5",
         default:

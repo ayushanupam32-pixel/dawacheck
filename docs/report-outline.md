@@ -1,4 +1,4 @@
-# Project report outline: DawaCheck
+# Project report outline: Medicheck
 
 Section order from the brief. Each section lists what to write and where the material already is.
 **[PHONE]** = fill in after timing the app on a mid-range Android phone; **[SUS]** = after the
@@ -16,7 +16,7 @@ Suggested length: 35–45 pages with figures. Screenshots: `docs/demo.gif` frame
 - Problem: Indian patients overpay for branded medicines when an identical Jan Aushadhi generic
   exists; quality alerts (CDSCO), ceiling prices (NPPA) and banned-combination lists are public but
   scattered across PDFs and portals that ordinary buyers never see.
-- What DawaCheck does: photograph a strip → read on the phone → match to a medicine → five checks.
+- What Medicheck does: photograph a strip → read on the phone → match to a medicine → five checks.
 - Method: in-browser preprocessing + Tesseract OCR, rule-based extraction, trigram retrieval +
   re-ranking with a conditional-logit choice model and abstention; monthly public-data pipeline.
 - Results: matching top-1 85.9% with 3.3% wrong answers on 207 unseen simulated strips (vs 26.3%
@@ -56,7 +56,7 @@ Check each fact against the app / site before citing; add access dates.
   e.g. pill-bottle / drug-label reading studies; check they exist).
 - **Entity matching under noise**: trigram similarity, re-ranking, abstention / selective
   prediction ("reject option"; Chow 1970).
-- **The gap DawaCheck fills**: one photo → all five public checks, on the phone, no account, ₹0,
+- **The gap Medicheck fills**: one photo → all five public checks, on the phone, no account, ₹0,
   says "not sure" instead of guessing.
 
 ## 3. System design
@@ -129,7 +129,7 @@ too small (3) to generalise. Do not re-tune on it. Then the fix made after the f
 8 → 6, everything else unchanged; state clearly that the test numbers are pre-fix.
 7.3 **Ablation: preprocessing** — full pipeline vs raw Tesseract (the brief's first baseline).
 7.4 **Matching** (`eval/match-results.md`): exact-name baseline, trigram only, re-ranking without
-abstention, DawaCheck; top-1, top-3, wrong of answered, wrong generic, abstention; on simulated
+abstention, Medicheck; top-1, top-3, wrong of answered, wrong generic, abstention; on simulated
 dev/test and labelled photos. Calibration table.
 7.5 **Ablation: brand guesses** — with vs without (no change on dev photos; say why).
 7.6 **Photo → medicine, fully automatic** vs with the user's correction. Test set: automatic

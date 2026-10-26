@@ -1,4 +1,4 @@
-# DawaCheck
+# Medicheck
 
 **Photograph an Indian medicine strip; get a cheaper Jan Aushadhi generic, batch-safety alerts,
 a fair-price check, banned-combination check and the nearest Jan Aushadhi Kendra, from public
@@ -7,9 +7,9 @@ government data, read on your phone, at ₹0 cost.**
 **Live:** https://dawacheck-psi.vercel.app (English, हिन्दी, தமிழ்) · B.Tech CSE (AI & ML) class
 project.
 
-<p align="center"><img src="docs/demo.gif" alt="DawaCheck demo: a demo strip is read on the phone, matched to Telmikind 40, the five checks and the Jan Aushadhi saving are shown; a second strip whose batch is in a CDSCO alert shows a red alert; then the nearest Kendras and the About page." width="360"></p>
+<p align="center"><img src="docs/demo.gif" alt="Medicheck demo: a demo strip is read on the phone, matched to Telmikind 40, the five checks and the Jan Aushadhi saving are shown; a second strip whose batch is in a CDSCO alert shows a red alert; then the nearest Kendras and the About page." width="360"></p>
 
-> **Medical disclaimer.** DawaCheck gives information from public government data. It is not
+> **Medical disclaimer.** Medicheck gives information from public government data. It is not
 > medical advice. It never tells you to stop or change a medicine: show the result to your
 > pharmacist or doctor.
 
@@ -62,14 +62,14 @@ never used for tuning; 1 in 4 is not in the brand list, so "not sure" is right):
 | Exact name only (baseline)                  | 62.6%              | 2.9%          | 62.6%          |
 | Trigram search, always answers (baseline)   | 81.0%              | 30.5%         | 90.8%          |
 | + re-ranking by ingredients, strength, form | 85.9%              | 26.3%         | 90.2%          |
-| **DawaCheck: + abstains when unsure**       | **85.9%**          | **3.3%**      | **90.2%**      |
+| **Medicheck: + abstains when unsure**       | **85.9%**          | **3.3%**      | **90.2%**      |
 
 Abstention is what removes the wrong answers: 26% → 3%, at the cost of saying "not sure" for 28%
 of in-list strips. Wrong _generic_ given: 0%. Simulated strips are easier than real photos.
 
 **Reading the strip** (13 real development photos, vs plain Tesseract on the untouched photo):
 
-| Field       | DawaCheck right | DawaCheck wrong | Plain OCR right |
+| Field       | Medicheck right | Medicheck wrong | Plain OCR right |
 | ----------- | --------------- | --------------- | --------------- |
 | Batch no.   | 3/3             | 0/3             | 1/3             |
 | Mfg date    | 3/4             | 0/4             | 1/4             |
@@ -79,7 +79,7 @@ of in-list strips. Wrong _generic_ given: 0%. Simulated strips are easier than r
 | Ingredients | 1/9             | 3/9             | 0/9             |
 | Brand       | 0/13            | 3/13            | 0/13            |
 
-**Frozen test set** (3 photos, labels checked by a person, run once on 2026-10-25): no field was read correctly; wrong values shown: brand 1/3, ingredients 2/2; plain OCR read 1 of 2 pack sizes, DawaCheck none. Two of the three are foreign packs (French Augmentin, German Sortis) and OCR confidence was only 23–44%, so almost nothing was readable. The run also exposed a defect: with no back photo, the merge step counts the missing back as a fully confident reading, which doubled weak front readings and let garbage ingredients ("Cee 8000 mg") past the bar for showing free text. The test result stands as measured.
+**Frozen test set** (3 photos, labels checked by a person, run once on 2026-10-25): no field was read correctly; wrong values shown: brand 1/3, ingredients 2/2; plain OCR read 1 of 2 pack sizes, Medicheck none. Two of the three are foreign packs (French Augmentin, German Sortis) and OCR confidence was only 23–44%, so almost nothing was readable. The run also exposed a defect: with no back photo, the merge step counts the missing back as a fully confident reading, which doubled weak front readings and let garbage ingredients ("Cee 8000 mg") past the bar for showing free text. The test result stands as measured.
 
 **Fixed after the final run** (2026-10-25, checked on the 13 dev photos only; the test-set numbers above were measured before the fix and are not re-run): a photo without a back side now counts only the front's own confidence. Dev photos: wrong values shown 8 → 6 (one garbage name and two garbage ingredient lines no longer shown), batch, dates, MRP and pack size unchanged, speed unchanged; one correct but low-confidence name ("Suhagra-100") is no longer pre-filled, yet its automatic match still succeeds through the brand guesses.
 
@@ -101,7 +101,7 @@ Details: [eval/results.md](eval/results.md), [eval/match-results.md](eval/match-
 | Jan Aushadhi product & MRP list; Kendra list                                                                            | PMBI, Government of India    | Public government data                                                                        |
 | Drug alerts (NSQ, spurious); prohibited FDC lists                                                                       | CDSCO                        | Public government data                                                                        |
 | Ceiling prices, orders S.O. 1575(E) and 1581(E), 25.03.2026                                                             | NPPA                         | Public Gazette notifications                                                                  |
-| [A-Z Medicine Dataset of India](https://www.kaggle.com/datasets/shudhanshusingh/az-medicine-dataset-of-india), Nov 2022 | Shudhanshu Singh (Kaggle)    | **CC BY-SA 4.0**; the brand tables DawaCheck builds from it are shared under the same licence |
+| [A-Z Medicine Dataset of India](https://www.kaggle.com/datasets/shudhanshusingh/az-medicine-dataset-of-india), Nov 2022 | Shudhanshu Singh (Kaggle)    | **CC BY-SA 4.0**; the brand tables Medicheck builds from it are shared under the same licence |
 | Map tiles, geocoding (Nominatim)                                                                                        | © OpenStreetMap contributors | ODbL                                                                                          |
 
 A GitHub Action refreshes everything on the 5th of each month (polite: rate-limited, clear

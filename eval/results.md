@@ -1,11 +1,11 @@
-# DawaCheck evaluation results
+# Medicheck evaluation results
 
 Generated 2026-10-25 by `pnpm eval`.
 Strips: 15 (demo, dev). Photos with a back side: 2.
 
 ## Field reading: exact-match accuracy and character error rate (CER)
 
-| Field       | DawaCheck correct | DawaCheck wrong | Baseline correct | Baseline wrong | CER DawaCheck | CER baseline |
+| Field       | Medicheck correct | Medicheck wrong | Baseline correct | Baseline wrong | CER Medicheck | CER baseline |
 | ----------- | ----------------- | --------------- | ---------------- | -------------- | ------------- | ------------ |
 | brand       | 13% (2/15)        | 20% (3/15)      | 0% (0/15)        | 0% (0/15)      | 0.82          | 1.00         |
 | ingredients | 27% (3/11)        | 27% (3/11)      | 0% (0/11)        | 0% (0/11)      | 0.64          | 1.00         |
@@ -20,7 +20,7 @@ wrong) was left empty: the user is asked to type it. A wrong value is worse than
 
 ## Batch number: foil vs matte packs
 
-| Pack  | DawaCheck  | Baseline  |
+| Pack  | Medicheck  | Baseline  |
 | ----- | ---------- | --------- |
 | Foil  | 100% (3/3) | 33% (1/3) |
 | Matte | 100% (2/2) | 0% (0/2)  |
@@ -44,7 +44,7 @@ others, abstaining is the right answer. In the app the user can fix the name fir
   Right: 3 · Wrong: 0 · Abstained: 4 in dataset, 8 not in dataset
 - Ablation, only the one name the reader picked: Right: 2 · Wrong: 0 · Abstained: 5 in dataset, 8 not in dataset
 
-| Photo                  | Expected                     | DawaCheck                  |           | Without guesses | Guesses tried                                                                                                        |
+| Photo                  | Expected                     | Medicheck                  |           | Without guesses | Guesses tried                                                                                                        |
 | ---------------------- | ---------------------------- | -------------------------- | --------- | --------------- | -------------------------------------------------------------------------------------------------------------------- |
 | demo-telmikind         | Telmikind 40 Tablet          | Telmikind 40 Tablet        | right     | right           | TELMIKIND 40                                                                                                         |
 | demo-omee              | Omee Capsule                 | Omee Capsule               | right     | right           | OMEE                                                                                                                 |

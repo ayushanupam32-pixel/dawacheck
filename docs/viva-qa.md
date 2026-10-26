@@ -12,7 +12,7 @@ Answer in your own words; these are the points to hit. Each milestone note
 2. **What does preprocessing do, and does it help?**
    Scale, straighten (projection profile), contrast stretch, adaptive black-and-white (Bradley,
    integral image), inverted, and the "ink" image (max − min of RGB) that removes silver-foil
-   glare. Ablation: plain Tesseract on the untouched photo read the batch 1/3, DawaCheck 3/3 on
+   glare. Ablation: plain Tesseract on the untouched photo read the batch 1/3, Medicheck 3/3 on
    dev photos. On the 3 frozen test photos neither read anything right (foreign packs, OCR
    confidence 23–44%). The baseline is deliberately the original file, so the gain isn't
    exaggerated.

@@ -1,11 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
-import {
-  Bricolage_Grotesque,
-  Noto_Sans,
-  Noto_Sans_Devanagari,
-  Noto_Sans_Tamil,
-} from "next/font/google";
+import { Anek_Devanagari, Anek_Latin, Anek_Tamil } from "next/font/google";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -13,16 +8,18 @@ import { themeScript } from "@/lib/theme";
 import { isLocale, locales } from "@/lib/i18n/config";
 import "../globals.css";
 
-// One font family per script. The browser picks the right one per character,
-// so English, Hindi and Tamil text all render with matching Noto fonts.
-const notoLatin = Noto_Sans({ subsets: ["latin"], variable: "--font-noto-latin" });
-const notoDevanagari = Noto_Sans_Devanagari({
+// Anek (Ek Type, Mumbai; SIL Open Font License): one family designed together for Latin,
+// Devanagari and Tamil, so English, Hindi and Tamil look like the same brand. Variable in weight
+// and width: body text uses the normal width, headings a wider, heavier cut (globals.css).
+// next/font downloads the files at build time and serves them from our own site: no request to
+// Google from the visitor's browser.
+const anekLatin = Anek_Latin({ subsets: ["latin"], axes: ["wdth"], variable: "--font-anek-latin" });
+const anekDevanagari = Anek_Devanagari({
   subsets: ["devanagari"],
-  variable: "--font-noto-devanagari",
+  axes: ["wdth"],
+  variable: "--font-anek-devanagari",
 });
-const notoTamil = Noto_Sans_Tamil({ subsets: ["tamil"], variable: "--font-noto-tamil" });
-// Display face for headings (Latin only; Hindi and Tamil headings use the Noto fonts above).
-const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-display" });
+const anekTamil = Anek_Tamil({ subsets: ["tamil"], axes: ["wdth"], variable: "--font-anek-tamil" });
 
 // Pre-render /en, /hi and /ta at build time so pages are served as static files.
 export function generateStaticParams() {
@@ -59,7 +56,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
   return (
     <html
       lang={locale}
-      className={`${notoLatin.variable} ${notoDevanagari.variable} ${notoTamil.variable} ${display.variable} h-full antialiased`}
+      className={`${anekLatin.variable} ${anekDevanagari.variable} ${anekTamil.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>

@@ -9,7 +9,7 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/kendras"
   const { locale } = await params;
   if (!isLocale(locale)) return {};
   const dict = await getDictionary(locale);
-  return { title: `${dict.kendras.title} | DawaCheck` };
+  return { title: `${dict.kendras.title} | Medicheck` };
 }
 
 export default async function KendrasPage({ params }: PageProps<"/[locale]/kendras">) {

@@ -3,7 +3,7 @@
 One idea per slide, big text, one picture each. **[PHONE]** / **[SUS]**: numbers to fill in
 after timing a phone and after the usability study.
 
-1. **DawaCheck** — "Photograph your medicine strip; check it against public government data."
+1. **Medicheck** — "Photograph your medicine strip; check it against public government data."
    Name, roll number, guide, college. Picture: app on a phone (frame from `docs/demo.gif`).
 
 2. **The problem** — Same medicine, very different price: Telmikind 40 ₹3.86 per tablet vs Jan
@@ -14,7 +14,7 @@ after timing a phone and after the usability study.
    Daam (prices only), pharmacy apps (commercial, accounts, no batch alerts). Gap: one photo → all
    checks, private, free, honest when unsure.
 
-4. **What DawaCheck does** — The five checks with their icons (generic, batch, fair price, banned,
+4. **What Medicheck does** — The five checks with their icons (generic, batch, fair price, banned,
    Kendra). Three ways in: scan, type, demo. Three languages.
 
 5. **Architecture** — `docs/architecture.png`. Say: photo stays on the phone; server sees only
@@ -22,14 +22,14 @@ after timing a phone and after the usability study.
 
 6. **Reading a strip (AI part 1)** — One strip shown 4 ways: original, black-and-white (adaptive
    threshold), ink (foil glare removed), straightened stamp. Tesseract in the browser,
-   progressive passes. "Plain OCR read the batch 1/3; DawaCheck 3/3" (dev photos). Be honest about the test set:
+   progressive passes. "Plain OCR read the batch 1/3; Medicheck 3/3" (dev photos). Be honest about the test set:
    3 hard photos (French and German packs), 0 fields read right — the OCR limit.
 
 7. **Finding the medicine (AI part 2)** — Trigram candidates → evidence features → choice model
    (softmax over candidates + "none") → safety rules → answer or "not sure". Valium 2/5/10 example:
    no strength read → shares probability → asks.
 
-8. **Why "not sure" matters** — Table: always-answer re-ranking 26.3% wrong answers vs DawaCheck
+8. **Why "not sure" matters** — Table: always-answer re-ranking 26.3% wrong answers vs Medicheck
    3.3% (207 unseen simulated strips), same top-1 85.9%. Wrong generic: 0%. The "DEMO"
    watermark that matched a real "Demo 20mg Capsule": why we never trust a name alone.
 

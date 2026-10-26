@@ -16,7 +16,18 @@ async function main() {
   const page = await browser.newPage({ ...devices["Pixel 7"] });
   let n = 0;
   const shot = async (name: string) => {
-    await page.waitForTimeout(400); // let animations settle
+    // Let entrance animations finish (the hero's words and live check take about 2 s); endless
+    // ones (the drifting lights) are skipped, or this would never return.
+    await page.waitForTimeout(300);
+    await page.evaluate(() =>
+      Promise.all(
+        document
+          .getAnimations()
+          .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity)
+          .map((a) => a.finished.catch(() => undefined)),
+      ),
+    );
+    await page.waitForTimeout(200);
     await page.screenshot({ path: join(OUT, `${String(++n).padStart(2, "0")}-${name}.png`) });
   };
   const show = async (p: Page, text: string | RegExp) => {

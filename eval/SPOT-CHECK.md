@@ -14,8 +14,8 @@ the 3 test photos, 45 minutes with the dev photos too.
      `Salt strength unit`, e.g. `Telmisartan 40 mg`.
    - If you can't see a value on the photo, leave it **empty**. Don't fill it in from memory.
    - Dates as `YYYY-MM` (`2027-05`).
-   - **Match brand**: the exact name in DawaCheck's brand list (check on the Search page), or
-     empty if the medicine is not in the list (then DawaCheck should say "not sure").
+   - **Match brand**: the exact name in Medicheck's brand list (check on the Search page), or
+     empty if the medicine is not in the list (then Medicheck should say "not sure").
 4. **Do not scan the 3 test photos in the app** and don't open `eval/results*.md` for them. They
    must stay unseen until the final run, or the final numbers are not honest.
 5. Tell Claude when you're done; it then runs `pnpm eval -- --final` and

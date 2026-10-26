@@ -1,4 +1,4 @@
-# DawaCheck usability questionnaire (SUS)
+# Medicheck usability questionnaire (SUS)
 
 Participant: P\_\_ · Language used: English / हिन्दी / தமிழ் · Phone: Android / iPhone
 

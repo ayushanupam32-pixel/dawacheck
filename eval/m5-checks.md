@@ -7,7 +7,7 @@ Written 2026-10-25. Targets are from the project brief (section 7, "What to meas
 Target: correct verdict on all 40 (100%). **Result: 40 / 40.**
 
 Each case is a medicine described in full (salts, strengths, form, release type). The expected
-verdict comes from the official CDSCO list text, not from DawaCheck's code:
+verdict comes from the official CDSCO list text, not from Medicheck's code:
 
 - **20 banned**, each with the notification that bans exactly it: rosiglitazone, terfenadine,
   astemizole, phenformin, rimonabant (single-drug bans); nimesulide + paracetamol dispersible
@@ -37,12 +37,12 @@ brands: 62 certain alerts (all withdrawn single drugs) and 4,885 "show your phar
 
 Target: precision and recall ≥ 98% against 3 manually checked monthly lists.
 
-DawaCheck does not parse PDFs for this check: since August 2025 CDSCO publishes the alerts as a
+Medicheck does not parse PDFs for this check: since August 2025 CDSCO publishes the alerts as a
 searchable online table, which the pipeline reads as structured data. CDSCO's monthly PDFs (up to
 June 2025) are an independent copy, so we compared the batch numbers of the three latest
 CDSCO-laboratory PDFs with our data for the same month.
 
-| Month (CDSCO labs PDF) | Batches in PDF | Found in DawaCheck's data | Recall    |
+| Month (CDSCO labs PDF) | Batches in PDF | Found in Medicheck's data | Recall    |
 | ---------------------- | -------------- | ------------------------- | --------- |
 | June 2025              | 57             | 56                        | 98.2%     |
 | May 2025               | 55 *           | 54                        | 98.2%     |

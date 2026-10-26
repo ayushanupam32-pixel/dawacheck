@@ -3,7 +3,7 @@ import { cn } from "cn";
 /**
  * A link to another website (a government source, the code on GitHub). Adapted from Skiper UI's
  * skiper40 "CssLink" (Link001): the underline is always visible here (links must not rely on
- * hover), it thickens on hover, and the arrow shows that the link leaves DawaCheck. Pure CSS.
+ * hover), it thickens on hover, and the arrow shows that the link leaves Medicheck. Pure CSS.
  */
 export function ExternalLink({
   href,

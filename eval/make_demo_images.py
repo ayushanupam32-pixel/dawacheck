@@ -68,7 +68,7 @@ card([
     (60, 350, "M.R.P. Rs. 38.59 (Incl. of all taxes)", 40, True),
     (60, 430, "Strip of 10 tablets", 36, False),
     (60, 520, "Marketed by: Mankind Pharma Ltd.", 36, False),
-    (60, 580, "Demo image made for DawaCheck, not a photo of a real pack.", 32, False),
+    (60, 580, "Demo image made for Medicheck, not a photo of a real pack.", 32, False),
 ], f"{OUT}/telmikind-back.jpg", tilt=-2)
 
 card([
@@ -86,6 +86,6 @@ card([
     (60, 430, "Strip of 20 capsules", 36, False),
     (60, 520, "Manufactured by: Alkem Laboratories Ltd.", 36, False),
     (60, 580, "Baddi, Distt. Solan, H.P.", 32, False),
-    (60, 640, "Demo image made for DawaCheck, not a photo of a real pack.", 32, False),
+    (60, 640, "Demo image made for Medicheck, not a photo of a real pack.", 32, False),
 ], f"{OUT}/omee-back.jpg", tilt=2)
 print("ok")

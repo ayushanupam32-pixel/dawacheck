@@ -1,11 +1,11 @@
-# DawaCheck evaluation results
+# Medicheck evaluation results
 
 Generated 2026-10-25 by `pnpm eval --final`.
 Strips: 3 (test). Photos with a back side: 0.
 
 ## Field reading: exact-match accuracy and character error rate (CER)
 
-| Field       | DawaCheck correct | DawaCheck wrong | Baseline correct | Baseline wrong | CER DawaCheck | CER baseline |
+| Field       | Medicheck correct | Medicheck wrong | Baseline correct | Baseline wrong | CER Medicheck | CER baseline |
 | ----------- | ----------------- | --------------- | ---------------- | -------------- | ------------- | ------------ |
 | brand       | 0% (0/3)          | 33% (1/3)       | 0% (0/3)         | 33% (1/3)      | 1.00          | 1.00         |
 | ingredients | 0% (0/2)          | 100% (2/2)      | 0% (0/2)         | 50% (1/2)      | 0.78          | 1.00         |
@@ -20,7 +20,7 @@ wrong) was left empty: the user is asked to type it. A wrong value is worse than
 
 ## Batch number: foil vs matte packs
 
-| Pack  | DawaCheck | Baseline |
+| Pack  | Medicheck | Baseline |
 | ----- | --------- | -------- |
 | Foil  | 0% (0/1)  | 0% (0/1) |
 | Matte | –         | –        |
@@ -44,7 +44,7 @@ others, abstaining is the right answer. In the app the user can fix the name fir
   Right: 0 · Wrong: 0 · Abstained: 2 in dataset, 1 not in dataset
 - Ablation, only the one name the reader picked: Right: 0 · Wrong: 0 · Abstained: 2 in dataset, 1 not in dataset
 
-| Photo        | Expected                  | DawaCheck               |           | Without guesses | Guesses tried                                                                   |
+| Photo        | Expected                  | Medicheck               |           | Without guesses | Guesses tried                                                                   |
 | ------------ | ------------------------- | ----------------------- | --------- | --------------- | ------------------------------------------------------------------------------- |
 | augmentin875 | Augmentin 1000 Duo Tablet | abstain (no_candidates) | abstained | abstained       | Dono me \| / Dono mer \| / Amoxicilline/acide Clavulanique - A \|               |
 | diazepam10   | Valium 10mg Tablet        | abstain (no_candidates) | abstained | abstained       | NE Ream, go A RE \ te wt / yiazepa™                                             |

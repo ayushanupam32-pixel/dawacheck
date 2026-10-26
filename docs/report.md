@@ -9,7 +9,7 @@ Every number here comes from eval/, docs/milestones/, the Supabase data_sources 
 25 Oct 2026) or a test run on 26 Oct 2026. Do not add a number that is not in eval/ or docs/sus/.
 -->
 
-# DawaCheck: Checking Indian Medicine Strips Against Public Government Data on the Phone
+# Medicheck: Checking Indian Medicine Strips Against Public Government Data on the Phone
 
 **A project report submitted in partial fulfilment of the requirements for the degree of
 Bachelor of Technology in Computer Science and Engineering (Artificial Intelligence and Machine
@@ -65,7 +65,7 @@ generic with exactly the same composition. The government also publishes medicin
 alerts (CDSCO), ceiling prices (NPPA) and lists of banned fixed-dose combinations, but these are
 scattered across PDFs and portals that buyers at a pharmacy counter never see.
 
-DawaCheck is a free web app that brings these sources together. The user photographs the front
+Medicheck is a free web app that brings these sources together. The user photographs the front
 and back of a medicine strip. The phone reads it in the browser, the user confirms what was read,
 and the app runs five checks: a cheaper Jan Aushadhi generic with an identical composition, the
 batch number against CDSCO quality alerts, the MRP against the NPPA ceiling price, the
@@ -117,17 +117,17 @@ milestones
 **Price.** In India most medicines are bought out of pocket. [CITE: a National Health Accounts
 estimate of the out-of-pocket share of health spending, and the share of it spent on medicines.]
 The same molecule is sold under many brand names at very different prices. For example, in the
-data DawaCheck uses, a strip of Telmikind 40 (telmisartan 40 mg) costs ₹38.59 for 10 tablets
+data Medicheck uses, a strip of Telmikind 40 (telmisartan 40 mg) costs ₹38.59 for 10 tablets
 (₹3.86 a tablet), and the Jan Aushadhi product with exactly the same composition costs ₹12.38 for
 10 (₹1.24 a tablet). For one tablet a day, that difference is about ₹79 a month.
 
 **Jan Aushadhi.** The Pradhan Mantri Bhartiya Janaushadhi Pariyojana (PMBJP), run by PMBI, sells
 generic medicines at low prices through dedicated shops called Jan Aushadhi Kendras. [VERIFY:
-launch year and renaming.] The official list loaded by DawaCheck on 25 October 2026 has 1,627
+launch year and renaming.] The official list loaded by Medicheck on 25 October 2026 has 1,627
 priced generic products and 21,560 Kendras.
 
 **Quality.** CDSCO publishes monthly lists of drug samples found "Not of Standard Quality" (NSQ)
-or spurious, each with the batch number, manufacturer and the test that failed. DawaCheck holds
+or spurious, each with the batch number, manufacturer and the test that failed. Medicheck holds
 6,882 such alerts (January 2019 to September 2026). A patient holding a strip has no easy way to
 check whether its batch appears in any of them.
 
@@ -216,7 +216,7 @@ light background, so photographs need preprocessing.
 
 A single global threshold (for example Otsu's method [2]) fails when lighting varies across the
 image. Bradley and Roth [3] compare each pixel with the mean of its neighbourhood, computed in
-constant time per pixel from an integral image (summed-area table); this is the method DawaCheck
+constant time per pixel from an integral image (summed-area table); this is the method Medicheck
 uses. Skew is commonly estimated with projection profiles: the image is projected onto rows at
 candidate angles, and at the correct angle the row sums alternate sharply between text lines
 and gaps.
@@ -230,7 +230,7 @@ citing.]
 Trigram similarity, as in PostgreSQL's `pg_trgm` [4], compares the sets of three-letter pieces of
 two strings and tolerates typos. Retrieval with a cheap similarity, followed by re-ranking with
 richer evidence, is a standard pattern in entity matching. To choose among competing candidates,
-DawaCheck uses McFadden's conditional logit [5], in which each option's probability is a softmax
+Medicheck uses McFadden's conditional logit [5], in which each option's probability is a softmax
 over the scores of all options, so candidates compete.
 
 ### 2.4 Abstention and calibration
@@ -243,7 +243,7 @@ where it says 90%, about 90% are right [8].
 ### 2.5 The gap
 
 No existing tool goes from a photograph of a strip to all five public checks; works without an
-account, privately and for free; and says "not sure" instead of guessing. DawaCheck fills this
+account, privately and for free; and says "not sure" instead of guessing. Medicheck fills this
 gap with public data only.
 
 ---
@@ -268,7 +268,7 @@ gap with public data only.
 
 > **Figure 1.** `docs/architecture.png`
 
-DawaCheck has four parts:
+Medicheck has four parts:
 
 1. **The phone (browser).** Takes the photos with the phone's own camera app, prepares them in
    a Web Worker, reads them with Tesseract.js, extracts the fields and shows the confirm screen.
@@ -377,7 +377,7 @@ before any code depended on it. Examples of what inspection found:
 - NPPA's web pages return HTTP 403 to scripts, and its price dashboard uses rotating security
   tokens and encrypted requests. It was therefore **not** scripted. The official yearly Gazette
   orders (plain PDFs on its "Circulars / Orders" page) are downloaded by hand once a year instead.
-- The Kendra list includes each owner's personal name. DawaCheck does not copy it.
+- The Kendra list includes each owner's personal name. Medicheck does not copy it.
 
 ### 4.2 Stages
 
@@ -709,7 +709,7 @@ strips and 11 foreign packs (English, German, French, Czech and Turkish), from W
 and Flickr (credits in Appendix A). The photos are not in the repository; `eval/photo-sources.json`
 says where to download each one.
 
-- **Labels** were typed into a form that starts _empty_ (no pre-fill from DawaCheck's reading,
+- **Labels** were typed into a form that starts _empty_ (no pre-fill from Medicheck's reading,
   which would bias the labeller towards accepting its mistakes). Anything not clearly readable was
   left unlabelled. The labels were drafted with AI assistance and checked by the author before the
   final run (no corrections were needed).
@@ -732,9 +732,9 @@ so the simulated numbers are probably optimistic.
 
 ### 7.2 Reading the strip
 
-**Table 7.1 — Development photos (13), DawaCheck vs plain Tesseract on the untouched photo.**
+**Table 7.1 — Development photos (13), Medicheck vs plain Tesseract on the untouched photo.**
 
-| Field       | DawaCheck right | DawaCheck wrong | Plain OCR right |
+| Field       | Medicheck right | Medicheck wrong | Plain OCR right |
 | ----------- | --------------- | --------------- | --------------- |
 | Batch no.   | 3/3             | 0/3             | 1/3             |
 | Mfg date    | 3/4             | 0/4             | 1/4             |
@@ -746,7 +746,7 @@ so the simulated numbers are probably optimistic.
 
 The denominator is the number of photos where that field is readable and labelled.
 
-For the safety-critical stamp fields (batch, dates, MRP, pack size), DawaCheck **never showed a
+For the safety-critical stamp fields (batch, dates, MRP, pack size), Medicheck **never showed a
 wrong value**: when unsure it left the field empty. Brand and ingredients, read from whole photos
 of busy packs, are weak, and this is the main limitation of the reader.
 
@@ -758,7 +758,7 @@ size 0.58 vs 0.92, ingredients 0.64 vs 1.00, brand 0.82 vs 1.00. The batch numbe
 
 **Table 7.2 — Frozen test photos (3), run once.**
 
-| Field       | DawaCheck right | DawaCheck wrong | Plain OCR right | Plain OCR wrong |
+| Field       | Medicheck right | Medicheck wrong | Plain OCR right | Plain OCR wrong |
 | ----------- | --------------- | --------------- | --------------- | --------------- |
 | Brand       | 0/3             | 1/3             | 0/3             | 1/3             |
 | Ingredients | 0/2             | 2/2             | 0/2             | 1/2             |
@@ -805,9 +805,9 @@ at all.
 | Exact name only (baseline)                | 62.6%     | 62.6%     | 50.7%    | 2.9%                | 2.9%          | 36.2%                  |
 | Trigram search, always answers (baseline) | 81.0%     | 90.8%     | 91.8%    | 30.5%               | 26.8%         | 6.1%                   |
 | + re-ranking, no abstention               | 85.9%     | 90.2%     | 91.8%    | 26.3%               | 19.5%         | 6.1%                   |
-| **DawaCheck (re-ranking + abstention)**   | **85.9%** | **90.2%** | 58.5%    | **3.3%**            | **0.0%**      | 28.2%                  |
+| **Medicheck (re-ranking + abstention)**   | **85.9%** | **90.2%** | 58.5%    | **3.3%**            | **0.0%**      | 28.2%                  |
 
-**Development cases (593; fitted here):** DawaCheck top-1 89.1%, top-3 90.9%, wrong 1.0% of
+**Development cases (593; fitted here):** Medicheck top-1 89.1%, top-3 90.9%, wrong 1.0% of
 answers, wrong generic 0.0%, abstained on 29.8% of in-dataset strips.
 
 - **Re-ranking** adds 4.9 points of top-1 over trigram search alone on the test cases (7.1 on
@@ -817,7 +817,7 @@ answers, wrong generic 0.0%, abstained on 29.8% of in-dataset strips.
 - **Wrong generic: 0%.** Every remaining wrong answer was a brand with the same composition as
   the right one (for example "Etozoc 90" for "Etozox 90", both etoricoxib 90 mg), so the generic
   shown was still correct.
-- **Why top-3 stops at about 90%:** for the in-dataset test strips DawaCheck did not answer
+- **Why top-3 stops at about 90%:** for the in-dataset test strips Medicheck did not answer
   correctly, the search never found the right brand in 15 cases (names too garbled), found it but
   ranked it below another in 8, and ranked it first but was not sure enough in 23 (8 of them
   because a same-name brand with another strength was also possible).
@@ -832,7 +832,7 @@ answers, wrong generic 0.0%, abstained on 29.8% of in-dataset strips.
 | 0.75–0.90        | 41    | 90.2%            |
 | 0.90–1.00        | 53    | 98.1%            |
 
-When DawaCheck says 90–100%, it is right 98% of the time. Above 50% the confidence is, if
+When Medicheck says 90–100%, it is right 98% of the time. Above 50% the confidence is, if
 anything, cautious.
 
 **Real photos, names as the user would confirm them.** Development (13 photos, 5 in the
@@ -959,7 +959,7 @@ and the page says so. The privacy claims are enforced by an automated test on ev
 
 ### 8.2 Medical safety
 
-- DawaCheck **never** says "stop taking", "switch" or "unsafe for you". Every alert ends with
+- Medicheck **never** says "stop taking", "switch" or "unsafe for you". Every alert ends with
   "show this to your pharmacist or doctor", and every result carries the disclaimer.
 - A generic is shown only on an identical composition key. Near misses (another strength, form or
   release type) are no answer.
@@ -968,7 +968,7 @@ and the page says so. The privacy claims are enforced by an automated test on ev
 
 ### 8.3 Why abstain
 
-The costs are not symmetric. If DawaCheck says "not sure", the user types a name or asks the
+The costs are not symmetric. If Medicheck says "not sure", the user types a name or asks the
 pharmacist. If it confidently names the wrong medicine, the user may be shown a generic with the
 wrong strength. So the threshold was set for at most 2% wrong answers, and the safety rules sit
 above the learnt model.
@@ -1034,7 +1034,7 @@ speakers.
 
 ### 10.1 Conclusion
 
-DawaCheck shows that five useful checks on a medicine strip can be made from public government
+Medicheck shows that five useful checks on a medicine strip can be made from public government
 data alone, on the phone, at no cost, and without sending the photo or location anywhere. Against
 the objectives: all five checks work from a photo, a typed name and Demo mode; reading runs in
 the browser with no AI API; the running cost is ₹0; the privacy claims are tested on every push;

@@ -41,7 +41,7 @@ const fromLabel = (l: Label | null): Form =>
 
 /**
  * Local labeling tool for the evaluation (see eval/README.md). The form starts EMPTY on purpose:
- * pre-filling it with DawaCheck's own reading would bias the person labelling towards accepting it,
+ * pre-filling it with Medicheck's own reading would bias the person labelling towards accepting it,
  * which would make the measured accuracy look better than it is.
  */
 export function LabelTool() {

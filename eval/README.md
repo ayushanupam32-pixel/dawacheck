@@ -1,6 +1,6 @@
 # Evaluation
 
-This folder measures how well DawaCheck reads medicine strips. The numbers end up in
+This folder measures how well Medicheck reads medicine strips. The numbers end up in
 `results.md`, the About page and the report.
 
 ```
@@ -41,7 +41,7 @@ pnpm dev
 ```
 
 Open http://localhost:3000/en/eval/label and, for each photo, type exactly what is printed.
-The form starts empty on purpose: pre-filling it with DawaCheck's reading would make you more
+The form starts empty on purpose: pre-filling it with Medicheck's reading would make you more
 likely to accept a mistake, which would inflate the accuracy.
 
 The first time a photo is saved it is put in the **dev** set (3 in 4) or the frozen **test**
@@ -60,7 +60,7 @@ pnpm eval            # dev + demo photos
 pnpm eval --final    # the frozen test photos, once, for the final report
 ```
 
-Each strip is read twice: by DawaCheck (with preprocessing) and by raw Tesseract (the original
+Each strip is read twice: by Medicheck (with preprocessing) and by raw Tesseract (the original
 photo, untouched: the baseline). `results.md` shows exact-match accuracy and character error rate
 per field, batch-number accuracy for foil vs matte packs, and timing.
 

@@ -1,4 +1,4 @@
-# DawaCheck progress
+# Medicheck progress
 
 Last updated: 2026-10-26 (UI/UX redesign and dark mode done; report drafted in `docs/report.md`; SUS
 study, phone timing and finishing the report wait for the user).
@@ -331,7 +331,7 @@ eval` reports both (with / without guesses). Word-level guesses were tried and r
   each with its publisher, what we use it for, licence and **last refresh date + row count from
   `data_sources`** (cached for an hour with `"use cache"`; if the database can't be reached the
   page says the date isn't available). Results: matching on the simulated **test** set (4 methods:
-  exact name, trigram, re-ranking, DawaCheck; top-1, wrong answers, top-3) and field reading on the
+  exact name, trigram, re-ranking, Medicheck; top-1, wrong answers, top-3) and field reading on the
   dev photos vs plain OCR, plus speed. Privacy (incl. OSM tiles only after "Show on map", what the
   server receives) and medical safety. All texts in en/hi/ta (Hindi/Tamil by Claude: review).
 - **Numbers are generated, not typed:** `pnpm eval` writes `reader` (dev photos only, demo strips
@@ -469,6 +469,24 @@ skiper16, 19-idea, 31, 37, 61); ink footer; animated inner headers. `lib/segment
 (Intl.Segmenter) keeps Hindi/Tamil letters whole. 416 Vitest, 33 Playwright, sweep clean,
 Lighthouse a11y 100. Details: M7 note, "Second pass". Commits `ee64576` and `7f1f78c` (steadier test timing after
 2 flaky tests); CI run 40288156774: 33/33 first try; live in en/hi/ta.
+
+### Font and rename to Medicheck (2026-10-26)
+
+- **Font: Anek** (Ek Type, Mumbai; SIL OFL; Google Fonts via `next/font`, self-hosted at build)
+  for everything: Anek Latin, Anek Devanagari and Anek Tamil were designed together, so all three
+  languages share one look (before: Noto + Bricolage for Latin headings only). Variable width
+  axis: body at 100%, headings at 118% (wide, bold). Chosen after a web search of current pairings
+  because it is the only well-made family covering all three of our scripts.
+- **Renamed DawaCheck to Medicheck** in every user-facing text (en/hi/ta), page titles, header,
+  footer, README, docs, eval reports, the demo strips' credit line (images regenerated; 18/18 demo
+  strips re-verified, `demo/VERIFIED.md`), the architecture diagram and the README demo GIF
+  (`web/scripts/demo-screens.ts` now waits for animations before each screenshot).
+- **Kept the old name on purpose** (internal, or changing it would break things): the GitHub repo
+  `ayushanupam32-pixel/dawacheck`, the live address `dawacheck-psi.vercel.app`, the Vercel project,
+  the Python package `dawacheck_pipeline` and its User-Agent and comments, an already-applied SQL
+  migration comment, browser storage keys (`dc-theme`, `dc-large-text`), the working folder.
+  Renaming the repo or the Vercel address is the user's decision (it changes public links).
+- Checks: 416 Vitest, 33 Playwright, responsive sweep clean, Lighthouse accessibility 100.
 
 ## Exact next steps
 

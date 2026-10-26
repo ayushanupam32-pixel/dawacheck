@@ -106,7 +106,7 @@ From `eval/match-results.md` (`pnpm eval:match`).
 | Exact name only (no fuzzy matching)     | 62.6% | 62.6% | 50.7%    | 2.9%                | 2.9%          | 36.2%                  |
 | Trigram search only                     | 81.0% | 90.8% | 91.8%    | 30.5%               | 26.8%         | 6.1%                   |
 | Re-ranking, no abstention               | 85.9% | 90.2% | 91.8%    | 26.3%               | 19.5%         | 6.1%                   |
-| **DawaCheck (re-ranking + abstention)** | 85.9% | 90.2% | 58.5%    | 3.3%                | **0.0%**      | 28.2%                  |
+| **Medicheck (re-ranking + abstention)** | 85.9% | 90.2% | 58.5%    | 3.3%                | **0.0%**      | 28.2%                  |
 
 Development set (593 strips): top-1 89.1%, wrong 1.0%, wrong generic 0.0%.
 

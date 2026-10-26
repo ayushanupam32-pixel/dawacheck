@@ -396,7 +396,7 @@ function baselines(w: Weights): [string, Strategy][] {
       },
     ],
     ["Re-ranking, no abstention", (c, cands) => alwaysAnswer(decide(c.input, cands, w))],
-    ["DawaCheck (re-ranking + abstention)", (c, cands) => decide(c.input, cands, w)],
+    ["Medicheck (re-ranking + abstention)", (c, cands) => decide(c.input, cands, w)],
   ];
 }
 
@@ -548,7 +548,7 @@ async function main() {
       ),
       "",
       (({ misses: m }) =>
-        `DawaCheck on in-dataset strips it did not answer correctly: right brand not found by the search ${m.notFound}; found but ranked below another ${m.rankedLower}; ranked first but not sure enough, because a same-name brand with another strength is also possible ${m.unsureSibling}, for other reasons ${m.unsureOther}.`)(
+        `Medicheck on in-dataset strips it did not answer correctly: right brand not found by the search ${m.notFound}; found but ranked below another ${m.rankedLower}; ranked first but not sure enough, because a same-name brand with another strength is also possible ${m.unsureSibling}, for other reasons ${m.unsureOther}.`)(
         rows.at(-1)!,
       ),
       "",
@@ -564,7 +564,7 @@ async function main() {
     "",
     "## Each labelled photo",
     "",
-    "| Photo | Name confirmed | Expected | DawaCheck | Confidence | OK | Options offered |",
+    "| Photo | Name confirmed | Expected | Medicheck | Confidence | OK | Options offered |",
     "| --- | --- | --- | --- | --- | --- | --- |",
     ...photoDetail.map(
       (p) =>

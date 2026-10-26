@@ -47,13 +47,13 @@ export function SiteHeader({ t, locale }: { t: HeaderText; locale: Locale }) {
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-2 px-4 sm:px-6">
         <Link
           href={`/${locale}`}
-          aria-label={`DawaCheck, ${t.home}`}
+          aria-label={`Medicheck, ${t.home}`}
           className="-ml-2 flex min-h-12 items-center gap-2.5 rounded-lg px-2 focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
         >
           <span className="flex size-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Pill aria-hidden="true" className="size-5" />
           </span>
-          <span className="text-lg font-bold tracking-tight">DawaCheck</span>
+          <span className="text-lg font-bold tracking-tight">Medicheck</span>
         </Link>
 
         <nav aria-label={t.mainNav} className="ml-4 hidden lg:block">

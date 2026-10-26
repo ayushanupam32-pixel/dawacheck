@@ -9,12 +9,11 @@
   --color-foreground: var(--foreground);
   /* Latin first, then Devanagari and Tamil: the browser falls through per character. */
   --font-sans:
-    var(--font-noto-latin), var(--font-noto-devanagari), var(--font-noto-tamil), system-ui,
+    var(--font-anek-latin), var(--font-anek-devanagari), var(--font-anek-tamil), system-ui,
     sans-serif;
   --font-mono: ui-monospace, monospace;
-  /* Headings: Bricolage Grotesque for Latin letters; Hindi and Tamil fall through to Noto. */
-  --font-heading:
-    var(--font-display), var(--font-noto-devanagari), var(--font-noto-tamil), system-ui, sans-serif;
+  /* Headings use the same family in a wider, heavier cut (font-stretch below). */
+  --font-heading: var(--font-sans);
   /* Result-row colours. Always paired with an icon and words, never colour alone. */
   --color-status-ok: var(--status-ok);
   --color-status-warn: var(--status-warn);
@@ -69,7 +68,7 @@
 
 :root {
   /*
-   * DawaCheck design tokens: "Ink + Marigold" (chosen by the user on 2026-10-26). Deep ink blue
+   * Medicheck design tokens: "Ink + Marigold" (chosen by the user on 2026-10-26). Deep ink blue
    * for text and the hero stage, marigold as the one accent (Indian marigold: warm, festive,
    * memorable). Marigold is a FILL colour (buttons, highlights) with ink text on it; text and
    * icons on the page use --brand, a deeper marigold that passes 4.5:1. Status colours are
@@ -187,11 +186,19 @@
   html[data-text="large"] {
     font-size: 125%;
   }
+  /* Body text: Anek at its normal width, slightly more open spacing for small sizes. */
+  body {
+    font-stretch: 100%;
+    letter-spacing: 0.005em;
+  }
+  /* Headings: Anek's wide cut (its width axis), bold and tightly set: the brand's voice. */
   h1,
   h2,
-  h3 {
-    @apply font-heading;
-    letter-spacing: -0.015em;
+  h3,
+  .font-heading {
+    font-family: var(--font-heading);
+    font-stretch: 118%;
+    letter-spacing: -0.02em;
     text-wrap: balance;
   }
   p {

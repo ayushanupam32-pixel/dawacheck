@@ -95,7 +95,7 @@ type Row = {
   full: Record<ScoredField, FieldScore>;
   base: Record<ScoredField, FieldScore>;
   ms: number;
-  /** What DawaCheck read, per field, for error analysis. */
+  /** What Medicheck read, per field, for error analysis. */
   read: Record<ScoredField, string>;
   /** OCR confidence of each reading, to spot photos the OCR could hardly read at all. */
   ocr: string[];
@@ -231,7 +231,7 @@ function matchSection(rows: Row[]): string[] {
     `  ${summary((r) => r.match)}`,
     `- Ablation, only the one name the reader picked: ${summary((r) => r.matchSingle)}`,
     ``,
-    `| Photo | Expected | DawaCheck | | Without guesses | Guesses tried |`,
+    `| Photo | Expected | Medicheck | | Without guesses | Guesses tried |`,
     `| --- | --- | --- | --- | --- | --- |`,
     ...matched.map(
       (r) =>
@@ -272,14 +272,14 @@ function writeReport(rows: Row[]) {
     times.length ? Math.round(times[Math.min(times.length - 1, Math.floor(q * times.length))]) : 0;
 
   const lines = [
-    `# DawaCheck evaluation results`,
+    `# Medicheck evaluation results`,
     ``,
     `Generated ${new Date().toISOString().slice(0, 10)} by \`pnpm eval${final ? " --final" : ""}\`.`,
     `Strips: ${rows.length} (${splits}). Photos with a back side: ${rows.filter((r) => r.label.back).length}.`,
     ``,
     `## Field reading: exact-match accuracy and character error rate (CER)`,
     ``,
-    `| Field | DawaCheck correct | DawaCheck wrong | Baseline correct | Baseline wrong | CER DawaCheck | CER baseline |`,
+    `| Field | Medicheck correct | Medicheck wrong | Baseline correct | Baseline wrong | CER Medicheck | CER baseline |`,
     `| --- | --- | --- | --- | --- | --- | --- |`,
     ...SCORED_FIELDS.map((k) => {
       const f = sum(rows, (r) => r.full, k);
@@ -292,7 +292,7 @@ function writeReport(rows: Row[]) {
     ``,
     `## Batch number: foil vs matte packs`,
     ``,
-    `| Pack | DawaCheck | Baseline |`,
+    `| Pack | Medicheck | Baseline |`,
     `| --- | --- | --- |`,
     ...([true, false] as const).map((foil) => {
       const subset = rows.filter((r) => r.label.foil === foil);

@@ -4,7 +4,7 @@ import { connection } from "next/server";
 import { LabelTool } from "@/components/label-tool";
 
 export const metadata = {
-  title: "Labeling tool | DawaCheck (local only)",
+  title: "Labeling tool | Medicheck (local only)",
   robots: { index: false },
 };
 
