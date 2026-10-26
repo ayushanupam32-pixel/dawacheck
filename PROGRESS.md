@@ -487,6 +487,9 @@ Lighthouse a11y 100. Details: M7 note, "Second pass". Commits `ee64576` and `7f1
   migration comment, browser storage keys (`dc-theme`, `dc-large-text`), the working folder.
   Renaming the repo or the Vercel address is the user's decision (it changes public links).
 - Checks: 416 Vitest, 33 Playwright, responsive sweep clean, Lighthouse accessibility 100.
+- Commits `714a27e` (font + rename) and `fc3dd0a` (results slide in without fading, after 1 flaky
+  axe check mid-fade). CI run 40304250518: 33/33 first try. Live: titles say Medicheck in
+  en/hi/ta, the stylesheet serves Anek Latin, Devanagari and Tamil.
 
 ## Exact next steps
 
