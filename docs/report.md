@@ -655,20 +655,30 @@ components) is kept thin. **The evaluation scripts call the same code as the app
   drafted with AI assistance and still need review by a native speaker.
 - Body text at least 16 px; tap targets at least 48 px; never colour alone (icon + words); real
   form labels; `aria-live` for changing results; a large-text switch (125%); focus moves to the
-  heading of each new screen.
+  heading of each new screen; a "skip to main content" link.
+- **Light and dark themes**, with a third choice, "Same as phone" (the default), which follows the
+  operating system live. The choice is saved on the phone and applied by a tiny script before the
+  first paint, so the page never flashes in the wrong theme. Dark mode has its own colour set (not
+  an inversion), checked for contrast with axe like the light one. Switching animates a circle
+  growing from the button (the View Transitions API), skipped when the user asks for reduced motion.
+- **One design system:** a single accent (the brand's teal), tokens for surfaces, borders and status
+  colours, one corner-radius rule and shared field, panel and skeleton styles. Loading states are
+  skeletons shaped like the result that is coming. A few interactions are adapted from the Skiper UI
+  component library (theme icon and reveal, the animated savings figure, the external-link style),
+  credited in the footer as its free licence requires.
 - **Demo mode** has two strips built from real records (Telmikind 40 from the brand data; Omee
   with the batch, dates and maker of a real CDSCO alert), clearly marked DEMO. `demo/` holds 18
   more strips covering every feature, each verified through the live upload flow (18/18).
 
 ### 6.4 Testing and CI
 
-| Suite                   | Count | What it covers                                                                                                         |
-| ----------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------- |
-| Vitest (web)            | 406   | Preprocessing, extraction (including real OCR snippets), merging, matching, checks, languages                          |
-| pytest (pipeline)       | 197   | Parsers, normalisation, validation, the NPPA 30-price check, rule-file freshness                                       |
-| Playwright (end to end) | 22    | Both demos end to end, typed search with all checks, Kendras by PIN, privacy network log, axe on every page and screen |
+| Suite                   | Count | What it covers                                                                                                                                       |
+| ----------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Vitest (web)            | 409   | Preprocessing, extraction (including real OCR snippets), merging, matching, checks, languages                                                        |
+| pytest (pipeline)       | 197   | Parsers, normalisation, validation, the NPPA 30-price check, rule-file freshness                                                                     |
+| Playwright (end to end) | 31    | Both demos end to end, typed search with all checks, Kendras by PIN, privacy network log, theme menu, axe on every page and screen in light and dark |
 
-Vitest and pytest pass (run on 26 October 2026); the 22 Playwright tests pass in CI. Every push to `main` runs formatting, lint, type
+Vitest and pytest pass (run on 26 October 2026); the 31 Playwright tests pass in CI. Every push to `main` runs formatting, lint, type
 checks, Vitest, the production build, Playwright against that build, and the pipeline's ruff and
 pytest, then deploys to Vercel.
 
@@ -903,7 +913,11 @@ The Hindi version of the questionnaire is our own translation and has not been v
   /en/search, /en/kendras, /en/about, /hi/about and /ta.
 - **axe** (WCAG 2.1 A and AA) through Playwright: **0 violations** on all 5 pages in all 3
   languages, and on the confirm screen, result card, search results and Kendra list, which
-  Lighthouse cannot see because they appear only after user actions.
+  Lighthouse cannot see because they appear only after user actions. The 5 pages, the result card
+  with a red alert and the Kendra list are also checked in **dark mode**.
+- **Responsive sweep:** every page in all 3 languages at 8 widths from 320 to 1920 px, in both
+  themes (240 page views): no horizontal scrolling and no tap target under 44 px. It found and fixed
+  Tamil button labels overflowing a 320 px screen.
 - **Keyboard pass:** logical order and visible focus everywhere. It found one real problem:
   after reading, focus fell back to the top of the page. Focus now moves to the new screen's
   heading.
@@ -1136,8 +1150,8 @@ Full URLs: `eval/photo-sources.json`.
 ```bash
 pnpm install
 cp web/.env.example web/.env.local   # SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY
-pnpm test                            # 406 unit tests
-pnpm build && pnpm test:e2e          # 22 end-to-end, privacy and accessibility tests
+pnpm test                            # 409 unit tests
+pnpm build && pnpm test:e2e          # 31 end-to-end, privacy, theme and accessibility tests
 pnpm eval                            # strip reader on the development photos
 pnpm eval:match                      # matching: simulated and labelled cases
 cd pipeline && uv run pytest -q      # 197 pipeline tests

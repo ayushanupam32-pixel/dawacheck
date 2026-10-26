@@ -12,7 +12,6 @@ import {
   AlertTriangle,
   CheckCircle2,
   CircleHelp,
-  Loader2,
   MapPin,
   MinusCircle,
   OctagonAlert,
@@ -20,6 +19,7 @@ import {
 } from "lucide-react";
 import { fill } from "@/components/generic-result";
 import { Button } from "@/components/ui/button";
+import { panelClass, Skeleton } from "@/components/ui/field";
 import type { CheckStatus } from "@/lib/checks/types";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { PriceResult } from "@/lib/checks/price";
@@ -56,6 +56,14 @@ const STATUS_COLOR: Record<CheckStatus, string> = {
   alert: "text-status-alert",
   na: "text-status-na",
   unknown: "text-status-warn",
+};
+/** The status chip's tint and border. The words inside stay in the normal text colour. */
+const STATUS_CHIP: Record<CheckStatus, string> = {
+  ok: "bg-status-ok/12 border-status-ok/40",
+  warn: "bg-status-warn/15 border-status-warn/50",
+  alert: "bg-status-alert/12 border-status-alert/50",
+  na: "bg-muted border-border",
+  unknown: "bg-status-warn/12 border-status-warn/40",
 };
 
 /** "2026-09" -> "Sep 2026" in the user's language. */
@@ -105,16 +113,26 @@ export function ResultCard({
   }, [key, attempt]);
 
   if (current.step === "loading") {
+    // Five placeholder rows, the shape of the card that is coming.
     return (
-      <p className="flex items-center gap-2 text-base">
-        <Loader2 aria-hidden="true" className="size-5 animate-spin" />
-        {t.loading}
-      </p>
+      <div role="status" className={panelClass("flex flex-col gap-4 p-5")}>
+        <span className="sr-only">{t.loading}</span>
+        <Skeleton className="h-7 w-1/2" />
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div key={i} className="flex flex-col gap-2 border-t border-border pt-4">
+            <div className="flex justify-between gap-4">
+              <Skeleton className="h-5 w-2/5" />
+              <Skeleton className="h-6 w-24 rounded-full" />
+            </div>
+            <Skeleton className="h-4 w-4/5" />
+          </div>
+        ))}
+      </div>
     );
   }
   if (current.step === "error") {
     return (
-      <div className="flex flex-col gap-2 rounded-xl border-2 border-status-warn p-4">
+      <div className="flex flex-col gap-3 rounded-2xl border-2 border-status-warn bg-card p-5">
         <p className="text-base">{t.error}</p>
         <Button variant="outline" className="w-fit" onClick={() => setAttempt((a) => a + 1)}>
           <RotateCcw aria-hidden="true" />
@@ -134,9 +152,11 @@ export function ResultCard({
   return (
     <section
       aria-labelledby="checks-title"
-      className="flex flex-col gap-3 rounded-xl border border-border p-4"
+      // No entrance animation: the card re-runs its checks as the user types a batch or MRP, and a
+      // fade on every keystroke would flicker.
+      className={panelClass("flex flex-col gap-2 p-5")}
     >
-      <h2 id="checks-title" className="text-xl font-semibold">
+      <h2 id="checks-title" className="text-2xl font-bold tracking-tight">
         {t.title}
       </h2>
       <ul className="flex flex-col divide-y divide-border">
@@ -164,8 +184,8 @@ export function ResultCard({
                         ? `${m.brand_name} (${m.product_name})`
                         : m.product_name,
                       batch: m.batch_no,
-                      failed: m.failed_parameter ?? "—",
-                      lab: m.reported_by ?? "—",
+                      failed: m.failed_parameter ?? "-",
+                      lab: m.reported_by ?? "-",
                     })}
                   </li>
                 ))}
@@ -264,7 +284,7 @@ export function ResultCard({
           </Link>
         </Row>
       </ul>
-      <p className="rounded-lg bg-muted/60 p-3 text-sm">{disclaimer}</p>
+      <p className="mt-2 rounded-xl bg-muted p-4 text-sm leading-relaxed">{disclaimer}</p>
     </section>
   );
 }
@@ -320,12 +340,22 @@ function Row({
       unknown: t.statusUnknown,
     }[status];
   return (
-    <li className="flex flex-col gap-1 py-3 text-base">
+    <li
+      className={`flex flex-col gap-1.5 py-4 text-base leading-relaxed ${
+        // A government alert is the most important thing the card can say: it gets a tinted band
+        // with a red edge, on top of the icon and the word "Alert".
+        status === "alert"
+          ? "-mx-5 border-l-4 border-l-status-alert bg-status-alert/8 px-4 sm:rounded-r-xl"
+          : ""
+      }`}
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="font-semibold">{title}</h3>
+        <h3 className="text-lg font-semibold">{title}</h3>
         {!hideStatus && (
-          <span className={`flex items-center gap-1 text-sm font-semibold ${STATUS_COLOR[status]}`}>
-            <Icon aria-hidden="true" className="size-5" />
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm font-semibold ${STATUS_CHIP[status]}`}
+          >
+            <Icon aria-hidden="true" className={`size-4.5 ${STATUS_COLOR[status]}`} />
             <span className="text-foreground">{label}</span>
           </span>
         )}
@@ -342,7 +372,7 @@ function Source({ t, url, note }: { t: T; url: string; note: string }) {
       <a href={url} target="_blank" rel="noreferrer" className="underline">
         CDSCO
       </a>
-      {note && ` · ${note.trim()}`}
+      {note && `, ${note.trim()}`}
     </p>
   );
 }

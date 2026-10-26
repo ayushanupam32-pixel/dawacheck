@@ -4,7 +4,9 @@
 // savings. Used after typing a name (search-client.tsx) and after scanning (scan-client.tsx).
 
 import { useEffect, useId, useState } from "react";
-import { AlertTriangle, CheckCircle2, CircleHelp, Loader2, PiggyBank } from "lucide-react";
+import NumberFlow from "@number-flow/react";
+import { AlertTriangle, CheckCircle2, CircleHelp, PiggyBank } from "lucide-react";
+import { inputClass, panelClass, Skeleton } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 import type { Ingredient } from "@/lib/ai/extract";
 import { compositionDiffers } from "@/lib/ai/rerank";
@@ -37,7 +39,7 @@ export function BrandButton({
     <button
       type="button"
       onClick={onChoose}
-      className="flex min-h-12 w-full flex-col items-start gap-1 rounded-xl border border-border bg-card p-4 text-left hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+      className="flex min-h-12 w-full flex-col items-start gap-1 rounded-2xl border border-border bg-card p-4 text-left shadow-soft transition-[border-color,background-color,scale] hover:border-primary/60 hover:bg-accent/50 focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none active:scale-[0.99] motion-reduce:transition-none"
     >
       <span className="text-lg font-semibold">{brand.name}</span>
       {brand.manufacturer && (
@@ -109,11 +111,14 @@ export function BrandResult({
   }, [brandId, stripKey]);
 
   if (current.step === "loading") {
+    // A placeholder the shape of the answer, so the page doesn't jump when it arrives.
     return (
-      <p className="flex items-center gap-2 text-base">
-        <Loader2 aria-hidden="true" className="size-5 animate-spin" />
-        {t.loading}
-      </p>
+      <div role="status" className={panelClass("flex flex-col gap-3 p-5")}>
+        <span className="sr-only">{t.loading}</span>
+        <Skeleton className="h-7 w-2/3" />
+        <Skeleton className="h-5 w-1/2" />
+        <Skeleton className="h-24 w-full rounded-xl" />
+      </div>
     );
   }
   if (current.step === "error") return <Notice kind="unknown">{t.error}</Notice>;
@@ -156,7 +161,7 @@ function Result({
   // Step 1: the dataset may have cut a 2-ingredient list short, so ask before answering.
   if (confirmed === null) {
     return (
-      <section className="flex flex-col gap-3 rounded-xl border-2 border-status-warn p-4">
+      <section className="flex flex-col gap-3 rounded-2xl border-2 border-status-warn bg-card p-5 shadow-soft">
         <h2 className="flex items-center gap-2 text-xl font-semibold">
           <CircleHelp aria-hidden="true" className="size-6 text-status-warn" />
           {t.confirmTitle}
@@ -181,9 +186,9 @@ function Result({
   }
 
   return (
-    <section className="flex flex-col gap-4">
+    <section className="flex flex-col gap-4 motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-1">
       <div className="flex flex-col gap-1">
-        <h2 className="text-xl font-semibold">{brand.name}</h2>
+        <h2 className="text-2xl font-bold tracking-tight">{brand.name}</h2>
         {ingredientList}
       </div>
 
@@ -193,7 +198,7 @@ function Result({
         <GenericCard t={t} locale={locale} data={data} />
       )}
 
-      <p className="flex gap-2 rounded-lg bg-muted/60 p-3 text-base font-medium">
+      <p className="flex gap-2 rounded-xl bg-muted p-4 text-base font-medium">
         <AlertTriangle aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
         {t.askPharmacist}
       </p>
@@ -226,19 +231,19 @@ function GenericCard({ t, locale, data }: { t: T; locale: string; data: GenericR
   const rupees = (amount: number) => formatRupees(amount, `${locale}-IN`);
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl border-2 border-status-ok p-4">
+    <div className="flex flex-col gap-4 rounded-2xl border-2 border-status-ok bg-card p-5 shadow-soft">
       <p className="flex items-start gap-2 text-base">
         <CheckCircle2 aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-status-ok" />
         {t.genericFound}
       </p>
       <div>
         <p className="text-lg font-semibold">{generic.name}</p>
-        <p className="text-base">
-          {rupees(generic.mrp)} · {fill(t.packOf, { size: generic.unitSize ?? "" })}
+        <p className="tabular text-base">
+          {rupees(generic.mrp)}, {fill(t.packOf, { size: generic.unitSize ?? "" })}
         </p>
       </div>
 
-      <fieldset className="flex flex-col gap-3 rounded-lg bg-muted/50 p-3">
+      <fieldset className="flex flex-col gap-3 rounded-xl bg-muted p-4">
         <legend className="px-1 text-base font-semibold">{t.yourStrip}</legend>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <NumberField
@@ -266,9 +271,11 @@ function GenericCard({ t, locale, data }: { t: T; locale: string; data: GenericR
         <div className="flex flex-col gap-1">
           <p className="flex items-center gap-2 text-3xl font-bold text-status-ok">
             <PiggyBank aria-hidden="true" className="size-8 shrink-0" />
-            {savings.perMonth !== null
-              ? fill(t.saveMonth, { amount: rupees(savings.perMonth) })
-              : fill(t.savePack, { amount: rupees(savings.perPack) })}
+            <SavingText
+              template={savings.perMonth !== null ? t.saveMonth : t.savePack}
+              amount={savings.perMonth ?? savings.perPack}
+              locale={locale}
+            />
           </p>
           {savings.perMonth !== null && (
             <p className="text-base">
@@ -295,7 +302,7 @@ function NumberField(props: {
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={props.id} className="text-base">
+      <label htmlFor={props.id} className="text-base font-medium">
         {props.label}
       </label>
       <input
@@ -307,7 +314,7 @@ function NumberField(props: {
         value={props.value}
         aria-describedby={props.describedBy}
         onChange={(e) => props.onChange(e.target.value)}
-        className="min-h-12 rounded-lg border border-input bg-background px-3 text-lg focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+        className={inputClass({ className: "tabular" })}
       />
     </div>
   );
@@ -317,12 +324,57 @@ function NumberField(props: {
 export function Notice({ kind, children }: { kind: "unknown" | "na"; children: React.ReactNode }) {
   return (
     <p
-      className={`flex gap-2 rounded-xl border-2 p-4 text-base ${
+      className={`flex gap-3 rounded-2xl border-2 bg-card p-4 text-base ${
         kind === "unknown" ? "border-status-warn" : "border-status-na"
       }`}
     >
-      <CircleHelp aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
+      <CircleHelp
+        aria-hidden="true"
+        className={`mt-0.5 size-5 shrink-0 ${kind === "unknown" ? "text-status-warn" : "text-status-na"}`}
+      />
       {children}
     </p>
+  );
+}
+
+/**
+ * "Save ₹209 a month" with the amount rolling to its new value as the user edits the MRP
+ * (Skiper UI skiper37 "Animated number", which uses Number Flow; free tier, credited in the
+ * footer). Number Flow formats in the user's language and skips the roll with reduced motion.
+ * The sentence is split around {amount} so the words stay translatable.
+ */
+function SavingText({
+  template,
+  amount,
+  locale,
+}: {
+  template: string;
+  amount: number;
+  locale: string;
+}) {
+  const [before, after = ""] = template.split("{amount}");
+  // Same rounding as formatRupees: whole rupees from ₹100, paise below.
+  const digits = Math.abs(amount) >= 100 ? 0 : 2;
+  return (
+    <>
+      {/* Screen readers get the plain sentence; the animated digits are for the eyes only. */}
+      <span className="sr-only">
+        {fill(template, { amount: formatRupees(amount, `${locale}-IN`) })}
+      </span>
+      <span aria-hidden="true" className="tabular">
+        {before}
+        <NumberFlow
+          value={amount}
+          locales={`${locale}-IN`}
+          format={{
+            style: "currency",
+            currency: "INR",
+            minimumFractionDigits: digits,
+            maximumFractionDigits: digits,
+          }}
+        />
+        {after}
+      </span>
+    </>
   );
 }

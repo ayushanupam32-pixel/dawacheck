@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "DawaCheck — check your medicine",
+    "title": "DawaCheck: check your medicine",
     "description": "Find a cheaper Jan Aushadhi generic, check batch safety alerts and fair prices, using public government data."
   },
   "home": {
@@ -23,12 +23,46 @@
     "privacy": "Your photos and location stay on your phone.",
     "kendraTitle": "Find a Jan Aushadhi Kendra",
     "kendraBody": "See the 3 nearest Kendras, with directions",
-    "aboutLink": "About DawaCheck: data sources, accuracy and privacy"
+    "aboutLink": "About DawaCheck: data sources, accuracy and privacy",
+    "heroTitle": "Check your medicine strip against government data",
+    "scanCta": "Scan a strip",
+    "typeCta": "Type a name",
+    "demoAlt": "A demo medicine strip of Telmikind 40, marked DEMO, as DawaCheck reads it",
+    "demoCaption": "One of the demo strips you can try on the Scan page.",
+    "checkBodies": {
+      "generic": "Only an exact match: same salts, strength, form and release.",
+      "batch": "Is this batch in a CDSCO quality alert?",
+      "price": "MRP per tablet against the NPPA ceiling plus GST.",
+      "banned": "Is it on a CDSCO list of prohibited combinations?",
+      "kendra": "The 3 nearest, worked out on your phone."
+    },
+    "exampleTitle": "Same medicine, different price",
+    "exampleBrand": "Telmikind 40, per tablet",
+    "exampleGeneric": "Jan Aushadhi telmisartan 40 mg, per tablet",
+    "exampleNote": "From our data: 2022 brand price, current Jan Aushadhi price. Same composition.",
+    "waysTitle": "Ways to start"
   },
   "common": {
     "language": "Language",
     "largeText": "Large text",
-    "disclaimer": "DawaCheck gives information from public government data. It is not medical advice. Always consult your doctor or pharmacist before changing any medicine."
+    "disclaimer": "DawaCheck gives information from public government data. It is not medical advice. Always consult your doctor or pharmacist before changing any medicine.",
+    "mainNav": "Main",
+    "home": "Home",
+    "navScan": "Scan",
+    "navSearch": "Search",
+    "navKendras": "Kendras",
+    "navAbout": "About",
+    "menu": "Menu",
+    "closeMenu": "Close menu",
+    "settings": "Display settings",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "Same as phone",
+    "skipToContent": "Skip to main content",
+    "footerData": "Data: PMBI (Jan Aushadhi), CDSCO, NPPA, A-Z Medicine Dataset of India (CC BY-SA 4.0), © OpenStreetMap contributors.",
+    "footerAnimations": "Some animations adapted from Skiper UI.",
+    "sourceCode": "Source code"
   },
   "search": {
     "title": "Find a cheaper generic",
@@ -45,7 +79,7 @@
     "confirmBody": "Does the back of your strip list exactly these ingredients and strengths, and nothing else?",
     "confirmYes": "Yes, exactly these",
     "confirmNo": "No, or not sure",
-    "notConfirmed": "Couldn't match confidently — please check with your pharmacist.",
+    "notConfirmed": "Couldn't match confidently. Please check with your pharmacist.",
     "stripDiffers": "The ingredients you confirmed from your strip are not the same as this medicine's record, so we can't show a generic. Please check with your pharmacist.",
     "genericFound": "Jan Aushadhi sells a medicine with the same ingredients, strength and form:",
     "noGeneric": "No Jan Aushadhi medicine has exactly the same ingredients, strength and form.",
@@ -164,9 +198,9 @@
     "discontinuedNote": "Our 2022 data lists this brand as no longer sold. The comparison is still for the ingredients on your strip.",
     "abstainNoBrand": "Type the medicine name in the box above, then try again.",
     "abstainNoCandidates": "Couldn't find this name in our medicine list. Check the spelling, or ask your pharmacist.",
-    "abstainContradiction": "Couldn't match confidently — the closest medicine we know has a different strength, form or ingredient than your strip. Please check with your pharmacist.",
+    "abstainContradiction": "Couldn't match confidently. The closest medicine we know has a different strength, form or ingredient than your strip. Please check with your pharmacist.",
     "abstainStrength": "This medicine comes in more than one strength. Which one is on your strip?",
-    "abstainUnsure": "Couldn't match confidently — please check with your pharmacist.",
+    "abstainUnsure": "Couldn't match confidently. Please check with your pharmacist.",
     "pickFromThese": "If your strip is one of these, choose it:",
     "optionSure": "How likely: {percent}",
     "evidenceTitle": "Why we think so",
@@ -180,7 +214,8 @@
     "evAgrees": "matches your strip",
     "evContradicts": "does not match your strip",
     "evUnknown": "not read from the strip",
-    "evidenceNote": "We compare what was read from your strip with our medicine list. We only show a medicine on our own when nothing disagrees and we are sure enough; otherwise we ask you."
+    "evidenceNote": "We compare what was read from your strip with our medicine list. We only show a medicine on our own when nothing disagrees and we are sure enough; otherwise we ask you.",
+    "demoTitle": "Try a demo strip"
   },
   "checks": {
     "title": "Checks for this strip",

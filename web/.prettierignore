@@ -6,3 +6,5 @@ AGENTS.md
 public/data
 lib/ai/salt-rules.json
 tests/fixtures/banned-fdcs.json
+test-results
+playwright-report

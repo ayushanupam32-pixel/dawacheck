@@ -2,8 +2,9 @@
 
 import { useId, useState } from "react";
 import dynamic from "next/dynamic";
-import { Loader2, Lock, LocateFixed, Map as MapIcon, Navigation, Phone } from "lucide-react";
+import { Lock, LocateFixed, Map as MapIcon, Navigation, Phone } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { inputClass, panelClass, Skeleton } from "@/components/ui/field";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { cellsAround } from "@/lib/geo/geohash";
 import {
@@ -125,32 +126,38 @@ export function KendraFinder({ t, locale }: { t: T; locale: string }) {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-3">
-        <Button onClick={useMyLocation} className="w-full sm:w-fit">
-          <LocateFixed aria-hidden="true" />
-          {t.useLocation}
-        </Button>
-        <p className="text-base text-muted-foreground">{t.or}</p>
-        <form onSubmit={usePin} className="flex flex-col gap-2">
-          <label htmlFor={pinId} className="text-base font-semibold">
-            {t.pinLabel}
-          </label>
-          <div className="flex gap-2">
-            <input
-              id={pinId}
-              value={pin}
-              onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              inputMode="numeric"
-              autoComplete="postal-code"
-              pattern="[1-9][0-9]{5}"
-              maxLength={6}
-              className="min-h-12 w-40 rounded-lg border border-input bg-background px-3 text-lg tracking-widest focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
-            />
-            <Button type="submit" variant="outline">
-              {t.pinSubmit}
+      <div className="flex flex-col gap-4">
+        <div className="grid items-stretch gap-3 sm:grid-cols-[1fr_auto_1fr]">
+          <div className={panelClass("flex flex-col justify-center gap-3 p-5")}>
+            <Button onClick={useMyLocation} size="xl" className="w-full">
+              <LocateFixed aria-hidden="true" />
+              {t.useLocation}
             </Button>
           </div>
-        </form>
+          <p className="self-center text-center text-base font-medium text-muted-foreground">
+            {t.or}
+          </p>
+          <form onSubmit={usePin} className={panelClass("flex flex-col gap-2 p-5")}>
+            <label htmlFor={pinId} className="text-base font-semibold">
+              {t.pinLabel}
+            </label>
+            <div className="flex gap-2">
+              <input
+                id={pinId}
+                value={pin}
+                onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                inputMode="numeric"
+                autoComplete="postal-code"
+                pattern="[1-9][0-9]{5}"
+                maxLength={6}
+                className={inputClass({ className: "tabular min-w-0 flex-1 tracking-widest" })}
+              />
+              <Button type="submit" variant="outline">
+                {t.pinSubmit}
+              </Button>
+            </div>
+          </form>
+        </div>
         <p className="flex items-start gap-2 text-base">
           <Lock aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-primary" />
           {t.privacy}
@@ -159,36 +166,52 @@ export function KendraFinder({ t, locale }: { t: T; locale: string }) {
 
       <div aria-live="polite" className="flex flex-col gap-4">
         {(state.step === "locating" || state.step === "loading") && (
-          <p className="flex items-center gap-2 text-base">
-            <Loader2 aria-hidden="true" className="size-5 animate-spin" />
-            {state.step === "locating" ? t.locating : t.loading}
-          </p>
+          <div role="status" className="flex flex-col gap-3">
+            <p className="text-base text-muted-foreground">
+              {state.step === "locating" ? t.locating : t.loading}
+            </p>
+            {[0, 1, 2].map((i) => (
+              <div key={i} className={panelClass("flex flex-col gap-2 p-5")}>
+                <div className="flex justify-between gap-4">
+                  <Skeleton className="h-6 w-1/2" />
+                  <Skeleton className="h-6 w-20 rounded-full" />
+                </div>
+                <Skeleton className="h-4 w-4/5" />
+                <Skeleton className="h-4 w-2/5" />
+              </div>
+            ))}
+          </div>
         )}
 
         {state.step === "message" && (
-          <p className="rounded-xl border-2 border-status-warn p-4 text-base">{state.text}</p>
+          <p className="rounded-2xl border-2 border-status-warn bg-card p-4 text-base">
+            {state.text}
+          </p>
         )}
 
         {state.step === "result" && (
           <>
             {state.origin.approximate && <p className="text-base">{t.pinApprox}</p>}
             {!state.result.anyNearby && (
-              <p className="rounded-xl border-2 border-status-warn p-4 text-base font-medium">
+              <p className="rounded-2xl border-2 border-status-warn bg-card p-4 text-base font-medium">
                 {t.noneNearby}
               </p>
             )}
 
-            <ol className="flex flex-col gap-3">
+            <ol className="flex flex-col gap-3 motion-safe:animate-in motion-safe:fade-in">
               {state.result.kendras.map((k, i) => (
-                <li
-                  key={k.code}
-                  className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4"
-                >
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="text-lg font-semibold">
-                      {i + 1}. {t.kendraName}
+                <li key={k.code} className={panelClass("flex flex-col gap-2 p-5")}>
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="flex items-center gap-3 text-lg font-semibold">
+                      <span
+                        aria-hidden="true"
+                        className="tabular flex size-8 shrink-0 items-center justify-center rounded-full bg-accent text-base font-bold text-accent-foreground"
+                      >
+                        {i + 1}
+                      </span>
+                      {t.kendraName}
                     </span>
-                    <span className="shrink-0 text-lg font-bold text-primary">
+                    <span className="tabular shrink-0 rounded-full bg-accent px-3 py-1 text-base font-bold text-accent-foreground">
                       {fill(t.km, { km: formatKm(k.km, locale) })}
                     </span>
                   </div>
@@ -199,7 +222,7 @@ export function KendraFinder({ t, locale }: { t: T; locale: string }) {
                   {k.precision === "pincode" && (
                     <p className="text-sm text-muted-foreground">{t.approxLocation}</p>
                   )}
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 pt-1">
                     {k.phone && (
                       <a
                         href={`tel:+91${k.phone}`}

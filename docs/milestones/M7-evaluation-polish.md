@@ -77,7 +77,7 @@ top of the page; it now moves to the new screen's heading.
 | Speed per strip (≤ 5 s p95 on phone) | 7.1 s median, 10.8 s p95 on a laptop (was 9.9 / 16.8); phone: [PHONE]                                             |
 | Lighthouse accessibility (≥ 90)      | 100 on every page tested                                                                                          |
 | axe WCAG 2.1 AA                      | 0 violations, 5 pages × 3 languages + 4 interactive screens                                                       |
-| Playwright end to end                | 22 tests pass (both demos, search + checks, Kendras, privacy, accessibility)                                      |
+| Playwright end to end                | 31 tests pass (both demos, search + checks, Kendras, privacy, theme, axe light + dark)                            |
 | Brand guesses (ablation)             | no change on dev photos: 1/5 right, 0 wrong, with or without                                                      |
 | SUS (≥ 70)                           | [SUS]                                                                                                             |
 | Final test set (3 photos, run once)  | reading: 0 fields right, wrong brand 1/3, wrong ingredients 2/2; matching with confirmed names 1/2 right, 0 wrong |
@@ -128,7 +128,7 @@ Building them found two things:
 
 ## How to test it
 
-- `pnpm build && pnpm test:e2e` (needs `web/.env.local`): 22 tests, ~15 s.
+- `pnpm build && pnpm test:e2e` (needs `web/.env.local`): 31 tests, ~15 s.
 - Live: Scan → "Demo: blood-pressure strip" → Find; "Demo: strip with a quality alert" → type
   "Omee", tick "It matches my strip" → Find → red alert. About page: refresh dates + results.
 - `python3 docs/sus/sus_score.py docs/sus/responses.csv` once responses exist.
@@ -152,3 +152,63 @@ Building them found two things:
 - _Where do the About page's numbers come from?_ Written by the evaluation scripts; never typed.
 - _What would make the final numbers trustworthy?_ A person-checked label set, a bigger frozen
   test set, one final run.
+
+## UI/UX redesign and dark mode (2026-10-26)
+
+Asked for by the user after the final evaluation; it changes how things look, not what the reader
+or matcher do, so the evaluation numbers are unaffected.
+
+**What changed**
+
+- **One header on every page** (`components/site-header.tsx`): brand, Scan / Search / Kendras /
+  About with the current page marked, language, large text, theme. On phones these move into a
+  menu sheet (Base UI Dialog: focus stays inside, Escape closes it). Switching language now keeps
+  you on the same page. A "skip to main content" link comes first for keyboard users.
+- **One footer** (`site-footer.tsx`): the medical disclaimer first, the privacy line, links, data
+  credits and the Skiper UI credit. The per-page back links and footers are gone.
+- **Theme: light, dark or "same as phone"** (default). `lib/theme.ts` holds the logic (unit-tested)
+  and a tiny script that applies the saved choice before the first paint, so there is no flash.
+  `components/theme-toggle.tsx`: a header menu (Base UI Menu, keyboard-friendly) and a three-way
+  switch in the phone menu. "Same as phone" follows the operating system live.
+- **Design system** (`app/globals.css`, `components/ui/field.tsx`): one accent (the brand teal),
+  cool neutrals, status colours tuned separately for light and dark, input borders with 3:1
+  contrast, soft tinted shadows, one corner-radius rule, shared input, panel and skeleton styles.
+  Noto Sans stays: it is the one family that matches across Latin, Devanagari and Tamil.
+- **Pages:** a new home page (headline and the two main actions next to a real demo strip; the five
+  checks, led by a real price example from our data: Telmikind 40 at ₹3.86 a tablet vs ₹1.24 for
+  the Jan Aushadhi equivalent; ways to start). Scan has a progress bar for the three photos and a
+  checklist while reading; results show skeletons while loading; the result card uses status chips
+  and gives a government alert a tinted band with a red edge; About has a sticky contents list.
+
+**Skiper UI** (https://skiper-ui.com, free tier; its licence asks for the footer credit): the
+sun/moon icon (skiper04), the circle reveal when switching theme (skiper26, here with our own small
+theme store instead of next-themes), the rolling savings number (skiper37, Number Flow) and the
+external-link style (skiper40). Not used: the letter-by-letter text animations, because splitting
+text into single characters breaks Hindi and Tamil letters, which are built from several
+characters. New dependencies: `framer-motion` 14.1.0, `@number-flow/react` 0.6.2.
+
+**Decisions, in plain words**
+
+- **Motion is small and has a reason:** the theme reveal shows what changed, the rolling number
+  shows the saving update as you type, panels fade in once. Everything is off with "reduce motion".
+  The result card does not fade, because it refreshes on every keystroke in the batch box and would
+  flicker.
+- **No em-dashes in the interface text** and plain " | DawaCheck" in page titles.
+- **Buttons may wrap to two lines** (still at least 48 px tall): a Tamil label that cannot wrap made
+  the page wider than a 320 px phone.
+
+**How it was checked**
+
+- Playwright now runs axe in dark mode too (5 pages, the result card with a red alert, the Kendra
+  list) and tests the theme menu (dark survives a reload; "same as phone" follows the system) and
+  the language switch. 31 tests, 3 runs in a row green. The axe helper waits for entrance
+  animations to finish, or it measures half-faded text.
+- A responsive sweep: every page in all 3 languages, 8 widths from 320 to 1920 px, both themes
+  (240 views): no sideways scrolling, no tap target under 44 px.
+- Lighthouse accessibility, re-run after the redesign: 100 on /en, /en/scan, /en/search,
+  /en/kendras, /en/about, /hi/about, /ta.
+- Found while checking: Turbopack's build cache once served the old stylesheet; delete `web/.next`
+  before `pnpm build` when checking CSS.
+
+**Limitations:** the new Hindi and Tamil texts were written by Claude and need a native speaker's
+review, like the rest; Lighthouse was run on a laptop, not a phone.

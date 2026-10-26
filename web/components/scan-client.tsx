@@ -2,10 +2,21 @@
 
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Camera, ChevronDown, ImageUp, Loader2, Lock, RotateCcw, Search } from "lucide-react";
+import {
+  Camera,
+  Check,
+  ChevronDown,
+  ImageUp,
+  Loader2,
+  Lock,
+  RotateCcw,
+  Search,
+  Sparkles,
+} from "lucide-react";
 import { BrandButton, BrandResult, fill, Notice } from "@/components/generic-result";
 import { ResultCard, type ResultCardInput } from "@/components/result-card";
 import { Button, buttonVariants } from "@/components/ui/button";
+import { inputClass, panelClass } from "@/components/ui/field";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { extractIngredients, type ExtractedFields, type Ingredient } from "@/lib/ai/extract";
 import { brandGuesses, type FieldKey } from "@/lib/ai/merge";
@@ -73,15 +84,17 @@ function PhotoPicker({
         <img
           src={preview}
           alt=""
-          className="max-h-72 w-full rounded-xl border border-border object-contain"
+          className="max-h-80 w-full rounded-2xl border border-border bg-muted object-contain shadow-soft"
         />
       ) : (
         // A strip-shaped guide frame, so people know what to fill the photo with.
         <div
           aria-hidden="true"
-          className="flex aspect-[16/9] w-full items-center justify-center rounded-xl border-4 border-dashed border-primary/50 bg-muted/40"
+          className="flex aspect-[16/9] w-full items-center justify-center rounded-2xl border-2 border-dashed border-primary/50 bg-accent/40"
         >
-          <Camera className="size-12 text-primary/60" />
+          <span className="flex size-16 items-center justify-center rounded-2xl bg-card text-primary shadow-soft">
+            <Camera className="size-8" />
+          </span>
         </div>
       )}
       <input
@@ -93,12 +106,12 @@ function PhotoPicker({
         onChange={pick}
       />
       <input ref={gallery} type="file" accept="image/*" hidden onChange={pick} />
-      <div className="flex flex-wrap gap-2">
-        <Button onClick={() => camera.current?.click()}>
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <Button size="xl" onClick={() => camera.current?.click()}>
           <Camera aria-hidden="true" />
           {photo ? t.retake : t.takePhoto}
         </Button>
-        <Button variant="outline" onClick={() => gallery.current?.click()}>
+        <Button size="xl" variant="outline" onClick={() => gallery.current?.click()}>
           <ImageUp aria-hidden="true" />
           {t.choosePhoto}
         </Button>
@@ -126,9 +139,17 @@ export function ScanClient({
   const [back, setBack] = useState<Blob | null>(null);
   const [stamp, setStamp] = useState<Blob | null>(null);
 
+  // The reading screen is much shorter than the photo screens: bring its top into view, or a phone
+  // left scrolled down would show only the footer.
+  const top = useRef<HTMLDivElement>(null);
+  const startReading = () => {
+    setStep({ name: "reading", stage: "loading-model" });
+    requestAnimationFrame(() => top.current?.scrollIntoView({ block: "start" }));
+  };
+
   async function read(stampPhoto: Blob | null) {
     if (!front) return;
-    setStep({ name: "reading", stage: "loading-model" });
+    startReading();
     try {
       // Loaded only now, so people who never scan don't download the OCR code.
       const { readStrip } = await import("@/lib/ai/ocr");
@@ -149,7 +170,7 @@ export function ScanClient({
   // exam hall. Two strips: a blood-pressure medicine with a cheaper generic, and a strip whose
   // batch is in a real CDSCO quality alert.
   async function readDemo(name: "telmikind" | "omee") {
-    setStep({ name: "reading", stage: "loading-model" });
+    startReading();
     try {
       const [demoFront, demoBack] = await Promise.all(
         [`/demo/${name}-front.jpg`, `/demo/${name}-back.jpg`].map((url) =>
@@ -175,11 +196,15 @@ export function ScanClient({
   }
 
   const tips = (
-    <details className="rounded-xl bg-muted/50 p-3 text-base">
-      <summary className="min-h-12 cursor-pointer content-center font-semibold">
+    <details className="group rounded-2xl bg-muted px-4 text-base">
+      <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2 font-semibold [&::-webkit-details-marker]:hidden">
+        <ChevronDown
+          aria-hidden="true"
+          className="size-5 transition-transform group-open:rotate-180 motion-reduce:transition-none"
+        />
         {t.tipsTitle}
       </summary>
-      <ul className="list-inside list-disc pt-1">
+      <ul className="flex list-disc flex-col gap-1 pb-4 pl-7">
         <li>{t.tip1}</li>
         <li>{t.tip2}</li>
         <li>{t.tip3}</li>
@@ -199,12 +224,28 @@ export function ScanClient({
       back: { title: t.stepBack, hint: t.backHint, photo: back, setPhoto: setBack },
       stamp: { title: t.stepStamp, hint: t.stampHint, photo: stamp, setPhoto: setStamp },
     }[step.name];
+    const stepIndex = { front: 0, back: 1, stamp: 2 }[step.name];
     return (
-      <div className="flex flex-col gap-4">
-        <h2 ref={screenHeading} tabIndex={-1} className="text-xl font-semibold outline-none">
-          {page.title}
-        </h2>
-        <p className="text-base">{page.hint}</p>
+      <div className="flex flex-col gap-5">
+        {/* Progress through the three photos. The heading says "Step 1 of 3" in words. */}
+        <div aria-hidden="true" className="grid grid-cols-3 gap-2">
+          {[0, 1, 2].map((i) => (
+            <span
+              key={i}
+              className={`h-1.5 rounded-full transition-colors motion-reduce:transition-none ${i <= stepIndex ? "bg-primary" : "bg-border"}`}
+            />
+          ))}
+        </div>
+        <div className="flex flex-col gap-1">
+          <h2
+            ref={screenHeading}
+            tabIndex={-1}
+            className="text-2xl font-bold tracking-tight outline-none"
+          >
+            {page.title}
+          </h2>
+          <p className="text-base text-muted-foreground">{page.hint}</p>
+        </div>
         <PhotoPicker t={t} photo={page.photo} onPhoto={page.setPhoto} />
         <div className="flex flex-wrap gap-2">
           {step.name === "front" && (
@@ -236,8 +277,12 @@ export function ScanClient({
         {tips}
         {privacy}
         {step.name === "front" && (
-          <div className="flex flex-col gap-1 rounded-xl border border-dashed border-border p-3">
-            <div className="flex flex-wrap gap-2">
+          <div className="flex flex-col gap-3 rounded-2xl border border-dashed border-input p-4">
+            <p className="flex items-center gap-2 text-base font-semibold">
+              <Sparkles aria-hidden="true" className="size-5 text-primary" />
+              {t.demoTitle}
+            </p>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <Button variant="outline" onClick={() => readDemo("telmikind")}>
                 {t.demoBp}
               </Button>
@@ -260,11 +305,40 @@ export function ScanClient({
       "reading-more": t.readingMore,
       done: t.reading,
     }[step.stage];
+    // The four stages as a checklist, so a slow phone shows it is still working.
+    const stages: Stage[] = ["loading-model", "preparing", "reading", "reading-more"];
+    const at = stages.indexOf(step.stage === "done" ? "reading-more" : step.stage);
+    const stageLabel = {
+      "loading-model": t.loadingModel,
+      preparing: t.preparing,
+      reading: t.reading,
+      "reading-more": t.readingMore,
+    } as Record<string, string>;
     return (
-      <p role="status" className="flex items-center gap-3 text-lg">
-        <Loader2 aria-hidden="true" className="size-6 animate-spin" />
-        {label}
-      </p>
+      <div ref={top} className={panelClass("flex scroll-mt-24 flex-col gap-4 p-6")}>
+        <p role="status" className="flex items-center gap-3 text-xl font-semibold">
+          <Loader2
+            aria-hidden="true"
+            className="size-6 animate-spin text-primary motion-reduce:animate-none"
+          />
+          {label}
+        </p>
+        <ol aria-hidden="true" className="flex flex-col gap-2">
+          {stages.map((stage, i) => (
+            <li
+              key={stage}
+              className={`flex items-center gap-3 text-base ${i <= at ? "text-foreground" : "text-muted-foreground"}`}
+            >
+              <span
+                className={`flex size-6 items-center justify-center rounded-full border ${i < at ? "border-primary bg-primary text-primary-foreground" : i === at ? "border-primary" : "border-border"}`}
+              >
+                {i < at && <Check className="size-4" />}
+              </span>
+              {stageLabel[stage]}
+            </li>
+          ))}
+        </ol>
+      </div>
     );
   }
 
@@ -274,7 +348,7 @@ export function ScanClient({
         <h2
           ref={screenHeading}
           tabIndex={-1}
-          className="rounded-xl border-2 border-status-warn p-4 text-base font-normal outline-none"
+          className="rounded-2xl border-2 border-status-warn bg-card p-4 text-base font-normal outline-none"
         >
           {t.error}
         </h2>
@@ -429,13 +503,17 @@ function Confirm({
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <h2 ref={confirmHeading} tabIndex={-1} className="text-xl font-semibold outline-none">
+        <h2
+          ref={confirmHeading}
+          tabIndex={-1}
+          className="text-2xl font-bold tracking-tight outline-none"
+        >
           {t.confirmTitle}
         </h2>
-        <p className="text-base">{t.confirmIntro}</p>
+        <p className="text-base text-muted-foreground">{t.confirmIntro}</p>
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className={panelClass("grid grid-cols-1 gap-5 p-5 sm:grid-cols-2 sm:p-6")}>
         {rows.map(({ key, label, multiline, placeholder }) => (
           <ConfirmField
             key={key}
@@ -465,8 +543,9 @@ function Confirm({
         ))}
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row">
         <Button
+          size="xl"
           onClick={findMedicine}
           disabled={
             !(values.brand.trim() || (nameAsRead && guesses.length)) || match.step === "matching"
@@ -475,7 +554,7 @@ function Confirm({
           <Search aria-hidden="true" />
           {t.lookUp}
         </Button>
-        <Button variant="outline" onClick={onStartOver}>
+        <Button size="xl" variant="outline" onClick={onStartOver}>
           <RotateCcw aria-hidden="true" />
           {t.startOver}
         </Button>
@@ -508,12 +587,15 @@ function Confirm({
       </div>
 
       {/* Explainability: what the reader saw and which image version each field came from. */}
-      <details className="rounded-xl border border-border p-3 text-base">
-        <summary className="flex min-h-12 cursor-pointer items-center gap-2 font-semibold">
-          <ChevronDown aria-hidden="true" className="size-5" />
+      <details className={panelClass("group px-5 text-base")}>
+        <summary className="flex min-h-14 cursor-pointer list-none items-center gap-2 font-semibold [&::-webkit-details-marker]:hidden">
+          <ChevronDown
+            aria-hidden="true"
+            className="size-5 transition-transform group-open:rotate-180 motion-reduce:transition-none"
+          />
           {t.howWeRead}
         </summary>
-        <div className="flex flex-col gap-2 pt-2">
+        <div className="flex flex-col gap-2 pb-5">
           <p>{t.readIn.replace("{seconds}", (reading.millis / 1000).toFixed(1))}</p>
           {(["front", "back"] as const).map((side) => {
             const deg = reading.skew[side];
@@ -530,14 +612,14 @@ function Confirm({
               const source = reading.source[key];
               return (
                 <li key={key}>
-                  {label}: {field ? `${Math.round(field.confidence * 100)}%` : "—"}
+                  {label}: {field ? `${Math.round(field.confidence * 100)}%` : "-"}
                   {source && ` · ${t.variantUsed}: ${source.front} / ${source.back}`}
                 </li>
               );
             })}
           </ul>
           <p className="font-medium">{t.rawText}</p>
-          <pre className="max-h-64 overflow-auto rounded-lg bg-muted p-2 text-sm whitespace-pre-wrap">
+          <pre className="max-h-64 overflow-auto rounded-xl bg-muted p-3 font-mono text-sm whitespace-pre-wrap">
             {best
               .map((r) => `[${r.variant}, ${Math.round(r.confidence)}%]\n${r.text}`)
               .join("\n\n")}
@@ -591,9 +673,9 @@ function MatchResult({
     const auto = response.status === "match" && response.brand.id === chosen.id;
     return (
       <section className="flex flex-col gap-4">
-        <div className="flex flex-col gap-2 rounded-xl border border-border p-4">
-          <p className="text-base">{auto ? t.matchedTitle : t.youChose}</p>
-          <p className="text-xl font-semibold">{chosen.name}</p>
+        <div className="flex flex-col gap-2 rounded-2xl border-2 border-primary/50 bg-card p-5 shadow-soft motion-safe:animate-in motion-safe:fade-in">
+          <p className="text-base text-muted-foreground">{auto ? t.matchedTitle : t.youChose}</p>
+          <p className="text-2xl font-bold tracking-tight">{chosen.name}</p>
           {chosen.manufacturer && <p className="text-base">{chosen.manufacturer}</p>}
           {auto && (
             <p className="text-base">
@@ -637,7 +719,7 @@ function MatchResult({
       {response.status === "abstain" && <Notice kind="unknown">{message}</Notice>}
       {response.options.length > 0 && (
         <>
-          <h3 className="text-lg font-semibold">{t.pickFromThese}</h3>
+          <h3 className="text-xl font-semibold">{t.pickFromThese}</h3>
           <ul className="flex flex-col gap-2">
             {response.options.map((o: ScanOption) => (
               <li key={o.brand.id}>
@@ -670,9 +752,12 @@ function Evidence({ t, features }: { t: T; features: Features }) {
     [t.evMaker, features.maker > 0 ? t.evAgrees : t.evUnknown],
   ];
   return (
-    <details className="text-base">
-      <summary className="flex min-h-12 cursor-pointer items-center gap-2 font-semibold">
-        <ChevronDown aria-hidden="true" className="size-5" />
+    <details className="group text-base">
+      <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2 font-semibold [&::-webkit-details-marker]:hidden">
+        <ChevronDown
+          aria-hidden="true"
+          className="size-5 transition-transform group-open:rotate-180 motion-reduce:transition-none"
+        />
         {t.evidenceTitle}
       </summary>
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 pt-1">
@@ -703,16 +788,14 @@ function ConfirmField(props: {
   const hintId = useId();
   const unsure = props.confidence === null || props.confidence < CHECK_BELOW;
   const missing = props.confidence === null;
-  const className = `w-full rounded-lg border-2 bg-background px-3 py-2 text-lg focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none ${
-    unsure ? "border-status-warn" : "border-input"
-  }`;
+  const className = inputClass({ warn: unsure });
   return (
-    <div className="flex flex-col gap-1">
-      <label htmlFor={id} className="flex items-center gap-2 text-base font-semibold">
+    <div className={`flex flex-col gap-1.5 ${props.multiline ? "sm:col-span-2" : ""}`}>
+      <label htmlFor={id} className="flex flex-wrap items-center gap-2 text-base font-semibold">
         {props.label}
         {unsure && (
           // Never colour alone: the amber border always comes with these words.
-          <span className="rounded-full bg-status-warn/15 px-2 py-0.5 text-sm font-medium text-foreground">
+          <span className="rounded-full border border-status-warn/50 bg-status-warn/15 px-2.5 py-0.5 text-sm font-medium text-foreground">
             {props.t.lowConfidence}
           </span>
         )}
@@ -734,7 +817,7 @@ function ConfirmField(props: {
           placeholder={props.placeholder}
           aria-describedby={missing ? hintId : undefined}
           onChange={(e) => props.onChange(e.target.value)}
-          className={`${className} min-h-12`}
+          className={className}
         />
       )}
       {missing && (

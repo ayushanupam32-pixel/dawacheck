@@ -1,7 +1,7 @@
 # DawaCheck progress
 
-Last updated: 2026-10-26 (M7 built and in CI; report drafted in `docs/report.md`; SUS study, phone
-timing and finishing the report wait for the user).
+Last updated: 2026-10-26 (UI/UX redesign and dark mode done; report drafted in `docs/report.md`; SUS
+study, phone timing and finishing the report wait for the user).
 
 ## Where we are
 
@@ -445,6 +445,17 @@ shows the test-set reading table).
   `[CITE]` (out-of-pocket spending source, 2–3 medicine-label OCR papers), `[VERIFY]` (the
   other apps in section 2, PMBJP dates). Figures 2–7 still to insert (frames from `demo.gif`,
   a preprocessing figure). The student must rewrite it in their own words.
+
+### UI/UX redesign and dark mode (2026-10-26)
+
+Done and verified (details: `docs/milestones/M7-evaluation-polish.md`, last section). One header
+and footer on every page, light / dark / "same as phone" theme with no flash, a design system
+(tokens, shared fields, panels, skeletons, one radius rule), new home page, restyled scan, search,
+Kendras and About; Skiper UI pieces (skiper04, 26, 37, 40) credited in the footer. New deps:
+`framer-motion` 14.1.0, `@number-flow/react` 0.6.2. Checks: 409 Vitest, 31 Playwright (axe in light
+and dark, theme tests; 3 green runs), 197 pytest, lint, types, format; responsive sweep of 240
+views clean; Lighthouse accessibility 100 on 7 pages after the redesign. Delete `web/.next` before
+building when checking CSS (stale Turbopack cache seen once).
 
 ## Exact next steps
 

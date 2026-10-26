@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
-import { Loader2, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { BrandButton, BrandResult, Notice } from "@/components/generic-result";
 import { ResultCard } from "@/components/result-card";
 import { Button } from "@/components/ui/button";
+import { inputClass, panelClass, Skeleton } from "@/components/ui/field";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { BrandCandidate, SearchResponse } from "@/lib/match";
 
@@ -74,24 +75,34 @@ export function SearchClient({
 
   return (
     <div className="flex flex-col gap-6">
-      <form onSubmit={search} className="flex flex-col gap-2" role="search">
+      <form
+        onSubmit={search}
+        className={panelClass("flex flex-col gap-3 p-5 sm:p-6")}
+        role="search"
+      >
         <label htmlFor={inputId} className="text-lg font-semibold">
           {t.label}
         </label>
-        <div className="flex gap-2">
-          <input
-            id={inputId}
-            aria-describedby={hintId}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            autoComplete="off"
-            autoCapitalize="words"
-            enterKeyHint="search"
-            minLength={3}
-            maxLength={60}
-            className="min-h-12 min-w-0 flex-1 rounded-lg border border-input bg-background px-3 text-lg focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
-          />
-          <Button type="submit" disabled={query.trim().length < 3}>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="relative min-w-0 flex-1">
+            <Search
+              aria-hidden="true"
+              className="pointer-events-none absolute top-1/2 left-3.5 size-5 -translate-y-1/2 text-muted-foreground"
+            />
+            <input
+              id={inputId}
+              aria-describedby={hintId}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              autoComplete="off"
+              autoCapitalize="words"
+              enterKeyHint="search"
+              minLength={3}
+              maxLength={60}
+              className={inputClass({ className: "h-14 pl-11 text-xl" })}
+            />
+          </div>
+          <Button type="submit" size="xl" disabled={query.trim().length < 3}>
             <Search aria-hidden="true" />
             {t.submit}
           </Button>
@@ -104,18 +115,23 @@ export function SearchClient({
       {/* Screen readers announce every change in this region. */}
       <div aria-live="polite" className="flex flex-col gap-4">
         {state.step === "searching" && (
-          <p className="flex items-center gap-2 text-base">
-            <Loader2 aria-hidden="true" className="size-5 animate-spin" />
-            {t.searching}
-          </p>
+          <div role="status" className="flex flex-col gap-2">
+            <span className="sr-only">{t.searching}</span>
+            {[0, 1, 2].map((i) => (
+              <div key={i} className={panelClass("flex flex-col gap-2 p-4")}>
+                <Skeleton className="h-6 w-1/2" />
+                <Skeleton className="h-4 w-1/3" />
+              </div>
+            ))}
+          </div>
         )}
 
         {state.step === "no_match" && <Notice kind="unknown">{t.noMatch}</Notice>}
         {state.step === "error" && <Notice kind="unknown">{t.error}</Notice>}
 
         {state.step === "candidates" && (
-          <section className="flex flex-col gap-3">
-            <h2 className="text-xl font-semibold">{t.pickOne}</h2>
+          <section className="flex flex-col gap-3 motion-safe:animate-in motion-safe:fade-in">
+            <h2 className="text-2xl font-bold tracking-tight">{t.pickOne}</h2>
             <ul className="flex flex-col gap-2">
               {state.candidates.map((c) => (
                 <li key={c.id}>
@@ -170,8 +186,6 @@ function TypedChecks({
   const [count, setCount] = useState("");
   const [mfg, setMfg] = useState("");
   const ids = { batch: useId(), mrp: useId(), count: useId(), mfg: useId() };
-  const field =
-    "min-h-12 w-full rounded-lg border border-input bg-background px-3 text-lg focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none";
   const mfgDate = /^(\d{2})\/(\d{4})$/.test(mfg.trim())
     ? mfg.trim().replace(/^(\d{2})\/(\d{4})$/, "$2-$1")
     : null;
@@ -184,8 +198,8 @@ function TypedChecks({
   ];
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3 rounded-xl border border-border p-4">
-        <h2 className="text-xl font-semibold">{t.stripTitle}</h2>
+      <div className={panelClass("flex flex-col gap-3 p-5")}>
+        <h2 className="text-2xl font-bold tracking-tight">{t.stripTitle}</h2>
         <p className="text-base">{t.stripHint}</p>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {inputs.map(([key, label, value, set, mode]) => (
@@ -200,7 +214,7 @@ function TypedChecks({
                 placeholder={key === "mfg" ? "MM/YYYY" : undefined}
                 autoComplete="off"
                 onChange={(e) => set(e.target.value)}
-                className={field}
+                className={inputClass({ className: "tabular" })}
               />
             </div>
           ))}

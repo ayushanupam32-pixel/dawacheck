@@ -12,3 +12,5 @@ pipeline/clean
 web/public/data
 web/lib/ai/salt-rules.json
 web/tests/fixtures/banned-fdcs.json
+web/test-results
+web/playwright-report

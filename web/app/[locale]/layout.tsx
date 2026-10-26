@@ -1,7 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { Noto_Sans, Noto_Sans_Devanagari, Noto_Sans_Tamil } from "next/font/google";
+import { SiteFooter } from "@/components/site-footer";
+import { SiteHeader } from "@/components/site-header";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { themeScript } from "@/lib/theme";
 import { isLocale, locales } from "@/lib/i18n/config";
 import "../globals.css";
 
@@ -29,7 +32,11 @@ export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Pr
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0f6b5c",
+  // The browser's toolbar colour follows the theme (the page background in each).
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f7fafa" },
+    { media: "(prefers-color-scheme: dark)", color: "#111a1d" },
+  ],
 };
 
 // Applies the saved "large text" preference before the first paint, so the page
@@ -39,6 +46,8 @@ const largeTextScript = `try{if(localStorage.getItem("dc-large-text")==="1")docu
 export default async function LocaleLayout({ children, params }: LayoutProps<"/[locale]">) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
+  const dict = await getDictionary(locale);
+  const common = dict.common;
 
   return (
     <html
@@ -48,8 +57,39 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: largeTextScript }} />
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {/* First thing a keyboard user reaches: jump past the header to the page's content. */}
+        <a
+          href="#main"
+          className="sr-only z-50 rounded-lg bg-primary px-4 py-3 font-semibold text-primary-foreground focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
+        >
+          {common.skipToContent}
+        </a>
+        <SiteHeader
+          locale={locale}
+          t={{
+            mainNav: common.mainNav,
+            home: common.home,
+            navScan: common.navScan,
+            navSearch: common.navSearch,
+            navKendras: common.navKendras,
+            navAbout: common.navAbout,
+            menu: common.menu,
+            closeMenu: common.closeMenu,
+            settings: common.settings,
+            language: common.language,
+            largeText: common.largeText,
+            theme: common.theme,
+            themeLight: common.themeLight,
+            themeDark: common.themeDark,
+            themeSystem: common.themeSystem,
+          }}
+        />
+        {children}
+        <SiteFooter t={common} privacy={dict.home.privacy} locale={locale} />
+      </body>
     </html>
   );
 }

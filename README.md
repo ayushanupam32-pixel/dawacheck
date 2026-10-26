@@ -26,7 +26,7 @@ project.
 Three ways in: **scan** (front, back and an optional close-up of the batch stamp), **type** a
 brand name, or **Demo mode** (two sample strips, so a demo never depends on the light in the
 room). For a full demo, [demo/](demo) has 18 ready-made strips (front, back, stamp) covering
-every feature, each verified on the live site. Accessible (Lighthouse accessibility 100, large-text switch, 48 px tap targets, never
+every feature, each verified on the live site. Light, dark or "same as phone" theme. Accessible (Lighthouse accessibility 100, large-text switch, 48 px tap targets, never
 colour alone) and in three languages.
 
 ## How it works
@@ -131,8 +131,8 @@ pnpm dev                             # http://localhost:3000
 
 | Command                        | What it does                                                  |
 | ------------------------------ | ------------------------------------------------------------- |
-| `pnpm test`                    | Unit tests (Vitest, 406)                                      |
-| `pnpm build && pnpm test:e2e`  | Playwright end to end, privacy (network log), axe (22 tests)  |
+| `pnpm test`                    | Unit tests (Vitest, 409)                                      |
+| `pnpm build && pnpm test:e2e`  | Playwright end to end, privacy, theme, axe light + dark (31)  |
 | `pnpm lint` / `pnpm typecheck` | ESLint / TypeScript strict                                    |
 | `pnpm eval`                    | Strip reader on the labelled photos (`-- --final`: test set)  |
 | `pnpm eval:match`              | Matching evaluation (`--fit` refits the weights on dev cases) |
